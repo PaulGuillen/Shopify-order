@@ -1,0 +1,192 @@
+body {
+    font-family: Inter, system-ui, sans-serif;
+}
+
+/* PAGE */
+
+.login-wrapper {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #f5f7fb;
+    padding: 20px;
+
+}
+
+/* HEADER */
+
+.login-header {
+    text-align: center;
+    margin-bottom: 30px;
+
+}
+
+.login-header h1 {
+    font-size: 28px;
+    font-weight: 600;
+
+}
+
+.login-header p {
+    color: #6b7280;
+    margin-top: 4px;
+
+}
+
+/* LOGO */
+
+.logo-box {
+    width: 60px;
+    height: 60px;
+    background: #1e22aa;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 24px;
+    margin: 0 auto 15px auto;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+
+}
+
+/* CARD */
+
+.login-card {
+    width: 100%;
+    max-width: 420px;
+    background: white;
+    padding: 32px;
+    border-radius: 14px;
+    border: 1px solid #e5e7eb;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+
+}
+
+/* FIELD */
+
+.login-field {
+    display: flex;
+    flex-direction: column;
+
+}
+
+.login-field label {
+    font-size: 14px;
+    margin-bottom: 6px;
+
+}
+
+/* PASSWORD HEADER */
+
+.password-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+
+}
+
+.password-header a {
+    color: #1e22aa;
+    text-decoration: none;
+
+}
+
+/* INPUT GROUP */
+
+.input-group {
+    position: relative;
+    display: flex;
+    align-items: center;
+
+}
+
+/* ICON */
+
+.input-icon {
+    position: absolute;
+    left: 12px;
+    color: #9ca3af;
+
+}
+
+/* INPUT */
+
+.input-group input {
+    width: 100%;
+    padding: 12px 12px 12px 36px;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    font-size: 14px;
+    outline: none;
+    transition: 0.2s;
+
+}
+
+.input-group input:focus {
+    border-color: #1e22aa;
+    box-shadow: 0 0 0 3px rgba(30, 34, 170, 0.1);
+}
+
+/* PASSWORD TOGGLE */
+
+.toggle-password {
+    position: absolute;
+    right: 10px;
+    border: none;
+    background: none;
+    cursor: pointer;
+
+}
+
+/* BUTTON */
+
+.login-button {
+    margin-top: 10px;
+    padding: 14px;
+    border: none;
+    border-radius: 10px;
+    background: #1e22aa;
+    color: white;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: 0.2s;
+
+}
+
+.login-button:hover {
+    background: #161a8a;
+    transform: translateY(-1px);
+}
+
+/* FOOTER */
+
+.login-footer {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 10px;
+    font-size: 13px;
+    color: #6b7280;
+
+}
+
+.login-footer a {
+    color: #6b7280;
+    text-decoration: none;
+}
+
+/* MOBILE */
+
+@media (max-width:480px) {
+    .login-card {
+        padding: 24px;
+    }
+
+}

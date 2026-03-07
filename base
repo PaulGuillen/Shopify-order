@@ -1,0 +1,55 @@
+src
+│
+├ api
+│   └ axios.ts
+│
+├ assets
+│
+├ auth
+│   └ AuthGuard.tsx
+│
+├ components
+│   ├ common
+│   │   ├ Loader.tsx
+│   │   └ ErrorMessage.tsx
+│   │
+│   └ ui
+│       ├ Button.tsx
+│       ├ Card.tsx
+│       └ Input.tsx
+│
+├ layouts
+│   ├ Layout.tsx
+│   ├ Header.tsx
+│   └ Sidebar.tsx
+│
+├ hooks
+│   ├ useAuth.ts
+│   └ useOrders.ts
+│
+├ pages
+│   ├ DashboardPage.tsx
+│   ├ OrdersPage.tsx
+│   ├ CustomersPage.tsx
+│   ├ ProductsPage.tsx
+│   └ LoginPage.tsx
+│
+├ router
+│   └ router.tsx
+│
+├ services
+│   ├ ordersService.ts
+│   └ authService.ts
+│
+├ store
+│   └ authStore.ts
+│
+├ styles
+│   ├ globals.css
+│   └ pages
+│        └ loginPage.css
+│
+├ utils
+│   └ formatDate.ts
+│
+└ App.tsx

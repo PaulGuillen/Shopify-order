@@ -1,0 +1,187 @@
+.products-container {
+    padding: 30px;
+}
+
+/* HEADER */
+
+.products-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.products-header h1 {
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.products-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.btn {
+    background: #f3f4f6;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.btn-primary {
+    background: #4338ca;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+/* TABS */
+
+.products-tabs {
+    display: flex;
+    gap: 20px;
+    border-bottom: 1px solid #e5e7eb;
+    margin-bottom: 20px;
+}
+
+.tab {
+    background: none;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    color: #6b7280;
+}
+
+.tab.active {
+    border-bottom: 3px solid #4338ca;
+    color: #111827;
+    font-weight: 600;
+}
+
+/* FILTER */
+
+.products-filter {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.search-input {
+    padding: 8px 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    width: 260px;
+}
+
+.btn-filter {
+    border: 1px solid #e5e7eb;
+    background: white;
+    padding: 8px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+/* TABLE */
+
+.products-table {
+    background: white;
+    border-radius: 10px;
+    border: 1px solid #e5e7eb;
+    overflow: hidden;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+thead {
+    background: #f9fafb;
+}
+
+th,
+td {
+    padding: 14px;
+    text-align: left;
+    border-bottom: 1px solid #f1f1f1;
+}
+
+.product-name {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.product-avatar {
+    width: 36px;
+    height: 36px;
+    background: #f3f4f6;
+    border-radius: 6px;
+}
+
+/* STATUS */
+
+.estado {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.estado-activo {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.estado-borrador {
+    background: #e5e7eb;
+    color: #374151;
+}
+
+.estado-archivado {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.sin-stock {
+    color: #b45309;
+    font-weight: 500;
+}
+
+/* PAGINATION */
+
+.products-pagination {
+    display: flex;
+    justify-content: space-between;
+    padding: 16px;
+    font-size: 14px;
+}
+
+.pagination-buttons button {
+    border: none;
+    background: #f3f4f6;
+    padding: 6px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-left: 6px;
+}
+
+/* WARNING */
+
+.inventory-warning {
+    margin-top: 20px;
+    background: #fef3c7;
+    padding: 14px;
+    border-radius: 8px;
+    color: #92400e;
+    font-size: 14px;
+}
+
+.inventory-warning span {
+    margin-left: 10px;
+    font-weight: 600;
+    cursor: pointer;
+}
