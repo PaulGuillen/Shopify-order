@@ -1,5 +1,5 @@
 import { useState } from "react";
-import "./../styles/pages/loginpage.css";
+import "./../styles/pages/loginPage.css";
 import { useNavigate } from "react-router-dom";
 
 export default function LoginPage() {
