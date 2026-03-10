@@ -1,6 +1,6 @@
 import { useState } from "react";
 import CredentialsModal from "../components/common/CredentialsModal";
-import "../styles/loginPage.css";
+import "../styles/pages/loginPage.css";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
