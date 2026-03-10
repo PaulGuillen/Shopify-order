@@ -1,38 +1,43 @@
 import { useEffect, useState } from "react";
 import CredentialsModal from "../components/common/CredentialsModal";
 import "../styles/pages/loginPage.css";
+import { useNavigate } from "react-router-dom";
 
 export default function LoginPage() {
+  const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showModal, setShowModal] = useState(false);
 
-  /* DETECTAR REDIRECT */
-
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
 
-    if (params.get("demo") === "true") {
+    const urlEmail = params.get("email");
+    const urlPassword = params.get("password");
+    const shop = params.get("shop");
+
+    if (urlEmail) setEmail(urlEmail);
+    if (urlPassword) setPassword(urlPassword);
+
+    /* MOSTRAR MODAL SOLO SI VIENE DEL REDIRECT */
+
+    if (shop || urlEmail || urlPassword) {
       setShowModal(true);
     }
   }, []);
 
-  /* LOGIN DESDE MODAL */
-
   const handleModalLogin = (email: string, password: string) => {
     setEmail(email);
     setPassword(password);
-
     setShowModal(false);
+    navigate("/dashboard");
   };
-
-  /* LOGIN NORMAL */
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
+    navigate("/dashboard");
     console.log("Login:", email, password);
   };
 
@@ -45,8 +50,6 @@ export default function LoginPage() {
         />
       )}
 
-      {/* HEADER */}
-
       <div className="login-header">
         <div className="logo-box">⌘</div>
 
@@ -54,8 +57,6 @@ export default function LoginPage() {
 
         <p>Inicia sesión para administrar tu tienda</p>
       </div>
-
-      {/* CARD */}
 
       <form className="login-card" onSubmit={handleSubmit}>
         {/* EMAIL */}
@@ -102,11 +103,7 @@ export default function LoginPage() {
           </div>
         </div>
 
-        {/* BUTTON */}
-
         <button className="login-button">Iniciar sesión →</button>
-
-        {/* FOOTER */}
 
         <div className="login-footer">
           <a href="#">Política de Privacidad</a>
