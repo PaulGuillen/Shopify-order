@@ -28,7 +28,7 @@ export default function LoginPage() {
       );
 
       /* limpiar la URL para que no quede visible la contraseña */
-      window.history.replaceState({}, document.title, "/");
+      window.history.replaceState({}, document.title, "/Shopify-order/");
     }
   }, []);
 
