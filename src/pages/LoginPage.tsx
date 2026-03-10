@@ -25,6 +25,8 @@ export default function LoginPage() {
     const urlPassword = params.get("password");
     const urlShop = params.get("shop");
 
+    console.log("URL Params:", { urlEmail, urlPassword, urlShop });
+
     if (urlEmail) setEmail(urlEmail);
     if (urlPassword) setPassword(urlPassword);
     if (urlShop) setShop(urlShop);

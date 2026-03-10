@@ -14,6 +14,7 @@ export default function CredentialsModal({
   onLogin,
   onClose,
 }: Props) {
+
   const [showPassword, setShowPassword] = useState(false);
 
   const copy = (text: string) => {
@@ -23,6 +24,7 @@ export default function CredentialsModal({
   return (
     <div className="modal-overlay">
       <div className="modal-container">
+
         <div className="modal-icon">🔒</div>
 
         <h2>Credenciales de Acceso</h2>
@@ -36,16 +38,17 @@ export default function CredentialsModal({
 
         <div className="input-copy">
           <input value={email} readOnly />
-
           <button onClick={() => copy(email)}>📋</button>
         </div>
 
         {/* PASSWORD */}
-
         <label>CONTRASEÑA</label>
 
         <div className="input-copy">
-          <input value={showPassword ? password : "••••••••••"} readOnly />
+          <input
+            value={showPassword ? password : "••••••••"}
+            readOnly
+          />
 
           <button onClick={() => setShowPassword(!showPassword)}>
             {showPassword ? "🙈" : "👁"}
@@ -66,6 +69,7 @@ export default function CredentialsModal({
             Iniciar Sesión
           </button>
         </div>
+
       </div>
     </div>
   );
