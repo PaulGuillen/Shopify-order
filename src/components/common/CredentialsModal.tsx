@@ -25,72 +25,100 @@ export default function CredentialsModal({
     <div className="modal-overlay">
       <div className="modal-container">
 
-        <div className="modal-icon">🔒</div>
+        {/* FORM SIN AUTOCOMPLETE */}
+        <form autoComplete="off">
 
-        <h2>Credenciales de Acceso</h2>
-
-        <p className="modal-subtitle">
-          Utiliza estas credenciales para acceder al entorno de pruebas.
-        </p>
-
-        {/* EMAIL */}
-        <label>USUARIO</label>
-
-        <div className="input-copy">
+          {/* INPUTS FALSOS PARA ENGAÑAR A CHROME */}
           <input
             type="text"
-            value={email}
-            readOnly
-            autoComplete="off"
+            name="fake-user"
+            autoComplete="username"
+            style={{ display: "none" }}
           />
 
-          <button type="button" onClick={() => copy(email)}>
-            📋
-          </button>
-        </div>
-
-        {/* PASSWORD */}
-        <label>CONTRASEÑA</label>
-
-        <div className="input-copy">
           <input
-            type={showPassword ? "text" : "password"}
-            value={password}
-            readOnly
-            autoComplete="new-password"
+            type="password"
+            name="fake-pass"
+            autoComplete="current-password"
+            style={{ display: "none" }}
           />
 
-          <button
-            type="button"
-            onClick={() => setShowPassword(!showPassword)}
-          >
-            {showPassword ? "🙈" : "👁"}
-          </button>
+          <div className="modal-icon">🔒</div>
 
-          <button type="button" onClick={() => copy(password)}>
-            📋
-          </button>
-        </div>
+          <h2>Credenciales de Acceso</h2>
 
-        <div className="modal-buttons">
+          <p className="modal-subtitle">
+            Utiliza estas credenciales para acceder al entorno de pruebas.
+          </p>
 
-          <button
-            className="btn-close"
-            type="button"
-            onClick={onClose}
-          >
-            Cerrar
-          </button>
+          {/* EMAIL */}
+          <label>USUARIO</label>
 
-          <button
-            className="btn-login"
-            type="button"
-            onClick={() => onLogin(email, password)}
-          >
-            Iniciar Sesión
-          </button>
+          <div className="input-copy">
+            <input
+              name="modal-user"
+              type="text"
+              value={email}
+              readOnly
+              autoComplete="off"
+            />
 
-        </div>
+            <button
+              type="button"
+              onClick={() => copy(email)}
+            >
+              📋
+            </button>
+          </div>
+
+          {/* PASSWORD */}
+          <label>CONTRASEÑA</label>
+
+          <div className="input-copy">
+            <input
+              name="modal-pass"
+              type={showPassword ? "text" : "password"}
+              value={password}
+              readOnly
+              autoComplete="new-password"
+            />
+
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              {showPassword ? "🙈" : "👁"}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => copy(password)}
+            >
+              📋
+            </button>
+          </div>
+
+          <div className="modal-buttons">
+
+            <button
+              className="btn-close"
+              type="button"
+              onClick={onClose}
+            >
+              Cerrar
+            </button>
+
+            <button
+              className="btn-login"
+              type="button"
+              onClick={() => onLogin(email, password)}
+            >
+              Iniciar Sesión
+            </button>
+
+          </div>
+
+        </form>
 
       </div>
     </div>
