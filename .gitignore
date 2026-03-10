@@ -1,24 +1,80 @@
-# Logs
-logs
-*.log
+# =========================
+# Node
+# =========================
+node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
-lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-*.local
+# =========================
+# Build
+# =========================
+dist/
+build/
+coverage/
 
-# Editor directories and files
+# =========================
+# Environment variables
+# =========================
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+
+# =========================
+# Vite
+# =========================
+.vite
+vite.config.ts.timestamp*
+
+# =========================
+# Logs
+# =========================
+logs
+*.log
+
+# =========================
+# System files
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# IDE
+# =========================
 .vscode/*
 !.vscode/extensions.json
-.idea
-.DS_Store
+.idea/
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
-*.sw?
+
+# =========================
+# TypeScript
+# =========================
+*.tsbuildinfo
+
+# =========================
+# Testing
+# =========================
+coverage/
+jest-cache/
+
+# =========================
+# Mac / Linux
+# =========================
+*.swp
+*.swo
+*.pid
+*.seed
+*.pid.lock
+
+# =========================
+# Temporary files
+# =========================
+tmp/
+temp/
+.cache/

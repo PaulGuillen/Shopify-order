@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import CredentialsModal from "../components/common/CredentialsModal";
 import "../styles/pages/loginPage.css";
 import { useNavigate } from "react-router-dom";
+import { API_URL } from "../config/api";
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -28,17 +29,46 @@ export default function LoginPage() {
     }
   }, []);
 
-  const handleModalLogin = (email: string, password: string) => {
+  const handleModalLogin = async (email: string, password: string) => {
     setEmail(email);
     setPassword(password);
-    setShowModal(false);
-    navigate("/dashboard");
+    const res = await fetch(`${API_URL}/auth/login`, {
+      method: "POST",
+
+      headers: {
+        "Content-Type": "application/json",
+      },
+
+      body: JSON.stringify({ email, password }),
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      setShowModal(false);
+      navigate("/dashboard");
+    }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    navigate("/dashboard");
-    console.log("Login:", email, password);
+
+    const res = await fetch(`${API_URL}/auth/login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email,
+        password,
+      }),
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      navigate("/dashboard");
+    }
   };
 
   return (

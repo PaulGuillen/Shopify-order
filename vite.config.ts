@@ -3,7 +3,9 @@ import react from "@vitejs/plugin-react";
 
 export default defineConfig(({ mode }) => ({
   plugins: [react()],
-  base: mode === "production" ? "/Shopify-order/" : "/",
+  base: mode === "production"
+    ? process.env.VITE_APP_BASE_URL || "/Shopify-order/"
+    : "/",
   build: {
     sourcemap: false
   }
