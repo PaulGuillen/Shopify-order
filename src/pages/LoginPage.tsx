@@ -45,7 +45,7 @@ export default function LoginPage() {
     setPassword(password);
 
     try {
-      const res = await fetch(`${API_URL}/auth/login`, {
+      const res = await fetch(`http://localhost:4000/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -81,7 +81,7 @@ export default function LoginPage() {
     e.preventDefault();
 
     try {
-      const res = await fetch(`${API_URL}/auth/login`, {
+      const res = await fetch(`http://localhost:4000/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -92,8 +92,16 @@ export default function LoginPage() {
           shop,
         }),
       });
+      const text = await res.text();
 
-      const data = await res.json();
+      let data;
+
+      try {
+        data = JSON.parse(text);
+      } catch {
+        console.error("Respuesta no es JSON:", text);
+        return;
+      }
 
       if (data.success) {
         localStorage.setItem("user", JSON.stringify(data.user));
