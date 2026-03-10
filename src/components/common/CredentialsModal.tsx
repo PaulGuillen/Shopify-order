@@ -2,14 +2,18 @@ import { useState } from "react";
 import "../../styles/components/credentialsModal.css";
 
 interface Props {
+  email: string;
+  password: string;
   onLogin: (email: string, password: string) => void;
   onClose: () => void;
 }
 
-export default function CredentialsModal({ onLogin, onClose }: Props) {
-  const email = "admin@store.com";
-  const password = "admin123";
-
+export default function CredentialsModal({
+  email,
+  password,
+  onLogin,
+  onClose,
+}: Props) {
   const [showPassword, setShowPassword] = useState(false);
 
   const copy = (text: string) => {
@@ -24,19 +28,22 @@ export default function CredentialsModal({ onLogin, onClose }: Props) {
         <h2>Credenciales de Acceso</h2>
 
         <p className="modal-subtitle">
-          Utiliza estas credenciales para acceder al entorno de pruebas de la
-          plataforma.
+          Utiliza estas credenciales para acceder al entorno de pruebas.
         </p>
 
         {/* EMAIL */}
         <label>USUARIO</label>
+
         <div className="input-copy">
           <input value={email} readOnly />
+
           <button onClick={() => copy(email)}>📋</button>
         </div>
 
         {/* PASSWORD */}
+
         <label>CONTRASEÑA</label>
+
         <div className="input-copy">
           <input value={showPassword ? password : "••••••••••"} readOnly />
 
