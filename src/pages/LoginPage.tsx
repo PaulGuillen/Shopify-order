@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./../styles/pages/loginPage.css";
 import { useNavigate } from "react-router-dom";
 
@@ -9,8 +9,37 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
+  /* ==========================
+     LEER PARAMETROS DE LA URL
+  ========================== */
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+
+    const emailParam = params.get("email");
+    const passwordParam = params.get("password");
+
+    if (emailParam && passwordParam) {
+      setEmail(emailParam);
+      setPassword(passwordParam);
+
+      alert(
+        `Cuenta creada correctamente\n\nUsuario: ${emailParam}\nContraseña: ${passwordParam}\n\nPor favor guarde estos datos.`,
+      );
+
+      /* limpiar la URL para que no quede visible la contraseña */
+      window.history.replaceState({}, document.title, "/");
+    }
+  }, []);
+
+  /* ==========================
+     LOGIN
+  ========================== */
+
   const handleLogin = () => {
-    console.log(email, password);
+    console.log("Usuario:", email);
+    console.log("Password:", password);
+
     navigate("/dashboard");
   };
 
@@ -21,9 +50,9 @@ export default function LoginPage() {
       <div className="login-header">
         <div className="logo-box">⌘</div>
 
-        <h1>Admin Panel</h1>
+        <h1>Panel Administrativo</h1>
 
-        <p>Sign in to manage your store</p>
+        <p>Inicia sesión para administrar tu tienda</p>
       </div>
 
       {/* CARD */}
@@ -32,14 +61,14 @@ export default function LoginPage() {
         {/* EMAIL */}
 
         <div className="login-field">
-          <label>Email</label>
+          <label>Correo</label>
 
           <div className="input-group">
             <span className="input-icon">✉</span>
 
             <input
               type="email"
-              placeholder="admin@example.com"
+              placeholder="admin@tienda.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
@@ -50,9 +79,9 @@ export default function LoginPage() {
 
         <div className="login-field">
           <div className="password-header">
-            <label>Password</label>
+            <label>Contraseña</label>
 
-            <a href="#">Forgot password?</a>
+            <a href="#">¿Olvidaste tu contraseña?</a>
           </div>
 
           <div className="input-group">
@@ -66,6 +95,7 @@ export default function LoginPage() {
             />
 
             <button
+              type="button"
               className="toggle-password"
               onClick={() => setShowPassword(!showPassword)}
             >
@@ -77,21 +107,21 @@ export default function LoginPage() {
         {/* BUTTON */}
 
         <button className="login-button" onClick={handleLogin}>
-          Sign in →
+          Iniciar sesión →
         </button>
 
         {/* FOOTER */}
 
         <div className="login-footer">
-          <a href="#">Privacy Policy</a>
+          <a href="#">Política de Privacidad</a>
 
           <span>•</span>
 
-          <a href="#">Terms</a>
+          <a href="#">Términos</a>
 
           <span>•</span>
 
-          <a href="#">Help</a>
+          <a href="#">Ayuda</a>
         </div>
       </div>
     </div>
