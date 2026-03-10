@@ -4,6 +4,15 @@ import "../styles/pages/loginPage.css";
 import { useNavigate } from "react-router-dom";
 import { API_URL } from "../config/api";
 
+/* =====================================
+   EXTRAER SHOP DESDE EMAIL
+===================================== */
+
+const extractShopFromEmail = (email: string) => {
+  const parts = email.split("@");
+  return parts.length > 1 ? parts[1] : null;
+};
+
 export default function LoginPage() {
   const navigate = useNavigate();
 
@@ -23,17 +32,23 @@ export default function LoginPage() {
 
     const urlEmail = params.get("email");
     const urlPassword = params.get("password");
-    const urlShop = params.get("shop");
 
-    console.log("URL Params:", { urlEmail, urlPassword, urlShop });
+    console.log("URL Params:", { urlEmail, urlPassword });
 
-    if (urlEmail) setEmail(urlEmail);
-    if (urlPassword) setPassword(urlPassword);
-    if (urlShop) setShop(urlShop);
+    if (urlEmail) {
+      setEmail(urlEmail);
+
+      const shopFromEmail = extractShopFromEmail(urlEmail);
+      setShop(shopFromEmail);
+    }
+
+    if (urlPassword) {
+      setPassword(urlPassword);
+    }
 
     /* MOSTRAR MODAL SI VIENE DESDE SHOPIFY */
 
-    if (urlEmail || urlPassword || urlShop) {
+    if (urlEmail || urlPassword) {
       setShowModal(true);
     }
   }, []);
@@ -43,8 +58,11 @@ export default function LoginPage() {
   =============================== */
 
   const handleModalLogin = async (email: string, password: string) => {
+    const shopFromEmail = extractShopFromEmail(email);
+
     setEmail(email);
     setPassword(password);
+    setShop(shopFromEmail);
 
     try {
       const res = await fetch(`${API_URL}/auth/login`, {
@@ -55,7 +73,7 @@ export default function LoginPage() {
         body: JSON.stringify({
           email,
           password,
-          shop,
+          shop: shopFromEmail,
         }),
       });
 
@@ -82,6 +100,8 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    const shopFromEmail = extractShopFromEmail(email);
+
     try {
       const res = await fetch(`${API_URL}/auth/login`, {
         method: "POST",
@@ -91,19 +111,20 @@ export default function LoginPage() {
         body: JSON.stringify({
           email,
           password,
-          shop,
+          shop: shopFromEmail,
         }),
       });
-     const text = await res.text();
 
-let data;
+      const text = await res.text();
 
-try {
-  data = JSON.parse(text);
-} catch {
-  console.error("Respuesta no es JSON:", text);
-  return;
-}
+      let data;
+
+      try {
+        data = JSON.parse(text);
+      } catch {
+        console.error("Respuesta no es JSON:", text);
+        return;
+      }
 
       if (data.success) {
         localStorage.setItem("user", JSON.stringify(data.user));
@@ -142,7 +163,7 @@ try {
 
       {/* LOGIN FORM */}
 
-      <form className="login-card" onSubmit={handleSubmit}>
+      <form className="login-card" onSubmit={handleSubmit} autoComplete="off">
         {/* EMAIL */}
 
         <div className="login-field">
@@ -155,7 +176,15 @@ try {
               type="email"
               placeholder="correo@empresa.com"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              autoComplete="off"
+              onChange={(e) => {
+                const value = e.target.value;
+
+                setEmail(value);
+
+                const shopFromEmail = extractShopFromEmail(value);
+                setShop(shopFromEmail);
+              }}
               required
             />
           </div>
@@ -177,6 +206,7 @@ try {
               type={showPassword ? "text" : "password"}
               placeholder="Ingresa tu contraseña"
               value={password}
+              autoComplete="new-password"
               onChange={(e) => setPassword(e.target.value)}
               required
             />
