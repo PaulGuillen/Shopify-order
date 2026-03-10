@@ -37,8 +37,16 @@ export default function CredentialsModal({
         <label>USUARIO</label>
 
         <div className="input-copy">
-          <input value={email} readOnly />
-          <button onClick={() => copy(email)}>📋</button>
+          <input
+            type="text"
+            value={email}
+            readOnly
+            autoComplete="off"
+          />
+
+          <button type="button" onClick={() => copy(email)}>
+            📋
+          </button>
         </div>
 
         {/* PASSWORD */}
@@ -46,28 +54,42 @@ export default function CredentialsModal({
 
         <div className="input-copy">
           <input
-            value={showPassword ? password : "••••••••"}
+            type={showPassword ? "text" : "password"}
+            value={password}
             readOnly
+            autoComplete="new-password"
           />
 
-          <button onClick={() => setShowPassword(!showPassword)}>
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+          >
             {showPassword ? "🙈" : "👁"}
           </button>
 
-          <button onClick={() => copy(password)}>📋</button>
+          <button type="button" onClick={() => copy(password)}>
+            📋
+          </button>
         </div>
 
         <div className="modal-buttons">
-          <button className="btn-close" onClick={onClose}>
+
+          <button
+            className="btn-close"
+            type="button"
+            onClick={onClose}
+          >
             Cerrar
           </button>
 
           <button
             className="btn-login"
+            type="button"
             onClick={() => onLogin(email, password)}
           >
             Iniciar Sesión
           </button>
+
         </div>
 
       </div>
