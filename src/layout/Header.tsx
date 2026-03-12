@@ -1,8 +1,18 @@
-import "../styles/pages/homePage.css";
+import "../styles/layout/header.css";
 
-export default function Header() {
+interface HeaderProps {
+  toggleSidebar: () => void;
+}
+
+export default function Header({ toggleSidebar }: HeaderProps) {
   return (
     <header className="topbar">
+      {/* HAMBURGER */}
+
+      <button className="menu-btn" onClick={toggleSidebar}>
+        ☰
+      </button>
+
       <div className="topbar-search">
         <span className="search-icon">🔎</span>
         <input placeholder="Buscar pedidos, productos o clientes..." />

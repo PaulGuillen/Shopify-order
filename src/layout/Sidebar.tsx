@@ -1,6 +1,6 @@
 import { NavLink } from "react-router-dom";
 import { useEffect, useState } from "react";
-import "../styles/pages/homePage.css";
+import "../styles/layout/sidebar.css";
 
 interface User {
   email: string;
@@ -8,7 +8,12 @@ interface User {
   shop: string;
 }
 
-export default function Sidebar() {
+interface SidebarProps {
+  open: boolean;
+  closeSidebar: () => void;
+}
+
+export default function Sidebar({ open, closeSidebar }: SidebarProps) {
   const [role, setRole] = useState<string>("");
 
   useEffect(() => {
@@ -21,7 +26,9 @@ export default function Sidebar() {
   }, []);
 
   return (
-    <aside className="sidebar">
+    <aside className={`sidebar ${open ? "open" : ""}`}>
+      {/* BRAND */}
+
       <div className="sidebar-brand">
         <div className="brand-icon">🛍️</div>
         <div>
@@ -32,6 +39,7 @@ export default function Sidebar() {
 
       <nav className="sidebar-nav">
         {/* ADMIN */}
+
         {role === "admin" && (
           <>
             <NavLink
@@ -39,6 +47,7 @@ export default function Sidebar() {
               className={({ isActive }) =>
                 isActive ? "nav-item active" : "nav-item"
               }
+              onClick={closeSidebar}
             >
               <span>🏠</span> Inicio
             </NavLink>
@@ -48,6 +57,7 @@ export default function Sidebar() {
               className={({ isActive }) =>
                 isActive ? "nav-item active" : "nav-item"
               }
+              onClick={closeSidebar}
             >
               <span>🧾</span> Pedidos
             </NavLink>
@@ -57,6 +67,7 @@ export default function Sidebar() {
               className={({ isActive }) =>
                 isActive ? "nav-item active" : "nav-item"
               }
+              onClick={closeSidebar}
             >
               <span>📦</span> Productos
             </NavLink>
@@ -66,6 +77,7 @@ export default function Sidebar() {
               className={({ isActive }) =>
                 isActive ? "nav-item active" : "nav-item"
               }
+              onClick={closeSidebar}
             >
               <span>👥</span> Clientes
             </NavLink>
@@ -75,6 +87,7 @@ export default function Sidebar() {
               className={({ isActive }) =>
                 isActive ? "nav-item active" : "nav-item"
               }
+              onClick={closeSidebar}
             >
               <span>📈</span> Analítica
             </NavLink>
@@ -84,6 +97,7 @@ export default function Sidebar() {
               className={({ isActive }) =>
                 isActive ? "nav-item active" : "nav-item"
               }
+              onClick={closeSidebar}
             >
               <span>📣</span> Marketing
             </NavLink>
@@ -93,6 +107,7 @@ export default function Sidebar() {
               className={({ isActive }) =>
                 isActive ? "nav-item active" : "nav-item"
               }
+              onClick={closeSidebar}
             >
               <span>🏷️</span> Descuentos
             </NavLink>
@@ -100,6 +115,7 @@ export default function Sidebar() {
         )}
 
         {/* ASESORA */}
+
         {role === "asesora" && (
           <>
             <NavLink
@@ -107,14 +123,17 @@ export default function Sidebar() {
               className={({ isActive }) =>
                 isActive ? "nav-item active" : "nav-item"
               }
+              onClick={closeSidebar}
             >
               <span>🏠</span> Inicio
             </NavLink>
+
             <NavLink
               to="/orders"
               className={({ isActive }) =>
                 isActive ? "nav-item active" : "nav-item"
               }
+              onClick={closeSidebar}
             >
               <span>🧾</span> Pedidos
             </NavLink>
@@ -124,6 +143,7 @@ export default function Sidebar() {
               className={({ isActive }) =>
                 isActive ? "nav-item active" : "nav-item"
               }
+              onClick={closeSidebar}
             >
               <span>📦</span> Productos
             </NavLink>
@@ -133,6 +153,7 @@ export default function Sidebar() {
               className={({ isActive }) =>
                 isActive ? "nav-item active" : "nav-item"
               }
+              onClick={closeSidebar}
             >
               <span>📣</span> Marketing
             </NavLink>
@@ -141,9 +162,10 @@ export default function Sidebar() {
       </nav>
 
       {/* FOOTER SOLO ADMIN */}
+
       {role === "admin" && (
         <div className="sidebar-footer">
-          <NavLink to="/settings" className="nav-item">
+          <NavLink to="/settings" className="nav-item" onClick={closeSidebar}>
             <span>⚙️</span> Configuración
           </NavLink>
         </div>

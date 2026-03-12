@@ -1,0 +1,49 @@
+:root {
+    --bg: #f5f7fb;
+    --card: #ffffff;
+    --text: #0f172a;
+    --muted: #64748b;
+    --border: #e5e7eb;
+    --primary: #4338ca;
+}
+
+/* APP STRUCTURE */
+
+.app-shell {
+    display: flex;
+    min-height: 100vh;
+    background: var(--bg);
+}
+
+.app-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.app-content {
+    padding: 32px;
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* OVERLAY MOBILE */
+
+.sidebar-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, .35);
+    z-index: 900;
+}
+
+/* MOBILE */
+
+@media (max-width:768px) {
+
+    .app-content {
+        padding: 20px;
+    }
+
+}
