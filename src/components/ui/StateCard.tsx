@@ -1,4 +1,4 @@
-import "../../styles/pages/dashboardPage.css";
+import "../../styles/pages/homePage.css";
 
 type Props = {
   title: string;

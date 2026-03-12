@@ -84,7 +84,7 @@ export default function LoginPage() {
 
         setShowModal(false);
 
-        navigate("/dashboard");
+        navigate("/home");
       } else {
         alert(data.message);
       }
@@ -129,7 +129,7 @@ export default function LoginPage() {
       if (data.success) {
         localStorage.setItem("user", JSON.stringify(data.user));
 
-        navigate("/dashboard");
+        navigate("/home");
       } else {
         alert(data.message);
       }

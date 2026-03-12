@@ -1,8 +1,8 @@
 import Layout from "../layout/Layout";
 import StatCard from "../components/ui/StateCard";
-import "../styles/pages/dashboardPage.css";
+import "../styles/pages/homePage.css";
 
-export default function DashboardPage() {
+export default function Home() {
   return (
     <Layout>
       <div className="dashboard">

@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
-import "../styles/pages/dashboardPage.css";
+import "../styles/pages/homePage.css";
 
 type Props = {
   readonly children: ReactNode;

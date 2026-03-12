@@ -1,10 +1,10 @@
 import { createHashRouter } from "react-router-dom";
-import LoginPage from "../pages/LoginPage";
-import DashboardPage from "../pages/DashboardPage";
+import LoginPage from "../pages/LoginPage"
 import CustomersPage from "../pages/CustomersPage";
 import OrdersPage from "../pages/OrdersPage";
 import ProductsPage from "../pages/ProductsPage";
 import AnalyticsPage from "../pages/AnalyticsPage";
+import Home from "../pages/HomePage";
 
 export const router = createHashRouter([
   {
@@ -12,8 +12,8 @@ export const router = createHashRouter([
     element: <LoginPage />,
   },
   {
-    path: "/dashboard",
-    element: <DashboardPage />,
+    path: "/home",
+    element: <Home />,
   },
   {
     path: "/customers",
