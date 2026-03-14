@@ -1,0 +1,23 @@
+.orders-date-filter {
+    display: flex;
+    align-items: center;
+}
+
+.date-input {
+    padding: 8px;
+    border-radius: 10px;
+    border: 1px solid #e5e7eb;
+    font-size: 14px;
+    background: white;
+    cursor: pointer;
+    width: 180px;
+}
+
+.date-input:hover {
+    border-color: #c7c7c7;
+}
+
+.date-input:focus {
+    outline: none;
+    border-color: #4f46e5;
+}

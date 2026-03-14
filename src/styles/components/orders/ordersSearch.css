@@ -1,0 +1,15 @@
+.orders-filter input {
+    padding: 8px 10px;
+    border-radius: 6px;
+    border: 1px solid #d1d5db;
+    width: 250px;
+    font-size: 14px;
+}
+
+@media (max-width: 768px) {
+
+    .orders-filter input {
+        width: 100%;
+    }
+
+}
