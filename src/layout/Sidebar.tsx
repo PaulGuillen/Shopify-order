@@ -79,7 +79,7 @@ export default function Sidebar({ open, closeSidebar }: SidebarProps) {
               }
               onClick={closeSidebar}
             >
-              <span>👥</span> Clientes
+              <span>👥</span> Usuarios
             </NavLink>
 
             <NavLink
@@ -93,13 +93,13 @@ export default function Sidebar({ open, closeSidebar }: SidebarProps) {
             </NavLink>
 
             <NavLink
-              to="/marketing"
+              to="/agency"
               className={({ isActive }) =>
                 isActive ? "nav-item active" : "nav-item"
               }
               onClick={closeSidebar}
             >
-              <span>📣</span> Marketing
+              <span>📣</span> Agencias
             </NavLink>
 
             <NavLink
@@ -149,13 +149,13 @@ export default function Sidebar({ open, closeSidebar }: SidebarProps) {
             </NavLink>
 
             <NavLink
-              to="/marketing"
+              to="/agency"
               className={({ isActive }) =>
                 isActive ? "nav-item active" : "nav-item"
               }
               onClick={closeSidebar}
             >
-              <span>📣</span> Marketing
+              <span>📣</span> Agencia
             </NavLink>
           </>
         )}
