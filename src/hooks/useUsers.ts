@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 export const useUsers = (shop: string) => {
   const [users, setUsers] = useState<any[]>([]);
+  const loaded = useRef(false);
 
   const loadUsers = async () => {
     try {
@@ -26,7 +27,11 @@ export const useUsers = (shop: string) => {
   };
 
   useEffect(() => {
-    if (shop) loadUsers();
+    if (!shop || loaded.current) return;
+
+    loaded.current = true;
+
+    loadUsers();
   }, [shop]);
 
   return {

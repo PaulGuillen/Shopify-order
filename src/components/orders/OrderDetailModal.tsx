@@ -1,9 +1,12 @@
 import "./../../styles/components/orders/orderModal.css";
+
 import {
   formatShopifyDate,
   paymentLabel,
   fulfillmentLabel,
 } from "../../utils/ordersUtil";
+
+import { useAssignOrder } from "../../hooks/useOrders";
 
 type Props = {
   order: any;
@@ -11,22 +14,34 @@ type Props = {
   onAssign?: (order: any) => void;
 };
 
-export default function OrderDetailModal({
-  order,
-  onClose,
-  onAssign,
-}: Props) {
+export default function OrderDetailModal({ order, onClose, onAssign }: Readonly<Props>) {
+  const { handleAssignOrder, loadingAssign } = useAssignOrder();
+
   if (!order) return null;
+
+  const handleAssign = async () => {
+    const success = await handleAssignOrder(order);
+
+    if (success) {
+      alert("Pedido asignado correctamente");
+
+      if (onAssign) {
+        onAssign(order);
+      }
+
+      onClose();
+    }
+  };
 
   return (
     <div className="order-modal-overlay" onClick={onClose}>
       <div className="order-modal" onClick={(e) => e.stopPropagation()}>
-
         {/* HEADER */}
 
         <div className="modal-header">
           <div>
             <h2>Pedido #{order.order_number}</h2>
+
             <p className="modal-subtitle">
               Revisa la información completa del pedido
             </p>
@@ -42,7 +57,6 @@ export default function OrderDetailModal({
         {/* CONTENT */}
 
         <div className="modal-content">
-
           {/* INFORMACIÓN PEDIDO */}
 
           <div className="order-modal-section">
@@ -56,7 +70,9 @@ export default function OrderDetailModal({
 
               <div>
                 <span>Total</span>
-                <p>{order.currency} {order.total_price}</p>
+                <p>
+                  {order.currency} {order.total_price}
+                </p>
               </div>
 
               <div>
@@ -190,26 +206,23 @@ export default function OrderDetailModal({
               </div>
             </div>
           </div>
-
         </div>
 
         {/* FOOTER */}
 
         <div className="modal-footer">
-
           <button className="btn-cancel" onClick={onClose}>
             Cancelar
           </button>
 
           <button
             className="btn-assign"
-            onClick={() => onAssign && onAssign(order)}
+            disabled={loadingAssign}
+            onClick={handleAssign}
           >
-            Asignármelo
+            {loadingAssign ? "Asignando..." : "Asignármelo"}
           </button>
-
         </div>
-
       </div>
     </div>
   );

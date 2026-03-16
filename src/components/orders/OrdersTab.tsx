@@ -8,12 +8,25 @@ type Props = {
 export default function OrdersTabs({ activeTab, setActiveTab }: Props) {
   return (
     <div className="orders-tabs">
+      {/* TODOS */}
+
       <button
         className={activeTab === "todos" ? "active" : ""}
         onClick={() => setActiveTab("todos")}
       >
         Todos
       </button>
+
+      {/* MIS PEDIDOS */}
+
+      <button
+        className={activeTab === "mis_pedidos" ? "active" : ""}
+        onClick={() => setActiveTab("mis_pedidos")}
+      >
+        Mis pedidos
+      </button>
+
+      {/* POR CONFIRMAR */}
 
       <button
         className={activeTab === "confirmar" ? "active" : ""}
@@ -22,6 +35,8 @@ export default function OrdersTabs({ activeTab, setActiveTab }: Props) {
         Por confirmar
       </button>
 
+      {/* ENTREGADO */}
+
       <button
         className={activeTab === "entregado" ? "active" : ""}
         onClick={() => setActiveTab("entregado")}
@@ -29,12 +44,16 @@ export default function OrdersTabs({ activeTab, setActiveTab }: Props) {
         Entregado
       </button>
 
+      {/* PAGADO */}
+
       <button
         className={activeTab === "pagado" ? "active" : ""}
         onClick={() => setActiveTab("pagado")}
       >
         Pagado
       </button>
+
+      {/* PENDIENTE */}
 
       <button
         className={activeTab === "pendiente" ? "active" : ""}

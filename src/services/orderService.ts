@@ -24,6 +24,7 @@ export interface Order {
         quantity: number;
     } | null;
 
+    statuts: string | null;
 }
 
 export async function fetchOrders(shop: string): Promise<Order[]> {
@@ -37,3 +38,37 @@ export async function fetchOrders(shop: string): Promise<Order[]> {
 
     return data.orders;
 }
+
+export const getAdvisorOrders = async (
+    advisorId: string,
+    shop: string
+) => {
+    const res = await fetch(
+        `${API_URL}/orders/advisor-orders/${advisorId}/${shop}`
+    );
+
+    if (!res.ok) {
+        throw new Error("Error fetching advisor orders");
+    }
+
+    return res.json();
+};
+
+export const assignOrder = async (order: any, advisor: any) => {
+    const res = await fetch(`${API_URL}/orders/assign-order`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            order,
+            advisor,
+        }),
+    });
+
+    if (!res.ok) {
+        throw new Error("Error assigning order");
+    }
+
+    return res.json();
+};

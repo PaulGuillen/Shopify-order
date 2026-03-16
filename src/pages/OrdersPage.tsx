@@ -1,7 +1,9 @@
 import { useMemo, useState } from "react";
 import Layout from "../layout/Layout";
 import "../styles/pages/ordersPage.css";
-import { useOrders } from "../hooks/useOrders";
+
+import { useOrders, useAdvisorOrders } from "../hooks/useOrders";
+
 import OrdersHeader from "../components/orders/OrdersHeader";
 import OrdersTabs from "../components/orders/OrdersTab";
 import OrdersSearch from "../components/orders/OrdersSearch";
@@ -14,16 +16,29 @@ export default function OrdersPage() {
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   const shop = user.shop || "";
 
+  /* =========================
+  SHOPIFY ORDERS
+  ========================= */
+
   const { orders, loading, error } = useOrders(shop);
+
+  /* =========================
+  UI STATE
+  ========================= */
 
   const [search, setSearch] = useState("");
   const [activeTab, setActiveTab] = useState("todos");
   const [currentPage, setCurrentPage] = useState(1);
-
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
   /* =========================
-  NUEVO FILTRO DE FECHA
+  MIS PEDIDOS (FIRESTORE)
+  ========================= */
+
+  const { advisorOrders } = useAdvisorOrders(user.userId, user.shop, activeTab);
+
+  /* =========================
+  FILTRO FECHA
   ========================= */
 
   const [dateRange, setDateRange] = useState<{
@@ -35,32 +50,35 @@ export default function OrdersPage() {
   });
 
   /* =========================
-  FILTRO TABS
+  FILTRO POR TABS
   ========================= */
 
   const tabFiltered = useMemo(() => {
-    let filtered = orders;
+    let filtered =
+      activeTab === "mis_pedidos"
+        ? advisorOrders.map((o) => o.orderData)
+        : orders;
 
     switch (activeTab) {
       case "confirmar":
-        filtered = orders.filter((o) => o.fulfillment_status === null);
+        filtered = filtered.filter((o) => o.fulfillment_status === null);
         break;
 
       case "entregado":
-        filtered = orders.filter((o) => o.fulfillment_status === "fulfilled");
+        filtered = filtered.filter((o) => o.fulfillment_status === "fulfilled");
         break;
 
       case "pagado":
-        filtered = orders.filter((o) => o.financial_status === "paid");
+        filtered = filtered.filter((o) => o.financial_status === "paid");
         break;
 
       case "pendiente":
-        filtered = orders.filter((o) => o.financial_status === "pending");
+        filtered = filtered.filter((o) => o.financial_status === "pending");
         break;
     }
 
     return [...filtered].sort((a, b) => b.order_number - a.order_number);
-  }, [orders, activeTab]);
+  }, [orders, advisorOrders, activeTab]);
 
   /* =========================
   BUSCADOR + FECHA
