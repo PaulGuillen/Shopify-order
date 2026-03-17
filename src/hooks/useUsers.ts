@@ -6,7 +6,8 @@ export const useUsers = (shop: string) => {
 
   const loadUsers = async () => {
     try {
-      const response = await fetch(`http://localhost:4000/users?shop=${shop}`);
+      const API = import.meta.env.VITE_API_URL;
+      const response = await fetch(`${API}/users?shop=${shop}`);
 
       const data = await response.json();
 

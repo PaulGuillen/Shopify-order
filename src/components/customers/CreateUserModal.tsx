@@ -16,8 +16,8 @@ export default function CreateUserModal({ shop, onClose, onCreated }: Props) {
   const createUser = async () => {
     try {
       const email = `${username}@${shop}`;
-
-      const response = await fetch("http://localhost:4000/users/create-user", {
+      const API = import.meta.env.VITE_API_URL;
+      const response = await fetch(`${API}/users/create-user`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

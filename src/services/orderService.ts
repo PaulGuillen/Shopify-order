@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:4000";
+const API = import.meta.env.VITE_API_URL;
 
 export interface Order {
     order_id: number;
@@ -28,7 +28,7 @@ export interface Order {
 }
 
 export async function fetchOrders(shop: string): Promise<Order[]> {
-    const response = await fetch(`${API_URL}/orders/orders-firebase/${shop}`);
+    const response = await fetch(`${API}/orders/orders-firebase/${shop}`);
 
     if (!response.ok) {
         throw new Error("Error obteniendo pedidos");
@@ -44,7 +44,7 @@ export const getAdvisorOrders = async (
     shop: string
 ) => {
     const res = await fetch(
-        `${API_URL}/orders/advisor-orders/${advisorId}/${shop}`
+        `${API}/orders/advisor-orders/${advisorId}/${shop}`
     );
 
     if (!res.ok) {
@@ -55,7 +55,7 @@ export const getAdvisorOrders = async (
 };
 
 export const assignOrder = async (order: any, advisor: any) => {
-    const res = await fetch(`${API_URL}/orders/assign-order`, {
+    const res = await fetch(`${API}/orders/assign-order`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",

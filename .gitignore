@@ -20,7 +20,6 @@ coverage/
 .env
 .env.local
 .env.development
-.env.production
 .env.test
 
 # =========================
@@ -78,3 +77,5 @@ jest-cache/
 tmp/
 temp/
 .cache/
+
+*.md

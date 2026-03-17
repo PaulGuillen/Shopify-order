@@ -1,4 +1,4 @@
-const API = "http://localhost:4000";
+const API = import.meta.env.VITE_API_URL;
 
 export const getUsers = async (shop: string) => {
   const res = await fetch(`${API}/users?shop=${shop}`);
