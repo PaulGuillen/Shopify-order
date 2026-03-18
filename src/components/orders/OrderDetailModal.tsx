@@ -14,23 +14,30 @@ type Props = {
   onAssign?: (order: any) => void;
 };
 
-export default function OrderDetailModal({ order, onClose, onAssign }: Readonly<Props>) {
+export default function OrderDetailModal({
+  order,
+  onClose,
+  onAssign,
+}: Readonly<Props>) {
   const { handleAssignOrder, loadingAssign } = useAssignOrder();
 
   if (!order) return null;
 
   const handleAssign = async () => {
-    const success = await handleAssignOrder(order);
+    const result = await handleAssignOrder(order);
 
-    if (success) {
-      alert("Pedido asignado correctamente");
-
-      if (onAssign) {
-        onAssign(order);
-      }
-
-      onClose();
+    if (!result.success) {
+      alert(result.message);
+      return;
     }
+
+    alert("Pedido asignado correctamente");
+
+    if (onAssign) {
+      onAssign(order);
+    }
+
+    onClose();
   };
 
   return (

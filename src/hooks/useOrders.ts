@@ -75,10 +75,14 @@ export const useAssignOrder = () => {
 
         try {
             await assignOrder(order, advisor);
-            return true;
-        } catch (error) {
+            return { success: true };
+        } catch (error: any) {
             console.error(error);
-            return false;
+
+            return {
+                success: false,
+                message: error.message,
+            };
         } finally {
             setLoadingAssign(false);
         }
@@ -103,7 +107,7 @@ export const useUpdateOrderStatus = () => {
                 order,
                 user.shop,
                 action,
-                user // 🔥 ENVÍAS USER
+                user
             );
 
             if (!result.success) {

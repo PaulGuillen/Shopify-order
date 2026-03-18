@@ -66,11 +66,13 @@ export const assignOrder = async (order: any, advisor: any) => {
         }),
     });
 
-    if (!res.ok) {
-        throw new Error("Error assigning order");
+    const data = await res.json();
+
+    if (!data.success) {
+        throw new Error(data.message);
     }
 
-    return res.json();
+    return data;
 };
 
 export const updateOrderStatus = async (
