@@ -6,61 +6,26 @@ type Props = {
 };
 
 export default function OrdersTabs({ activeTab, setActiveTab }: Props) {
+  const tabs = [
+    { id: "todos", label: "Todos" },
+    { id: "mis_pedidos", label: "Mis pedidos" },
+    { id: "contactado", label: "Contactado" },
+    { id: "adelanto", label: "Adelanto" },
+    { id: "confirmo", label: "Confirmó" },
+    { id: "cancelo", label: "Canceló" },
+  ];
+
   return (
     <div className="orders-tabs">
-      {/* TODOS */}
-
-      <button
-        className={activeTab === "todos" ? "active" : ""}
-        onClick={() => setActiveTab("todos")}
-      >
-        Todos
-      </button>
-
-      {/* MIS PEDIDOS */}
-
-      <button
-        className={activeTab === "mis_pedidos" ? "active" : ""}
-        onClick={() => setActiveTab("mis_pedidos")}
-      >
-        Mis pedidos
-      </button>
-
-      {/* POR CONFIRMAR */}
-
-      <button
-        className={activeTab === "confirmar" ? "active" : ""}
-        onClick={() => setActiveTab("confirmar")}
-      >
-        Por confirmar
-      </button>
-
-      {/* ENTREGADO */}
-
-      <button
-        className={activeTab === "entregado" ? "active" : ""}
-        onClick={() => setActiveTab("entregado")}
-      >
-        Entregado
-      </button>
-
-      {/* PAGADO */}
-
-      <button
-        className={activeTab === "pagado" ? "active" : ""}
-        onClick={() => setActiveTab("pagado")}
-      >
-        Pagado
-      </button>
-
-      {/* PENDIENTE */}
-
-      <button
-        className={activeTab === "pendiente" ? "active" : ""}
-        onClick={() => setActiveTab("pendiente")}
-      >
-        Pendiente
-      </button>
+      {tabs.map((tab) => (
+        <button
+          key={tab.id}
+          className={`tab-item ${activeTab === tab.id ? "active" : ""}`}
+          onClick={() => setActiveTab(tab.id)}
+        >
+          {tab.label}
+        </button>
+      ))}
     </div>
   );
 }

@@ -2,7 +2,11 @@ import { useMemo, useState } from "react";
 import Layout from "../layout/Layout";
 import "../styles/pages/ordersPage.css";
 
-import { useOrders, useAdvisorOrders } from "../hooks/useOrders";
+import {
+  useOrders,
+  useAdvisorOrders,
+  useAdvisorOrdersContacted,
+} from "../hooks/useOrders";
 
 import OrdersHeader from "../components/orders/OrdersHeader";
 import OrdersTabs from "../components/orders/OrdersTab";
@@ -36,6 +40,11 @@ export default function OrdersPage() {
   ========================= */
 
   const { advisorOrders } = useAdvisorOrders(user.userId, user.shop, activeTab);
+  const { advisorOrdersContacted } = useAdvisorOrdersContacted(
+    user.userId,
+    user.shop,
+    activeTab,
+  );
 
   /* =========================
   FILTRO FECHA
@@ -54,10 +63,15 @@ export default function OrdersPage() {
   ========================= */
 
   const tabFiltered = useMemo(() => {
-    let filtered =
-      activeTab === "mis_pedidos"
-        ? advisorOrders.map((o) => o.orderData)
-        : orders;
+    let filtered;
+
+    if (activeTab === "mis_pedidos") {
+      filtered = advisorOrders.map((o) => o.orderData);
+    } else if (activeTab === "contactado") {
+      filtered = advisorOrdersContacted.map((o) => o.orderData);
+    } else {
+      filtered = orders;
+    }
 
     switch (activeTab) {
       case "confirmar":
@@ -78,7 +92,7 @@ export default function OrdersPage() {
     }
 
     return [...filtered].sort((a, b) => b.order_number - a.order_number);
-  }, [orders, advisorOrders, activeTab]);
+  }, [orders, advisorOrders, advisorOrdersContacted, activeTab]);
 
   /* =========================
   BUSCADOR + FECHA
@@ -183,7 +197,7 @@ export default function OrdersPage() {
             </div>
           </div>
 
-          <OrdersTable orders={paginatedOrders} />
+          <OrdersTable orders={paginatedOrders} activeTab={activeTab} />
 
           <OrdersPagination
             currentPage={currentPage}

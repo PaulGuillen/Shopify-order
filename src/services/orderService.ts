@@ -72,3 +72,53 @@ export const assignOrder = async (order: any, advisor: any) => {
 
     return res.json();
 };
+
+export const updateOrderStatus = async (
+    order: any,
+    shop: string,
+    action: string,
+    user: any
+) => {
+    const res = await fetch(`${API}/orders/order-to-deliver`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            order,
+            shop,
+            action,
+            user,
+        }),
+    });
+
+    return await res.json();
+};
+
+export const getAdvisorOrdersContacted = async (
+    activeTab: string,
+    advisorId: string,
+    shop: string
+) => {
+    try {
+        const url = new URL(`${API}/orders/orders-by-status`);
+
+        url.searchParams.append("status", activeTab);
+        url.searchParams.append("shop", shop);
+
+        if (advisorId) {
+            url.searchParams.append("advisorId", advisorId);
+        }
+
+        const res = await fetch(url.toString());
+
+        if (!res.ok) {
+            throw new Error("Error fetching advisor orders");
+        }
+
+        return res.json();
+    } catch (error) {
+        console.error("Error service contacted:", error);
+        return [];
+    }
+};

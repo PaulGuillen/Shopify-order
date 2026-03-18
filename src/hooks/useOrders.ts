@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { assignOrder, fetchOrders, getAdvisorOrders } from "../services/orderService";
+import { assignOrder, fetchOrders, getAdvisorOrders, getAdvisorOrdersContacted, updateOrderStatus } from "../services/orderService";
 import type { Order } from "../services/orderService";
 
 export function useOrders(shop: string) {
@@ -85,4 +85,74 @@ export const useAssignOrder = () => {
     };
 
     return { handleAssignOrder, loadingAssign };
+};
+
+export const useUpdateOrderStatus = () => {
+    const [loadingStatus, setLoadingStatus] = useState(false);
+
+    const handleUpdateStatus = async (
+        order: any,
+        action: string
+    ): Promise<boolean> => {
+        const user = JSON.parse(localStorage.getItem("user") || "{}");
+
+        try {
+            setLoadingStatus(true);
+
+            const result = await updateOrderStatus(
+                order,
+                user.shop,
+                action,
+                user // 🔥 ENVÍAS USER
+            );
+
+            if (!result.success) {
+                alert(result.message);
+                return false;
+            }
+
+            return true;
+        } catch (error) {
+            console.error("Error updating status:", error);
+            return false;
+        } finally {
+            setLoadingStatus(false);
+        }
+    };
+
+    return {
+        handleUpdateStatus,
+        loadingStatus,
+    };
+};
+
+export const useAdvisorOrdersContacted = (
+    advisorId: string,
+    shop: string,
+    activeTab: string
+) => {
+    const [orders, setOrders] = useState<any[]>([]);
+    const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        if (activeTab !== "contactado") return;
+        if (!advisorId || !shop) return;
+
+        const fetchData = async () => {
+            setLoading(true);
+
+            const data = await getAdvisorOrdersContacted(activeTab, advisorId, shop);
+
+            setOrders(data);
+
+            setLoading(false);
+        };
+
+        fetchData();
+    }, [advisorId, shop, activeTab]);
+
+    return {
+        advisorOrdersContacted: orders,
+        loadingContacted: loading,
+    };
 };

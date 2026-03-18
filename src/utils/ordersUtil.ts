@@ -125,3 +125,33 @@ export function isLast7Days(day: string) {
 
     return date >= last7;
 }
+
+export function orderStatusLabel(status: string) {
+    switch (status) {
+        case "contactado":
+            return "Contactado";
+        case "adelanto":
+            return "Adelanto";
+        case "confirmo":
+            return "Confirmado";
+        case "cancelo":
+            return "Cancelado";
+        default:
+            return status;
+    }
+}
+
+export function orderStatusClass(status: string) {
+    switch (status) {
+        case "contactado":
+            return "status-contactado";
+        case "adelanto":
+            return "status-adelanto";
+        case "confirmo":
+            return "status-confirmo";
+        case "cancelo":
+            return "status-cancelo";
+        default:
+            return "";
+    }
+}

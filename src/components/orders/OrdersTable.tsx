@@ -1,6 +1,5 @@
 import { useState } from "react";
 import "./../../styles/components/orders/ordersTable.css";
-
 import {
   formatShopifyDate,
   paymentLabel,
@@ -10,13 +9,19 @@ import {
 } from "../../utils/ordersUtil";
 
 import OrderDetailModal from "./OrderDetailModal";
+import ContactOrderModal from "./ContactOrderModal";
 
 type Props = {
   readonly orders: readonly any[];
+  readonly activeTab: string;
 };
 
-export default function OrdersTable({ orders }: Props) {
+export default function OrdersTable({ orders, activeTab }: Props) {
   const [selectedOrder, setSelectedOrder] = useState<any | null>(null);
+
+  const handleSelect = (order: any) => {
+    setSelectedOrder(order);
+  };
 
   return (
     <>
@@ -47,7 +52,7 @@ export default function OrdersTable({ orders }: Props) {
                     <input
                       type="checkbox"
                       checked={isChecked}
-                      onChange={() => setSelectedOrder(order)}
+                      onChange={() => handleSelect(order)}
                     />
                   </td>
 
@@ -94,14 +99,19 @@ export default function OrdersTable({ orders }: Props) {
         </table>
       </div>
 
-      {selectedOrder && (
+      {/* MODAL SEGUN TAB */}
+
+      {selectedOrder && activeTab === "todos" && (
         <OrderDetailModal
           order={selectedOrder}
           onClose={() => setSelectedOrder(null)}
-          onAssign={(order) => {
-            console.log("Asignado:", order);
-            setSelectedOrder(null);
-          }}
+        />
+      )}
+
+      {selectedOrder && activeTab === "mis_pedidos" && (
+        <ContactOrderModal
+          order={selectedOrder}
+          onClose={() => setSelectedOrder(null)}
         />
       )}
     </>
