@@ -190,7 +190,7 @@ export default function ContactOrderModal({ order, onClose }: Readonly<Props>) {
           {/* NO RESPONDIÓ */}
           <button
             className="btn-warning"
-            onClick={() => update("contactado", "Cliente no respondió")}
+            onClick={() => update("no_response", "Cliente no respondió")}
             disabled={loadingStatus}
           >
             {loadingStatus ? "Guardando..." : "⚠ No contestó"}
