@@ -96,7 +96,8 @@ export const useUpdateOrderStatus = () => {
 
     const handleUpdateStatus = async (
         order: any,
-        action: string
+        action: string,
+        newData?: any // 🔥 NUEVO
     ): Promise<boolean> => {
         const user = JSON.parse(localStorage.getItem("user") || "{}");
 
@@ -107,7 +108,8 @@ export const useUpdateOrderStatus = () => {
                 order,
                 user.shop,
                 action,
-                user
+                user,
+                newData // 🔥 NUEVO
             );
 
             if (!result.success) {
@@ -139,7 +141,7 @@ export const useAdvisorOrdersContacted = (
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        if (activeTab !== "contactado") return;
+        if (activeTab == "todos" || activeTab == "mis_pedidos") return;
         if (!advisorId || !shop) return;
 
         const fetchData = async () => {

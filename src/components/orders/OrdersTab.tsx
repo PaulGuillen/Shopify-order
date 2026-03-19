@@ -11,7 +11,7 @@ export default function OrdersTabs({ activeTab, setActiveTab }: Props) {
     { id: "mis_pedidos", label: "Mis pedidos" },
     { id: "contactado", label: "Contactado" },
     { id: "adelanto", label: "Adelanto" },
-    { id: "confirmo", label: "Confirmó" },
+    { id: "confirmo", label: "Confirmo" },
     { id: "cancelo", label: "Canceló" },
   ];
 

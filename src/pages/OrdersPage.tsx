@@ -69,6 +69,8 @@ export default function OrdersPage() {
       filtered = advisorOrders.map((o) => o.orderData);
     } else if (activeTab === "contactado") {
       filtered = advisorOrdersContacted.map((o) => o.orderData);
+    } else if (activeTab === "adelanto") {
+      filtered = advisorOrdersContacted.map((o) => o.orderData);
     } else {
       filtered = orders;
     }

@@ -10,6 +10,7 @@ import {
 
 import OrderDetailModal from "./OrderDetailModal";
 import ContactOrderModal from "./ContactOrderModal";
+import DeliveredOrderModal from "./DeliveredOrderModal";
 
 type Props = {
   readonly orders: readonly any[];
@@ -110,6 +111,13 @@ export default function OrdersTable({ orders, activeTab }: Props) {
 
       {selectedOrder && activeTab === "mis_pedidos" && (
         <ContactOrderModal
+          order={selectedOrder}
+          onClose={() => setSelectedOrder(null)}
+        />
+      )}
+
+      {selectedOrder && activeTab === "contactado" && (
+        <DeliveredOrderModal
           order={selectedOrder}
           onClose={() => setSelectedOrder(null)}
         />

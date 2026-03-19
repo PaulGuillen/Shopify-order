@@ -79,7 +79,8 @@ export const updateOrderStatus = async (
     order: any,
     shop: string,
     action: string,
-    user: any
+    user: any,
+    newData?: any // 🔥 NUEVO
 ) => {
     const res = await fetch(`${API}/orders/order-to-deliver`, {
         method: "POST",
@@ -91,6 +92,7 @@ export const updateOrderStatus = async (
             shop,
             action,
             user,
+            newData,
         }),
     });
 
