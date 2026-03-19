@@ -1,8 +1,33 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Layout from "../layout/Layout";
 import "../styles/pages/homePage.css";
+import { useAgencies } from "../hooks/useHome";
+import toast from "react-hot-toast";
+import { notify } from "../utils/notify";
 
 export default function Home() {
+  const { agencies, loadingAgencies, hasLoaded } = useAgencies();
+
+  const hasShownToast = useRef(false);
+
+  useEffect(() => {
+    if (hasShownToast.current) return;
+
+    if (hasLoaded) {
+      hasShownToast.current = true;
+
+      if (agencies.length > 0) {
+        notify.success("Agencias cargadas correctamente 🚚");
+      } else {
+        notify.error("Error al cargar agencias ❌");
+      }
+    }
+  }, [hasLoaded]);
+
+  /* =========================
+     BANNERS
+  ========================= */
+
   const banners = [
     {
       image: "/banners/banner1.jpeg",
@@ -30,11 +55,17 @@ export default function Home() {
     return () => clearInterval(interval);
   }, []);
 
+  /* =========================
+     UI
+  ========================= */
+
   return (
     <Layout>
       <div className="home-wrapper">
         <div className="home-grid">
-          {/* BANNER */}
+          {/* =========================
+              BANNER
+          ========================= */}
 
           <div className="promo-banner">
             <img src={banners[index].image} className="promo-image" />
@@ -50,7 +81,9 @@ export default function Home() {
             </div>
           </div>
 
-          {/* RIGHT SIDE */}
+          {/* =========================
+              RIGHT SIDE
+          ========================= */}
 
           <div className="right-column">
             {/* INFO BOX */}
@@ -68,7 +101,9 @@ export default function Home() {
             </div>
 
             <div className="right-grid">
-              {/* NOVEDADES */}
+              {/* =========================
+                  NOVEDADES
+              ========================= */}
 
               <div className="news-section">
                 <div className="section-header">
@@ -92,7 +127,9 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* PROVEEDORES */}
+              {/* =========================
+                  PROVEEDORES
+              ========================= */}
 
               <div className="providers-section">
                 <div className="section-header">
@@ -100,37 +137,35 @@ export default function Home() {
                   <span>Ver todos</span>
                 </div>
 
-                <div className="provider-item">
-                  <div className="provider-left">
-                    <div className="provider-icon">📦</div>
-                    Proveedor Anacaona
-                  </div>
-                  <button>Ver</button>
-                </div>
+                {/* LOADING */}
+                {loadingAgencies && agencies.length === 0 && (
+                  <p>Cargando agencias...</p>
+                )}
 
-                <div className="provider-item">
-                  <div className="provider-left">
-                    <div className="provider-icon">📦</div>
-                    Proveedor JyJ Fusión
-                  </div>
-                  <button>Ver</button>
-                </div>
+                {/* DATA */}
+                {agencies.slice(0, 4).map((agency) => (
+                  <div key={agency.id} className="provider-item">
+                    <div className="provider-left">
+                      <div className="provider-icon">📦</div>
+                      {agency.name}
+                    </div>
 
-                <div className="provider-item">
-                  <div className="provider-left">
-                    <div className="provider-icon">📦</div>
-                    Proveedor Imporza
-                  </div>
-                  <button>Ver</button>
-                </div>
+                    <button
+                      onClick={() => {
+                        console.log("AGENCIA:", agency);
 
-                <div className="provider-item">
-                  <div className="provider-left">
-                    <div className="provider-icon">📦</div>
-                    Proveedor LiquidAmbar
+                        toast.success(`Seleccionaste ${agency.name} 📍`);
+                      }}
+                    >
+                      Ver
+                    </button>
                   </div>
-                  <button>Ver</button>
-                </div>
+                ))}
+
+                {/* EMPTY STATE */}
+                {!loadingAgencies && agencies.length === 0 && (
+                  <p>No hay agencias disponibles</p>
+                )}
               </div>
             </div>
           </div>
