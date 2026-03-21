@@ -1,11 +1,12 @@
 .contact-modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(15, 23, 42, 0.35);
+    background: rgba(15, 23, 42, 0.75);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 1200;
+    will-change: opacity;
 }
 
 /* =========================
@@ -13,17 +14,83 @@
 ========================= */
 
 .contact-modal {
-    width: 100%;
-    max-width: 650px;
+    width: 95%;
+    max-width: 1000px;
+    /* 🔥 ancho ideal */
     height: 90vh;
-    /* 🔥 importante */
     background: white;
     border-radius: 14px;
     box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
     display: flex;
     flex-direction: column;
-    /* 🔥 clave */
     overflow: hidden;
+}
+
+/* HEADER MEJORADO */
+.modal-header {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    padding: 16px 20px;
+}
+
+/* CENTRO PERFECTO */
+.header-center {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* TITULO */
+.header-center h2 {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 700;
+}
+
+/* SUBTITULO */
+.modal-subtitle {
+    margin: 2px 0 0;
+    font-size: 13px;
+    color: #64748b;
+}
+
+/* izquierda */
+.header-left {
+    display: flex;
+    align-items: center;
+}
+
+.btn-reset-primary {
+    border: none;
+    padding: 10px 18px;
+    border-radius: 14px;
+    font-weight: 600;
+    font-size: 14px;
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 6px 18px rgba(239, 68, 68, 0.35);
+    transition: all 0.25s ease;
+}
+
+/* hover */
+.btn-reset-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 25px rgba(239, 68, 68, 0.45);
+}
+
+/* active */
+.btn-reset-primary:active {
+    transform: scale(0.96);
+}
+
+/* cerrar */
+.modal-close-btn {
+    all: unset;
+    cursor: pointer;
+    font-size: 18px;
 }
 
 .modal-content {
@@ -101,20 +168,27 @@
 }
 
 /* =========================
-   PRODUCT CARD (PRO UI)
+   PRODUCT CARD IMPROVED
 ========================= */
 
-.product-card {
+.product-card.improved {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 18px;
-    border: 1px solid #e5e7eb;
     border-radius: 14px;
-    background: #f9fafb;
+    background: #f8fafc;
+    border: 1px solid #eef2f7;
+    margin-bottom: 14px;
+    /* 🔥 separación real */
+    transition: all 0.2s ease;
 }
 
-/* LEFT INFO */
+.product-card.improved:hover {
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+}
+
+/* LEFT */
 .product-left {
     display: flex;
     flex-direction: column;
@@ -126,14 +200,42 @@
     font-size: 15px;
 }
 
-.product-sku {
-    font-size: 12px;
-    color: #9ca3af;
-}
-
 .product-price {
     font-size: 13px;
-    color: #6b7280;
+    color: #64748b;
+}
+
+/* RIGHT */
+.product-right {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.product-discount {
+    font-size: 13px;
+    color: #16a34a;
+    font-weight: 500;
+}
+
+/* DELETE ICON */
+.btn-remove.icon {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    color: #ef4444;
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.btn-remove.icon:hover {
+    background: #fee2e2;
+    transform: scale(1.1);
 }
 
 /* =========================
@@ -188,8 +290,10 @@
 }
 
 .product-total span {
-    font-size: 14px;
-    opacity: 0.8;
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
 }
 
 .product-total p {
@@ -378,6 +482,18 @@
     color: #9ca3af;
 }
 
+.input-field.valid {
+    border: 2px solid #22c55e;
+    /* verde */
+    background: #f0fdf4;
+}
+
+/* opcional hover */
+.input-field.valid:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2);
+}
+
 /* PROMO */
 .promo-label {
     font-size: 12px;
@@ -431,4 +547,138 @@
     .status-grid {
         grid-template-columns: 1fr;
     }
+}
+
+/* HEADER SECTION */
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* BOTÓN PRO */
+.btn-add-product {
+    background: linear-gradient(135deg, #2563eb, #1e40af);
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    box-shadow: 0 6px 18px rgba(37, 99, 235, 0.25);
+}
+
+.btn-add-product:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 22px rgba(37, 99, 235, 0.35);
+}
+
+.btn-add-product:active {
+    transform: scale(0.97);
+}
+
+/* GRID MEJORADO */
+.order-grid.improved {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+}
+
+.full-width {
+    grid-column: span 2;
+}
+
+/* AGENCY CARD */
+.agency-card {
+    border: 1px solid #e2e8f0;
+    border-radius: 18px;
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-height: 90px;
+}
+
+/* HOVER */
+.agency-card:hover {
+    border-color: #6366f1;
+    box-shadow: 0 6px 25px rgba(99, 102, 241, 0.15);
+}
+
+/* LABEL */
+.agency-label {
+    font-size: 13px;
+    color: #64748b;
+}
+
+/* CONTENT */
+.agency-content {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    transition: all 0.3s ease;
+}
+
+/* NAME */
+.agency-name {
+    font-weight: 600;
+    font-size: 15px;
+}
+
+/* EXTRA INFO */
+.agency-address {
+    font-size: 12px;
+    color: #64748b;
+}
+
+.agency-city {
+    font-size: 12px;
+    color: #2563eb;
+    font-weight: 500;
+}
+
+/* 🔥 ESTADO ACTIVO (CRECE) */
+.agency-card.active {
+    border-color: #6366f1;
+    background: #f8fafc;
+    transform: scale(1.01);
+    padding: 18px;
+}
+
+.product-total.clean {
+    margin-top: 24px;
+    border-top: 1px dashed #e2e8f0;
+    padding-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* filas */
+.product-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* adelanto */
+.product-line.advance p {
+    color: #ef4444;
+    font-weight: 600;
+}
+
+/* total */
+.product-line.total {
+    border-top: 1px solid #e5e7eb;
+    padding-top: 8px;
+    margin-top: 4px;
+}
+
+.product-line.total p {
+    font-size: 24px;
+    font-weight: 700;
 }

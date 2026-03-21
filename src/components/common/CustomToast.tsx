@@ -1,10 +1,20 @@
+import toast from "react-hot-toast";
+import "../../styles/customToast.css";
+
+
 type Props = {
   type: "success" | "error" | "warning" | "info";
   message: string;
-  onClose?: () => void;
+  toastId: string;
+  duration?: number;
 };
 
-export default function CustomToast({ type, message, onClose }: Props) {
+export default function CustomToast({
+  type,
+  message,
+  toastId,
+  duration = 4000,
+}: Props) {
   const styles = {
     success: {
       bg: "#065f46",
@@ -32,74 +42,29 @@ export default function CustomToast({ type, message, onClose }: Props) {
 
   return (
     <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        padding: "16px 20px",
-        borderRadius: "14px",
-        background: current.bg,
-        border: `1px solid ${current.border}`,
-        color: "#fff",
-        minWidth: "420px",
-        maxWidth: "520px",
-        boxShadow: "0 12px 35px rgba(0,0,0,0.45)",
-      }}
+      className={`toast-pro ${type}`}
+      onClick={() => toast.dismiss(toastId)}
     >
-      {/* LEFT SIDE (ICON + TEXT PERFECTAMENTE ALINEADO) */}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "14px",
-          flex: 1,
-        }}
-      >
-        {/* ICON BOX FIJO (clave para alineación) */}
+      {/* CONTENT */}
+      <div className="toast-content">
         <div
-          style={{
-            width: "28px",
-            height: "28px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            borderRadius: "50%",
-            background: current.border,
-            color: "#000",
-            fontSize: "14px",
-            fontWeight: "bold",
-            flexShrink: 0,
-          }}
+          className="toast-icon"
+          style={{ background: current.border }}
         >
           {current.icon}
         </div>
 
-        {/* TEXTO ALINEADO */}
-        <span
-          style={{
-            fontSize: "15px",
-            fontWeight: 500,
-            lineHeight: "20px",
-          }}
-        >
-          {message}
-        </span>
+        <span className="toast-message">{message}</span>
       </div>
 
-      {/* CLOSE */}
-      <button
-        onClick={onClose}
+      {/* PROGRESS BAR 🔥 */}
+      <div
+        className="toast-progress"
         style={{
-          background: "transparent",
-          border: "none",
-          color: "#ccc",
-          cursor: "pointer",
-          fontSize: "18px",
-          marginLeft: "10px",
+          animationDuration: `${duration}ms`,
+          background: current.border,
         }}
-      >
-        ✕
-      </button>
+      />
     </div>
   );
 }

@@ -1,0 +1,96 @@
+/* SELECTOR CARD */
+.selector-card {
+    margin-top: 6px;
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.selector-card:hover {
+    background: #f8fafc;
+}
+
+.selector-title {
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.selector-sub {
+    font-size: 12px;
+    color: #64748b;
+}
+
+.selector-action {
+    font-size: 12px;
+    color: #2563eb;
+    font-weight: 600;
+}
+
+/* LIST */
+.agency-list {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* ITEM */
+.agency-item {
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.agency-item:hover {
+    background: #f1f5f9;
+    border-color: #e2e8f0;
+}
+
+.agency-name {
+    font-weight: 600;
+    font-size: 13px;
+}
+
+.agency-address {
+    font-size: 12px;
+    color: #64748b;
+}
+
+
+.modal-close-btn {
+    all: unset;
+
+    width: 32px;
+    height: 32px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 8px;
+    cursor: pointer;
+
+    font-size: 18px;
+    font-weight: 600;
+    color: #334155;
+
+    transition: all 0.2s ease;
+}
+
+/* hover bonito */
+.modal-close-btn:hover {
+    background: #f1f5f9;
+    color: #111827;
+}
+
+/* active */
+.modal-close-btn:active {
+    transform: scale(0.95);
+}

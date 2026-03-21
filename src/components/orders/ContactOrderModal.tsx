@@ -1,14 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./../../styles/components/orders/contactOrderModal.css";
-
-import {
-  formatShopifyDate,
-  paymentLabel,
-  fulfillmentLabel,
-} from "../../utils/ordersUtil";
-
-import { useUpdateOrderStatus } from "../../hooks/useOrders";
+import { formatShopifyDate } from "../../utils/ordersUtil";
 import StatusSelectorModal from "../common/StatusSelectorModal";
+import AddProductModal from "../common/AddProductModal";
+import AgencySelectorModal from "../common/AgencySelectorModal";
+import AdvanceModal from "../common/AdvanceModal";
 
 type Props = {
   order: any;
@@ -16,12 +12,21 @@ type Props = {
 };
 
 export default function ContactOrderModal({ order, onClose }: Readonly<Props>) {
-  const { handleUpdateStatus, loadingStatus } = useUpdateOrderStatus();
+  const [agencies, setAgencies] = useState<any[]>([]);
+  const [selectedAgency, setSelectedAgency] = useState<any | null>(null);
+  const [showAgencyModal, setShowAgencyModal] = useState(false);
+  const [showAdvanceModal, setShowAdvanceModal] = useState(false);
+  const [advanceAmount, setAdvanceAmount] = useState(0);
+
+  useEffect(() => {
+    const cache = localStorage.getItem("agencies_cache");
+    if (cache) setAgencies(JSON.parse(cache));
+  }, []);
 
   if (!order) return null;
 
   /* =============================
-     🔥 BASE DATA (SHOPIFY)
+     BASE DATA
   ============================== */
 
   const originalQty = order.product?.quantity || 1;
@@ -34,7 +39,7 @@ export default function ContactOrderModal({ order, onClose }: Readonly<Props>) {
   const decrease = () => setQty((q: number) => (q > 1 ? q - 1 : 1));
 
   /* =============================
-     🔥 TOTAL DINÁMICO (CORRECTO)
+     TOTAL BASE (SHOPIFY LOGIC)
   ============================== */
 
   let total = 0;
@@ -48,6 +53,61 @@ export default function ContactOrderModal({ order, onClose }: Readonly<Props>) {
   }
 
   /* =============================
+     EXTRA PRODUCTS 🔥
+  ============================== */
+
+  const [extraProducts, setExtraProducts] = useState<any[]>([]);
+  const [showAddProduct, setShowAddProduct] = useState(false);
+
+  const handleAddProduct = (product: any) => {
+    setExtraProducts((prev) => {
+      const exists = prev.find((p) => p.id === product.id);
+
+      if (exists) {
+        return prev.map((p) =>
+          p.id === product.id ? { ...p, quantity: p.quantity + 1 } : p,
+        );
+      }
+
+      return [...prev, { ...product, quantity: 1 }];
+    });
+  };
+
+  const updateExtraQty = (index: number, type: "inc" | "dec") => {
+    setExtraProducts((prev) =>
+      prev.map((p, i) => {
+        if (i !== index) return p;
+
+        if (type === "inc") {
+          return { ...p, quantity: p.quantity + 1 };
+        }
+
+        return { ...p, quantity: Math.max(1, p.quantity - 1) };
+      }),
+    );
+  };
+
+  const extraTotal = extraProducts.reduce(
+    (acc, p) => acc + Number(p.price) * p.quantity,
+    0,
+  );
+
+  const baseTotal = total + extraTotal;
+  const finalTotal = Math.max(0, baseTotal - advanceAmount);
+
+  useEffect(() => {
+    if (advanceAmount === 0) return;
+
+    setStatuses((prev) => ({
+      ...prev,
+      adelanto: advanceAmount >= baseTotal ? "Pagado total" : "Parcial",
+    }));
+  }, [baseTotal]); // 🔥 clave
+
+  const removeProduct = (index: number) => {
+    setExtraProducts((prev) => prev.filter((_, i) => i !== index));
+  };
+  /* =============================
      CLIENT DATA
   ============================== */
 
@@ -55,7 +115,7 @@ export default function ContactOrderModal({ order, onClose }: Readonly<Props>) {
   const [address, setAddress] = useState(order.customer?.address || "");
 
   /* =============================
-     🔥 STATUS CONFIG
+     STATUS CONFIG
   ============================== */
 
   const STATUS_CONFIG = {
@@ -78,10 +138,6 @@ export default function ContactOrderModal({ order, onClose }: Readonly<Props>) {
       { label: "No aplica", color: "gray" },
     ],
   };
-
-  /* =============================
-     STATE
-  ============================== */
 
   const [statuses, setStatuses] = useState({
     llamada: "",
@@ -110,6 +166,36 @@ export default function ContactOrderModal({ order, onClose }: Readonly<Props>) {
   ============================== */
 
   const update = async () => {
+    const region = order.customer?.region_type?.toLowerCase();
+    const isProvince = region === "provincia";
+
+    /* =============================
+     VALIDACIONES 🔥
+  ============================== */
+
+    if ((isProvince && !statuses.adelanto) || statuses.adelanto === "") {
+      alert("⚠️ Debe registrar el adelanto antes de continuar");
+      return;
+    }
+
+    // Agencia obligatoria en provincia
+    if (isProvince && !selectedAgency) {
+      alert("⚠️ Debe seleccionar una agencia de destino");
+      return;
+    }
+
+    // DNI obligatorio en provincia
+    if (isProvince && dni.length !== 8) {
+      alert("⚠️ DNI obligatorio para envíos a provincia (8 dígitos)");
+      return;
+    }
+
+    // Adelanto válido si existe
+
+    /* =============================
+     CONTINÚA NORMAL
+  ============================== */
+
     const newData = {
       customer: {
         dni,
@@ -117,7 +203,18 @@ export default function ContactOrderModal({ order, onClose }: Readonly<Props>) {
       },
       order: {
         quantity: qty,
-        total,
+        total: finalTotal,
+        advance: advanceAmount,
+      },
+      products: [
+        {
+          ...order.product,
+          quantity: qty,
+        },
+        ...extraProducts,
+      ],
+      shipping: {
+        agency: selectedAgency,
       },
       tracking: {
         llamada: statuses.llamada,
@@ -125,34 +222,66 @@ export default function ContactOrderModal({ order, onClose }: Readonly<Props>) {
         adelanto: statuses.adelanto,
       },
     };
-
-    const ok = await handleUpdateStatus(
-      order,
-      "update_contact",
-      newData,
-    );
-
-    if (ok) {
-      window.dispatchEvent(new Event("orders-updated"));
-      onClose();
-    }
   };
 
+  const handleReset = () => {
+    // producto original
+    setQty(originalQty);
+
+    // extras
+    setExtraProducts([]);
+
+    // adelanto
+    setAdvanceAmount(0);
+
+    // estados
+    setStatuses({
+      llamada: "",
+      confirmacion: "",
+      adelanto: "",
+    });
+
+    // agencia
+    setSelectedAgency(null);
+
+    // cliente
+    setDni("");
+    setAddress("");
+
+    // modales
+    setActiveSelector(null);
+    setShowAddProduct(false);
+    setShowAgencyModal(false);
+    setShowAdvanceModal(false);
+  };
   /* =============================
      RENDER
   ============================== */
 
   return (
-    <div className="contact-modal-overlay" onClick={onClose}>
+    <div className="contact-modal-overlay">
       <div className="contact-modal" onClick={(e) => e.stopPropagation()}>
         {/* HEADER */}
         <div className="modal-header">
-          <div>
-            <h2>Pedido #{order.order_number}</h2>
-            <p className="modal-subtitle">Gestión de contacto con el cliente</p>
+          {/* IZQUIERDA */}
+          <div className="header-left">
+            <button className="btn-reset-primary" onClick={handleReset}>
+              Limpiar
+            </button>
           </div>
 
-          <button className="order-modal-close" onClick={onClose}>
+          {/* CENTRO */}
+          <div>
+            <div className="header-center">
+              <h2>Pedido #{order.order_number}</h2>
+              <p className="modal-subtitle">
+                Gestión de contacto con el cliente
+              </p>
+            </div>
+          </div>
+
+          {/* DERECHA */}
+          <button className="modal-close-btn" onClick={onClose}>
             ✕
           </button>
         </div>
@@ -191,10 +320,13 @@ export default function ContactOrderModal({ order, onClose }: Readonly<Props>) {
               <div className="customer-row">
                 <span>DNI</span>
                 <input
-                  className="input-field"
+                  className={`input-field ${dni.length === 8 ? "valid" : ""}`}
                   value={dni}
-                  onChange={(e) => setDni(e.target.value)}
-                  placeholder="Ingrese DNI"
+                  maxLength={8}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, "");
+                    setDni(value);
+                  }}
                 />
               </div>
 
@@ -204,7 +336,6 @@ export default function ContactOrderModal({ order, onClose }: Readonly<Props>) {
                   className="input-field"
                   value={address || ""}
                   onChange={(e) => setAddress(e.target.value)}
-                  placeholder="Ingrese dirección"
                 />
               </div>
             </div>
@@ -216,7 +347,7 @@ export default function ContactOrderModal({ order, onClose }: Readonly<Props>) {
           <div className="order-modal-section">
             <h3>Información del pedido</h3>
 
-            <div className="order-grid">
+            <div className="order-grid improved">
               <div>
                 <span>Fecha</span>
                 <p>{formatShopifyDate(order.created_at)}</p>
@@ -229,60 +360,133 @@ export default function ContactOrderModal({ order, onClose }: Readonly<Props>) {
                 </p>
               </div>
 
-              <div>
-                <span>Estado del pago</span>
-                <p>{paymentLabel(order.financial_status)}</p>
-              </div>
+              {/* 🔥 AGENCY ocupa toda la fila */}
+              <div className="full-width">
+                <div
+                  className={`agency-card ${selectedAgency ? "active" : ""}`}
+                  onClick={() => setShowAgencyModal(true)}
+                >
+                  <span className="agency-label">Agencia destino</span>
 
-              <div>
-                <span>Estado del pedido</span>
-                <p>{fulfillmentLabel(order.fulfillment_status)}</p>
+                  <div className="agency-content">
+                    <p className="agency-name">
+                      {selectedAgency?.name || "Seleccionar agencia"}
+                    </p>
+
+                    {selectedAgency && (
+                      <>
+                        <span className="agency-address">
+                          {selectedAgency.address}
+                        </span>
+
+                        <span className="agency-city">
+                          {selectedAgency.city}
+                        </span>
+                      </>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
 
           <div className="modal-divider" />
 
-          {/* PRODUCTO */}
+          {/* PRODUCTOS */}
           <div className="order-modal-section">
-            <h3>Producto</h3>
+            <div className="section-header">
+              <h3>Producto</h3>
 
-            <div className="product-card">
+              <button
+                className="btn-add-product"
+                onClick={() => setShowAddProduct(true)}
+              >
+                + Agregar producto
+              </button>
+            </div>
+
+            {/* ORIGINAL */}
+            <div className="product-card improved">
+              {/* LEFT */}
               <div className="product-left">
                 <p className="product-name">{order.product?.name}</p>
 
-                <span className="product-sku">
-                  Cantidad inicial: {originalQty}
-                </span>
-
-                  <span className="product-sku">
-                  Vendedor: {order.product.vendor}
-                </span>
-
+                <span>Cantidad inicial: {originalQty}</span>
+                <span>Vendedor: {order.product.vendor}</span>
                 <span className="product-price">
-                  Precio real: {order.currency} {realPrice.toFixed(2)}
+                  Precio: {order.currency} {realPrice.toFixed(2)}
                 </span>
 
-                {order.total_discount > 0 && qty > 2 && (
-                  <span className="promo-label">
+                {/* 🔥 PROMO */}
+                {order.total_discount > 0 && (
+                  <span className="product-discount">
                     🔥 Descuento aplicado: -{order.currency}{" "}
-                    {order.total_discount}
+                    {Number(order.total_discount).toFixed(2)}
                   </span>
                 )}
               </div>
 
-              <div className="product-stepper">
-                <button onClick={decrease}>−</button>
-                <span className="qty">{qty}</span>
-                <button onClick={increase}>+</button>
+              {/* RIGHT */}
+              <div className="product-right">
+                <div className="product-stepper">
+                  <button onClick={decrease}>−</button>
+                  <span>{qty}</span>
+                  <button onClick={increase}>+</button>
+                </div>
               </div>
             </div>
 
-            <div className="product-total">
-              <span>Total a cobrar</span>
-              <p>
-                {order.currency} {total.toFixed(2)}
-              </p>
+            {/* EXTRA */}
+            {extraProducts.map((p, i) => (
+              <div key={i} className="product-card extra improved">
+                {/* LEFT */}
+                <div className="product-left">
+                  <p className="product-name">{p.title}</p>
+                  <span className="product-price">PEN {p.price}</span>
+                </div>
+
+                {/* RIGHT */}
+                <div className="product-right">
+                  <div className="product-stepper">
+                    <button onClick={() => updateExtraQty(i, "dec")}>−</button>
+                    <span>{p.quantity}</span>
+                    <button onClick={() => updateExtraQty(i, "inc")}>+</button>
+                  </div>
+
+                  <button
+                    className="btn-remove icon"
+                    onClick={() => removeProduct(i)}
+                  >
+                    🗑
+                  </button>
+                </div>
+              </div>
+            ))}
+
+            {/* TOTAL */}
+            <div className="product-total clean">
+              <div className="product-line">
+                <span>Monto total</span>
+                <p>
+                  {order.currency} {baseTotal.toFixed(2)}
+                </p>
+              </div>
+
+              {advanceAmount > 0 && (
+                <div className="product-line advance">
+                  <span>Adelanto</span>
+                  <p>
+                    - {order.currency} {advanceAmount.toFixed(2)}
+                  </p>
+                </div>
+              )}
+
+              <div className="product-line total">
+                <span>Total a cobrar</span>
+                <p>
+                  {order.currency} {finalTotal.toFixed(2)}
+                </p>
+              </div>
             </div>
           </div>
 
@@ -301,23 +505,24 @@ export default function ContactOrderModal({ order, onClose }: Readonly<Props>) {
                 <button
                   key={item.key}
                   className="dropdown-card"
-                  onClick={() => setActiveSelector(item.key)}
-                  type="button"
+                  onClick={() => {
+                    if (item.key === "adelanto") {
+                      setShowAdvanceModal(true);
+                      return;
+                    }
+                    setActiveSelector(item.key);
+                  }}
                 >
-                  <span className="dropdown-label">{item.label}</span>
+                  <span>{item.label}</span>
 
-                  <div className="status-value">
-                    <span
-                      className={`chip ${getColorClass(
-                        statuses[item.key],
-                        item.key,
-                      )}`}
-                    >
-                      {statuses[item.key] || "Seleccionar"}
-                    </span>
-
-                    <span className="status-arrow">›</span>
-                  </div>
+                  <span
+                    className={`chip ${getColorClass(
+                      statuses[item.key],
+                      item.key,
+                    )}`}
+                  >
+                    {statuses[item.key] || "Seleccionar"}
+                  </span>
                 </button>
               ))}
             </div>
@@ -326,25 +531,17 @@ export default function ContactOrderModal({ order, onClose }: Readonly<Props>) {
 
         {/* FOOTER */}
         <div className="modal-footer contact-actions">
-          <button
-            className="btn-cancel"
-            onClick={onClose}
-            disabled={loadingStatus}
-          >
+          <button className="btn-cancel" onClick={onClose}>
             Cancelar
           </button>
 
-          <button
-            className="btn-success"
-            onClick={update}
-            disabled={loadingStatus}
-          >
+          <button className="btn-success" onClick={update}>
             ✔ Actualizar
           </button>
         </div>
       </div>
 
-      {/* MODAL SELECTOR */}
+      {/* MODALS */}
       {activeSelector && (
         <StatusSelectorModal
           title={`Seleccionar ${activeSelector}`}
@@ -353,6 +550,48 @@ export default function ContactOrderModal({ order, onClose }: Readonly<Props>) {
           onSelect={(value) => {
             handleSelect(activeSelector, value);
             setActiveSelector(null);
+          }}
+        />
+      )}
+
+      {showAddProduct && (
+        <AddProductModal
+          onClose={() => setShowAddProduct(false)}
+          onSelect={handleAddProduct}
+        />
+      )}
+
+      {showAgencyModal && (
+        <AgencySelectorModal
+          agencies={agencies}
+          onClose={() => setShowAgencyModal(false)}
+          onSelect={(agency) => {
+            setSelectedAgency(agency);
+            setShowAgencyModal(false);
+          }}
+        />
+      )}
+
+      {showAdvanceModal && (
+        <AdvanceModal
+          order={{
+            ...order,
+            total_price: baseTotal,
+          }}
+          onClose={() => setShowAdvanceModal(false)}
+          onConfirm={(amount, extra) => {
+            setAdvanceAmount(amount);
+
+            if (extra?.dni) {
+              setDni(extra.dni);
+            }
+
+            setStatuses((prev) => ({
+              ...prev,
+              adelanto: amount === baseTotal ? "Pagado total" : "Parcial",
+            }));
+
+            setShowAdvanceModal(false);
           }}
         />
       )}

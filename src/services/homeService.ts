@@ -16,3 +16,20 @@ export const getShalomAgencies = async () => {
         return [];
     }
 };
+
+export const getProducts = async (shop: string) => {
+    try {
+        const res = await fetch(`${API}/products/${shop}`);
+
+        if (!res.ok) {
+            throw new Error("Error obteniendo productos");
+        }
+
+        const data = await res.json();
+
+        return data.data;
+    } catch (error) {
+        console.error("Error en getProducts:", error);
+        return [];
+    }
+};

@@ -1,20 +1,39 @@
 import { useEffect, useState, useRef } from "react";
 import Layout from "../layout/Layout";
 import "../styles/pages/homePage.css";
-import { useAgencies } from "../hooks/useHome";
+import { useAgencies, useProducts } from "../hooks/useHome";
 import toast from "react-hot-toast";
 import { notify } from "../utils/notify";
 
 export default function Home() {
+  /* =========================
+     SHOP DINÁMICO 🔥
+  ========================= */
+
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const shop = user?.shop || "";
+
+  /* =========================
+     HOOKS
+  ========================= */
+
   const { agencies, loadingAgencies, hasLoaded } = useAgencies();
 
-  const hasShownToast = useRef(false);
+  const { products, loadingProducts, hasLoadedProducts } = useProducts(shop);
 
+  /* =========================
+     TOAST CONTROL
+  ========================= */
+
+  const hasShownAgenciesToast = useRef(false);
+  const hasShownProductsToast = useRef(false);
+
+  // 🔥 AGENCIAS
   useEffect(() => {
-    if (hasShownToast.current) return;
+    if (hasShownAgenciesToast.current) return;
 
     if (hasLoaded) {
-      hasShownToast.current = true;
+      hasShownAgenciesToast.current = true;
 
       if (agencies.length > 0) {
         notify.success("Agencias cargadas correctamente 🚚");
@@ -23,6 +42,21 @@ export default function Home() {
       }
     }
   }, [hasLoaded]);
+
+  // 🔥 PRODUCTOS
+  useEffect(() => {
+    if (hasShownProductsToast.current) return;
+
+    if (hasLoadedProducts) {
+      hasShownProductsToast.current = true;
+
+      if (products.length > 0) {
+        notify.success("Productos cargados correctamente 🛍️");
+      } else {
+        notify.error("Error al cargar productos ❌");
+      }
+    }
+  }, [hasLoadedProducts]);
 
   /* =========================
      BANNERS
@@ -137,12 +171,10 @@ export default function Home() {
                   <span>Ver todos</span>
                 </div>
 
-                {/* LOADING */}
                 {loadingAgencies && agencies.length === 0 && (
                   <p>Cargando agencias...</p>
                 )}
 
-                {/* DATA */}
                 {agencies.slice(0, 4).map((agency) => (
                   <div key={agency.id} className="provider-item">
                     <div className="provider-left">
@@ -151,20 +183,47 @@ export default function Home() {
                     </div>
 
                     <button
-                      onClick={() => {
-                        console.log("AGENCIA:", agency);
-
-                        toast.success(`Seleccionaste ${agency.name} 📍`);
-                      }}
+                      onClick={() =>
+                        toast.success(`Seleccionaste ${agency.name} 📍`)
+                      }
                     >
                       Ver
                     </button>
                   </div>
                 ))}
 
-                {/* EMPTY STATE */}
                 {!loadingAgencies && agencies.length === 0 && (
                   <p>No hay agencias disponibles</p>
+                )}
+              </div>
+
+              {/* =========================
+                  PRODUCTOS 🔥
+              ========================= */}
+
+              <div className="providers-section">
+                <div className="section-header">
+                  <h3>Productos destacados</h3>
+                  <span>Ver todos</span>
+                </div>
+
+                {loadingProducts && products.length === 0 && (
+                  <p>Cargando productos...</p>
+                )}
+
+                {products.slice(0, 4).map((product) => (
+                  <div key={product.id} className="provider-item">
+                    <div className="provider-left">
+                      <div className="provider-icon">🛍️</div>
+                      {product.title}
+                    </div>
+
+                    <span>S/ {product.price}</span>
+                  </div>
+                ))}
+
+                {!loadingProducts && products.length === 0 && (
+                  <p>No hay productos disponibles</p>
                 )}
               </div>
             </div>
