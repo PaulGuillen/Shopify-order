@@ -1,96 +1,112 @@
-/* SELECTOR CARD */
-.selector-card {
-    margin-top: 6px;
-    padding: 12px;
-    border-radius: 12px;
-    border: 1px solid #e2e8f0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    cursor: pointer;
-    transition: all 0.2s ease;
+/* OVERLAY */
+.agency-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1200;
 }
 
-.selector-card:hover {
-    background: #f8fafc;
+/* MODAL */
+.agency-modal {
+  width: 100%;
+  max-width: 600px;
+  height: 80vh;
+  background: white;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
-.selector-title {
-    font-weight: 600;
-    font-size: 14px;
+/* HEADER */
+.agency-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-.selector-sub {
-    font-size: 12px;
-    color: #64748b;
+.agency-header h3 {
+  font-size: 18px;
+  font-weight: 600;
 }
 
-.selector-action {
-    font-size: 12px;
-    color: #2563eb;
-    font-weight: 600;
+.agency-close-btn {
+  background: #f1f5f9;
+  border: none;
+  border-radius: 10px;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+}
+
+/* CONTENT */
+.agency-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* SEARCH */
+.agency-search {
+  position: sticky;
+  top: 0;
+  background: white;
+  z-index: 10;
+  padding: 0 16px 10px; /* 🔥 sin espacio arriba */
+  border-bottom: 1px solid #eee;
+}
+
+.agency-input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  font-size: 14px;
+}
+
+.agency-input:focus {
+  outline: none;
+  border-color: #6366f1;
 }
 
 /* LIST */
 .agency-list {
-    margin-top: 10px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+  overflow-y: auto;
+  flex: 1;
+  padding: 10px 16px;
 }
 
 /* ITEM */
 .agency-item {
-    padding: 10px;
-    border-radius: 10px;
-    border: 1px solid transparent;
-    cursor: pointer;
-    transition: all 0.2s ease;
+  padding: 12px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: 0.2s;
 }
 
 .agency-item:hover {
-    background: #f1f5f9;
-    border-color: #e2e8f0;
+  background: #f8fafc;
 }
 
 .agency-name {
-    font-weight: 600;
-    font-size: 13px;
+  font-weight: 600;
+  font-size: 14px;
 }
 
 .agency-address {
-    font-size: 12px;
-    color: #64748b;
+  font-size: 13px;
+  color: #64748b;
 }
 
-
-.modal-close-btn {
-    all: unset;
-
-    width: 32px;
-    height: 32px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    border-radius: 8px;
-    cursor: pointer;
-
-    font-size: 18px;
-    font-weight: 600;
-    color: #334155;
-
-    transition: all 0.2s ease;
-}
-
-/* hover bonito */
-.modal-close-btn:hover {
-    background: #f1f5f9;
-    color: #111827;
-}
-
-/* active */
-.modal-close-btn:active {
-    transform: scale(0.95);
+/* EMPTY */
+.agency-empty {
+  text-align: center;
+  color: #94a3b8;
+  margin-top: 20px;
 }

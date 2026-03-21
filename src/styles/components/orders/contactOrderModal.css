@@ -301,6 +301,38 @@
     font-weight: 700;
 }
 
+.product-total-new {
+    font-size: 13px;
+    font-weight: 600;
+    color: #2563eb;
+    /* azul pro */
+}
+
+/* =========================
+   PRODUCTS SCROLL 🔥
+========================= */
+
+.products-scroll {
+    max-height: 260px;
+    /* 🔥 ajustable */
+    overflow-y: auto;
+    padding-right: 6px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* scrollbar bonito */
+.products-scroll::-webkit-scrollbar {
+    width: 6px;
+}
+
+.products-scroll::-webkit-scrollbar-thumb {
+    background: #cbd5f5;
+    border-radius: 10px;
+}
+
 /* =========================
    CUSTOMER CARD (🔥 NUEVO)
 ========================= */

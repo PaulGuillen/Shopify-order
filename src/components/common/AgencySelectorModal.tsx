@@ -14,41 +14,66 @@ export default function AgencySelectorModal({
 }: Readonly<Props>) {
   const [search, setSearch] = useState("");
 
-  const filtered = agencies.filter((a) =>
-    `${a.name} ${a.address}`.toLowerCase().includes(search.toLowerCase()),
-  );
+  const normalize = (text: string) => {
+    return text
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9\s]/g, "")
+      .replace(/\s+/g, " ")
+      .trim();
+  };
+
+  const filtered = agencies.filter((a) => {
+    const searchNormalized = normalize(search);
+    const agencyText = normalize(`${a.name} ${a.address}`);
+    return agencyText.includes(searchNormalized);
+  });
 
   return (
-    <div className="contact-modal-overlay">
-      <div className="contact-modal small" onClick={(e) => e.stopPropagation()}>
+    <div className="agency-overlay" onClick={onClose}>
+      <div
+        className="agency-modal"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* HEADER */}
-        <div className="modal-header">
+        <div className="agency-header">
           <h3>Seleccionar agencia destino</h3>
-          <button className="modal-close-btn" onClick={onClose}>
+          <button className="agency-close-btn" onClick={onClose}>
             ✕
           </button>
         </div>
 
-        {/* SEARCH 🔥 */}
-        <div className="modal-content">
-          <input
-            className="input-field"
-            placeholder="Buscar agencia..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
+        {/* CONTENT */}
+        <div className="agency-content">
+          {/* SEARCH */}
+          <div className="agency-search">
+            <input
+              className="agency-input"
+              placeholder="Buscar agencia..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
 
+          {/* LIST */}
           <div className="agency-list">
-            {filtered.map((agency, i) => (
-              <div
-                key={i}
-                className="agency-item"
-                onClick={() => onSelect(agency)}
-              >
-                <p className="agency-name">{agency.name}</p>
-                <span className="agency-address">{agency.address}</span>
-              </div>
-            ))}
+            {filtered.length > 0 ? (
+              filtered.map((agency, i) => (
+                <div
+                  key={i}
+                  className="agency-item"
+                  onClick={() => onSelect(agency)}
+                >
+                  <p className="agency-name">{agency.name}</p>
+                  <span className="agency-address">
+                    {agency.address}
+                  </span>
+                </div>
+              ))
+            ) : (
+              <p className="agency-empty">Sin resultados</p>
+            )}
           </div>
         </div>
       </div>

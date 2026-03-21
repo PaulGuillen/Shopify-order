@@ -5,6 +5,7 @@ import StatusSelectorModal from "../common/StatusSelectorModal";
 import AddProductModal from "../common/AddProductModal";
 import AgencySelectorModal from "../common/AgencySelectorModal";
 import AdvanceModal from "../common/AdvanceModal";
+import ProductEditModal from "../common/ProductEditModal";
 
 type Props = {
   order: any;
@@ -17,6 +18,10 @@ export default function ContactOrderModal({ order, onClose }: Readonly<Props>) {
   const [showAgencyModal, setShowAgencyModal] = useState(false);
   const [showAdvanceModal, setShowAdvanceModal] = useState(false);
   const [advanceAmount, setAdvanceAmount] = useState(0);
+  const [editingProduct, setEditingProduct] = useState<any | null>(null);
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [customTotalMain, setCustomTotalMain] = useState<number | null>(null);
+  const [orderData, setOrderData] = useState(order);
 
   useEffect(() => {
     const cache = localStorage.getItem("agencies_cache");
@@ -34,9 +39,6 @@ export default function ContactOrderModal({ order, onClose }: Readonly<Props>) {
   const originalTotal = Number(order.total_price || 0);
 
   const [qty, setQty] = useState(originalQty);
-
-  const increase = () => setQty((q: number) => q + 1);
-  const decrease = () => setQty((q: number) => (q > 1 ? q - 1 : 1));
 
   /* =============================
      TOTAL BASE (SHOPIFY LOGIC)
@@ -59,20 +61,6 @@ export default function ContactOrderModal({ order, onClose }: Readonly<Props>) {
   const [extraProducts, setExtraProducts] = useState<any[]>([]);
   const [showAddProduct, setShowAddProduct] = useState(false);
 
-  const handleAddProduct = (product: any) => {
-    setExtraProducts((prev) => {
-      const exists = prev.find((p) => p.id === product.id);
-
-      if (exists) {
-        return prev.map((p) =>
-          p.id === product.id ? { ...p, quantity: p.quantity + 1 } : p,
-        );
-      }
-
-      return [...prev, { ...product, quantity: 1 }];
-    });
-  };
-
   const updateExtraQty = (index: number, type: "inc" | "dec") => {
     setExtraProducts((prev) =>
       prev.map((p, i) => {
@@ -87,22 +75,40 @@ export default function ContactOrderModal({ order, onClose }: Readonly<Props>) {
     );
   };
 
+  const basePrice = Number(order.product?.price || 0);
+  const initialQty = order.product?.quantity || 1;
+
+  // 🔥 detectar cambios reales
+  const hasChanges =
+    extraProducts.length > 0 || qty !== initialQty || !!customTotalMain;
+
+  // 🔥 total principal
+  const mainTotal = customTotalMain ?? qty * basePrice;
+
+  // 🔥 extras
   const extraTotal = extraProducts.reduce(
-    (acc, p) => acc + Number(p.price) * p.quantity,
+    (acc, item) => acc + (item.total ?? item.price * item.quantity),
     0,
   );
 
-  const baseTotal = total + extraTotal;
-  const finalTotal = Math.max(0, baseTotal - advanceAmount);
+  const calculatedTotal = mainTotal + extraTotal;
+
+  // 🔥 total final inteligente
+  const finalTotal = hasChanges
+    ? mainTotal + extraTotal
+    : Number(order.total_price);
+
+  const adelanto = Number(orderData.advance_payment || 0);
+  const totalACobrar = Math.max(0, finalTotal - adelanto);
 
   useEffect(() => {
     if (advanceAmount === 0) return;
 
     setStatuses((prev) => ({
       ...prev,
-      adelanto: advanceAmount >= baseTotal ? "Pagado total" : "Parcial",
+      adelanto: advanceAmount >= calculatedTotal ? "Pagado total" : "Parcial",
     }));
-  }, [baseTotal]); // 🔥 clave
+  }, [calculatedTotal]); // 🔥 clave
 
   const removeProduct = (index: number) => {
     setExtraProducts((prev) => prev.filter((_, i) => i !== index));
@@ -195,6 +201,8 @@ export default function ContactOrderModal({ order, onClose }: Readonly<Props>) {
     /* =============================
      CONTINÚA NORMAL
   ============================== */
+    const adelantoAnterior = Number(order.advance_payment || 0);
+    const totalPagado = adelantoAnterior + advanceAmount;
 
     const newData = {
       customer: {
@@ -202,14 +210,15 @@ export default function ContactOrderModal({ order, onClose }: Readonly<Props>) {
         address,
       },
       order: {
-        quantity: qty,
         total: finalTotal,
         advance: advanceAmount,
+        pending: Math.max(0, finalTotal - totalPagado),
       },
       products: [
         {
           ...order.product,
           quantity: qty,
+          total: mainTotal,
         },
         ...extraProducts,
       ],
@@ -222,6 +231,8 @@ export default function ContactOrderModal({ order, onClose }: Readonly<Props>) {
         adelanto: statuses.adelanto,
       },
     };
+
+    console.log("Request", newData);
   };
 
   const handleReset = () => {
@@ -233,6 +244,8 @@ export default function ContactOrderModal({ order, onClose }: Readonly<Props>) {
 
     // adelanto
     setAdvanceAmount(0);
+
+    setCustomTotalMain(null);
 
     // estados
     setStatuses({
@@ -253,6 +266,7 @@ export default function ContactOrderModal({ order, onClose }: Readonly<Props>) {
     setShowAddProduct(false);
     setShowAgencyModal(false);
     setShowAdvanceModal(false);
+    setOrderData(order);
   };
   /* =============================
      RENDER
@@ -405,70 +419,126 @@ export default function ContactOrderModal({ order, onClose }: Readonly<Props>) {
               </button>
             </div>
 
-            {/* ORIGINAL */}
-            <div className="product-card improved">
-              {/* LEFT */}
-              <div className="product-left">
-                <p className="product-name">{order.product?.name}</p>
-
-                <span>Cantidad inicial: {originalQty}</span>
-                <span>Vendedor: {order.product.vendor}</span>
-                <span className="product-price">
-                  Precio: {order.currency} {realPrice.toFixed(2)}
-                </span>
-
-                {/* 🔥 PROMO */}
-                {order.total_discount > 0 && (
-                  <span className="product-discount">
-                    🔥 Descuento aplicado: -{order.currency}{" "}
-                    {Number(order.total_discount).toFixed(2)}
-                  </span>
-                )}
-              </div>
-
-              {/* RIGHT */}
-              <div className="product-right">
-                <div className="product-stepper">
-                  <button onClick={decrease}>−</button>
-                  <span>{qty}</span>
-                  <button onClick={increase}>+</button>
-                </div>
-              </div>
-            </div>
-
-            {/* EXTRA */}
-            {extraProducts.map((p, i) => (
-              <div key={i} className="product-card extra improved">
+            <div className="products-scroll">
+              {/* ORIGINAL */}
+              <div className="product-card improved">
                 {/* LEFT */}
                 <div className="product-left">
-                  <p className="product-name">{p.title}</p>
-                  <span className="product-price">PEN {p.price}</span>
+                  <p className="product-name">{order.product?.name}</p>
+
+                  <span>Cantidad inicial: {originalQty}</span>
+                  <span>Vendedor: {order.product.vendor}</span>
+                  <span className="product-price">
+                    Precio: {order.currency} {realPrice.toFixed(2)}
+                  </span>
+
+                  {/* 🔥 PROMO */}
+                  {order.total_discount > 0 && (
+                    <span className="product-discount">
+                      🔥 Descuento aplicado: -{order.currency}{" "}
+                      {Number(order.total_discount).toFixed(2)}
+                    </span>
+                  )}
+
+                  {(customTotalMain || qty !== originalQty) && (
+                    <span className="product-total-new">
+                      Total Producto: {order.currency} {mainTotal.toFixed(2)}
+                    </span>
+                  )}
                 </div>
 
                 {/* RIGHT */}
                 <div className="product-right">
                   <div className="product-stepper">
-                    <button onClick={() => updateExtraQty(i, "dec")}>−</button>
-                    <span>{p.quantity}</span>
-                    <button onClick={() => updateExtraQty(i, "inc")}>+</button>
-                  </div>
+                    <button
+                      onClick={() => {
+                        setEditingProduct({
+                          ...order.product,
+                          quantity: qty,
+                          originalPrice: realPrice,
+                        });
+                        setEditingIndex(-1); // 🔥 producto principal
+                      }}
+                    >
+                      −
+                    </button>
 
-                  <button
-                    className="btn-remove icon"
-                    onClick={() => removeProduct(i)}
-                  >
-                    🗑
-                  </button>
+                    <span>{qty}</span>
+
+                    <button
+                      onClick={() => {
+                        setEditingProduct({
+                          ...order.product,
+                          quantity: qty,
+                          originalPrice: realPrice,
+                        });
+                        setEditingIndex(-1);
+                      }}
+                    >
+                      +
+                    </button>
+                  </div>
                 </div>
               </div>
-            ))}
+
+              {/* EXTRA */}
+              {extraProducts.map((p, i) => (
+                <div key={i} className="product-card extra improved">
+                  {/* LEFT */}
+                  <div className="product-left">
+                    <p className="product-name">{p.title}</p>
+                    <span className="product-price">PEN {p.price}</span>
+                    <span className="product-total-new">
+                      Total Producto: PEN{" "}
+                      {(p.total ?? p.price * p.quantity).toFixed(2)}
+                    </span>
+                  </div>
+
+                  {/* RIGHT */}
+                  <div className="product-right">
+                    <div className="product-stepper">
+                      <button
+                        onClick={() => {
+                          setEditingProduct({
+                            ...p,
+                            originalPrice: p.price,
+                          });
+                          setEditingIndex(i);
+                        }}
+                      >
+                        −
+                      </button>
+                      <span>{p.quantity}</span>
+                      <button
+                        onClick={() => {
+                          setEditingProduct({
+                            ...p,
+                            originalPrice: p.price,
+                          });
+                          setEditingIndex(i);
+                        }}
+                      >
+                        +
+                      </button>
+                    </div>
+
+                    <button
+                      className="btn-remove icon"
+                      onClick={() => removeProduct(i)}
+                    >
+                      🗑
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
 
             {/* TOTAL */}
             <div className="product-total clean">
               <div className="product-line">
                 <span>Monto total</span>
                 <p>
-                  {order.currency} {baseTotal.toFixed(2)}
+                  {order.currency} {finalTotal.toFixed(2)}
                 </p>
               </div>
 
@@ -476,7 +546,7 @@ export default function ContactOrderModal({ order, onClose }: Readonly<Props>) {
                 <div className="product-line advance">
                   <span>Adelanto</span>
                   <p>
-                    - {order.currency} {advanceAmount.toFixed(2)}
+                    - {order.currency} {adelanto.toFixed(2)}
                   </p>
                 </div>
               )}
@@ -484,7 +554,7 @@ export default function ContactOrderModal({ order, onClose }: Readonly<Props>) {
               <div className="product-line total">
                 <span>Total a cobrar</span>
                 <p>
-                  {order.currency} {finalTotal.toFixed(2)}
+                  {order.currency} {totalACobrar.toFixed(2)}
                 </p>
               </div>
             </div>
@@ -557,7 +627,34 @@ export default function ContactOrderModal({ order, onClose }: Readonly<Props>) {
       {showAddProduct && (
         <AddProductModal
           onClose={() => setShowAddProduct(false)}
-          onSelect={handleAddProduct}
+          onSelect={(product) => {
+            setExtraProducts((prev) => {
+              const exist = prev.find((p) => p.id === product.id);
+
+              if (exist) {
+                return prev.map((p) =>
+                  p.id === product.id
+                    ? {
+                        ...p,
+                        quantity: p.quantity + product.quantity,
+                        total:
+                          (p.total ?? p.price * p.quantity) +
+                          (product.total ?? product.price * product.quantity),
+                      }
+                    : p,
+                );
+              }
+
+              return [
+                ...prev,
+                {
+                  ...product,
+                  quantity: product.quantity,
+                  total: product.total ?? product.price * product.quantity,
+                },
+              ];
+            });
+          }}
         />
       )}
 
@@ -576,11 +673,15 @@ export default function ContactOrderModal({ order, onClose }: Readonly<Props>) {
         <AdvanceModal
           order={{
             ...order,
-            total_price: baseTotal,
+            total_price: totalACobrar,
           }}
           onClose={() => setShowAdvanceModal(false)}
           onConfirm={(amount, extra) => {
             setAdvanceAmount(amount);
+            setOrderData((prev: { advance_payment: any }) => ({
+              ...prev,
+              advance_payment: (prev.advance_payment || 0) + amount,
+            }));
 
             if (extra?.dni) {
               setDni(extra.dni);
@@ -588,10 +689,37 @@ export default function ContactOrderModal({ order, onClose }: Readonly<Props>) {
 
             setStatuses((prev) => ({
               ...prev,
-              adelanto: amount === baseTotal ? "Pagado total" : "Parcial",
+              adelanto: amount === calculatedTotal ? "Pagado total" : "Parcial",
             }));
 
             setShowAdvanceModal(false);
+          }}
+        />
+      )}
+
+      {editingProduct && (
+        <ProductEditModal
+          product={editingProduct}
+          onClose={() => setEditingProduct(null)}
+          onConfirm={({ quantity, total }) => {
+            if (editingIndex === -1) {
+              setQty(quantity);
+              setCustomTotalMain(total); // 🔥 ESTE ES EL FIX
+            } else {
+              setExtraProducts((prev) =>
+                prev.map((item, index) =>
+                  index === editingIndex
+                    ? {
+                        ...item,
+                        quantity,
+                        total, // 🔥 IMPORTANTE
+                      }
+                    : item,
+                ),
+              );
+            }
+
+            setEditingProduct(null);
           }}
         />
       )}
