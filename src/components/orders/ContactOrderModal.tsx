@@ -6,6 +6,8 @@ import AddProductModal from "../common/AddProductModal";
 import AgencySelectorModal from "../common/AgencySelectorModal";
 import AdvanceModal from "../common/AdvanceModal";
 import ProductEditModal from "../common/ProductEditModal";
+import { FiCopy } from "react-icons/fi";
+import { notify } from "../../utils/notify";
 
 type Props = {
   order: any;
@@ -41,39 +43,11 @@ export default function ContactOrderModal({ order, onClose }: Readonly<Props>) {
   const [qty, setQty] = useState(originalQty);
 
   /* =============================
-     TOTAL BASE (SHOPIFY LOGIC)
-  ============================== */
-
-  let total = 0;
-
-  if (qty >= originalQty) {
-    total = originalTotal + (qty - originalQty) * realPrice;
-  } else if (qty === 2) {
-    total = originalTotal;
-  } else {
-    total = realPrice;
-  }
-
-  /* =============================
      EXTRA PRODUCTS 🔥
   ============================== */
 
   const [extraProducts, setExtraProducts] = useState<any[]>([]);
   const [showAddProduct, setShowAddProduct] = useState(false);
-
-  const updateExtraQty = (index: number, type: "inc" | "dec") => {
-    setExtraProducts((prev) =>
-      prev.map((p, i) => {
-        if (i !== index) return p;
-
-        if (type === "inc") {
-          return { ...p, quantity: p.quantity + 1 };
-        }
-
-        return { ...p, quantity: Math.max(1, p.quantity - 1) };
-      }),
-    );
-  };
 
   const basePrice = Number(order.product?.price || 0);
   const initialQty = order.product?.quantity || 1;
@@ -174,29 +148,44 @@ export default function ContactOrderModal({ order, onClose }: Readonly<Props>) {
   const update = async () => {
     const region = order.customer?.region_type?.toLowerCase();
     const isProvince = region === "provincia";
+    const isLima = region === "lima";
+    const isContactado = statuses.llamada === "Contactado"
+
+    if (!statuses.llamada || statuses.llamada === "") {
+      alert("⚠️ Debe seleccionar Llamada en Estados del Pedido");
+      return;
+    }
 
     /* =============================
      VALIDACIONES 🔥
   ============================== */
 
-    if ((isProvince && !statuses.adelanto) || statuses.adelanto === "") {
-      alert("⚠️ Debe registrar el adelanto antes de continuar");
-      return;
+    if (isContactado && isLima) {
+      if (!address || address == "") {
+        alert("⚠️ Debe ingresar una direccion");
+        return;
+      }
     }
 
-    // Agencia obligatoria en provincia
-    if (isProvince && !selectedAgency) {
-      alert("⚠️ Debe seleccionar una agencia de destino");
-      return;
-    }
+    if (isContactado && isProvince) {
+      // Adelanto obligatorio en provincia
+      if (!statuses.adelanto || statuses.adelanto === "") {
+        alert("⚠️ Debe registrar el adelanto antes de continuar");
+        return;
+      }
 
-    // DNI obligatorio en provincia
-    if (isProvince && dni.length !== 8) {
-      alert("⚠️ DNI obligatorio para envíos a provincia (8 dígitos)");
-      return;
-    }
+      // Agencia obligatoria en provincia
+      if (!selectedAgency) {
+        alert("⚠️ Debe seleccionar una agencia de destino");
+        return;
+      }
 
-    // Adelanto válido si existe
+      // DNI obligatorio en provincia
+      if (dni.length !== 8) {
+        alert("⚠️ DNI obligatorio para envíos a provincia (8 dígitos)");
+        return;
+      }
+    }
 
     /* =============================
      CONTINÚA NORMAL
@@ -315,8 +304,33 @@ export default function ContactOrderModal({ order, onClose }: Readonly<Props>) {
               </div>
 
               <div className="customer-row">
-                <span>Teléfono</span>
-                <p>{order.customer?.phone}</p>
+                <div className="phone-field">
+                  <label>TELÉFONO</label>
+
+                  <div className="phone-input-container">
+                    <span className="phone-prefix">+51</span>
+
+                    <input
+                      type="text"
+                      value={order.customer?.phone?.replace("+51", "")}
+                      readOnly
+                    />
+
+                    <button
+                      className="copy-btn-icon"
+                      onClick={() => {
+                        const onlyPhone = order.customer?.phone
+                          ?.replace("+51", "")
+                          ?.trim();
+
+                        navigator.clipboard.writeText(onlyPhone || "");
+                        notify.info("Núnmero copiado");
+                      }}
+                    >
+                      <FiCopy size={16} />
+                    </button>
+                  </div>
+                </div>
               </div>
 
               <div className="customer-row">
