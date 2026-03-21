@@ -1,3 +1,4 @@
+import { useState } from "react";
 import "./../../styles/components/orders/contactOrderModal.css";
 
 import {
@@ -7,6 +8,7 @@ import {
 } from "../../utils/ordersUtil";
 
 import { useUpdateOrderStatus } from "../../hooks/useOrders";
+import StatusSelectorModal from "../common/StatusSelectorModal";
 
 type Props = {
   order: any;
@@ -19,18 +21,119 @@ export default function ContactOrderModal({ order, onClose }: Readonly<Props>) {
   if (!order) return null;
 
   /* =============================
-     ACTIONS
+     🔥 BASE DATA (SHOPIFY)
   ============================== */
 
-  const update = async (action: string, message: string) => {
-    const ok = await handleUpdateStatus(order, action);
+  const originalQty = order.product?.quantity || 1;
+  const realPrice = Number(order.product?.price || 0);
+  const originalTotal = Number(order.total_price || 0);
+
+  const [qty, setQty] = useState(originalQty);
+
+  const increase = () => setQty((q: number) => q + 1);
+  const decrease = () => setQty((q: number) => (q > 1 ? q - 1 : 1));
+
+  /* =============================
+     🔥 TOTAL DINÁMICO (CORRECTO)
+  ============================== */
+
+  let total = 0;
+
+  if (qty >= originalQty) {
+    total = originalTotal + (qty - originalQty) * realPrice;
+  } else if (qty === 2) {
+    total = originalTotal;
+  } else {
+    total = realPrice;
+  }
+
+  /* =============================
+     CLIENT DATA
+  ============================== */
+
+  const [dni, setDni] = useState(order.customer?.dni || "");
+  const [address, setAddress] = useState(order.customer?.address || "");
+
+  /* =============================
+     🔥 STATUS CONFIG
+  ============================== */
+
+  const STATUS_CONFIG = {
+    llamada: [
+      { label: "Contactado", color: "blue" },
+      { label: "No contesta", color: "red" },
+      { label: "Agendado", color: "yellow" },
+      { label: "Corta llamada", color: "orange" },
+    ],
+    confirmacion: [
+      { label: "Pendiente", color: "yellow" },
+      { label: "Confirmado", color: "green" },
+      { label: "No desea", color: "red" },
+      { label: "Cancelado", color: "darkred" },
+      { label: "Duplicado", color: "gray" },
+    ],
+    adelanto: [
+      { label: "Parcial", color: "green" },
+      { label: "Pagado total", color: "darkgreen" },
+      { label: "No aplica", color: "gray" },
+    ],
+  };
+
+  /* =============================
+     STATE
+  ============================== */
+
+  const [statuses, setStatuses] = useState({
+    llamada: "",
+    confirmacion: "",
+    adelanto: "",
+  });
+
+  const [activeSelector, setActiveSelector] = useState<string | null>(null);
+
+  const handleSelect = (key: string, value: string) => {
+    setStatuses((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
+  };
+
+  const getColorClass = (value: string, key: string) => {
+    const found = STATUS_CONFIG[key as keyof typeof STATUS_CONFIG].find(
+      (s) => s.label === value,
+    );
+    return found?.color || "gray";
+  };
+
+  /* =============================
+     ACTION
+  ============================== */
+
+  const update = async () => {
+    const newData = {
+      customer: {
+        dni,
+        address,
+      },
+      order: {
+        quantity: qty,
+        total,
+      },
+      tracking: {
+        llamada: statuses.llamada,
+        confirmacion: statuses.confirmacion,
+        adelanto: statuses.adelanto,
+      },
+    };
+
+    const ok = await handleUpdateStatus(
+      order,
+      "update_contact",
+      newData,
+    );
 
     if (ok) {
-      alert(message);
-
-      // 🔥 refrescar UI
       window.dispatchEvent(new Event("orders-updated"));
-
       onClose();
     }
   };
@@ -40,10 +143,9 @@ export default function ContactOrderModal({ order, onClose }: Readonly<Props>) {
   ============================== */
 
   return (
-    <div className="order-modal-overlay" onClick={onClose}>
-      <div className="order-modal" onClick={(e) => e.stopPropagation()}>
+    <div className="contact-modal-overlay" onClick={onClose}>
+      <div className="contact-modal" onClick={(e) => e.stopPropagation()}>
         {/* HEADER */}
-
         <div className="modal-header">
           <div>
             <h2>Pedido #{order.order_number}</h2>
@@ -57,11 +159,60 @@ export default function ContactOrderModal({ order, onClose }: Readonly<Props>) {
 
         <div className="modal-divider" />
 
-        {/* CONTENT */}
-
+        {/* BODY */}
         <div className="modal-content">
-          {/* INFORMACIÓN PEDIDO */}
+          {/* CLIENTE */}
+          <div className="order-modal-section">
+            <h3>Información del cliente</h3>
 
+            <div className="customer-card">
+              <div className="customer-row">
+                <span>Nombre</span>
+                <p>{order.customer?.name}</p>
+              </div>
+
+              <div className="customer-row">
+                <span>Teléfono</span>
+                <p>{order.customer?.phone}</p>
+              </div>
+
+              <div className="customer-row">
+                <span>Región</span>
+                <p>{order.customer?.region_type}</p>
+              </div>
+
+              <div className="customer-row">
+                <span>Ubicación</span>
+                <p>
+                  {order.customer?.district} - {order.customer?.department}
+                </p>
+              </div>
+
+              <div className="customer-row">
+                <span>DNI</span>
+                <input
+                  className="input-field"
+                  value={dni}
+                  onChange={(e) => setDni(e.target.value)}
+                  placeholder="Ingrese DNI"
+                />
+              </div>
+
+              <div className="customer-row full">
+                <span>Dirección</span>
+                <input
+                  className="input-field"
+                  value={address || ""}
+                  onChange={(e) => setAddress(e.target.value)}
+                  placeholder="Ingrese dirección"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="modal-divider" />
+
+          {/* PEDIDO */}
           <div className="order-modal-section">
             <h3>Información del pedido</h3>
 
@@ -72,15 +223,10 @@ export default function ContactOrderModal({ order, onClose }: Readonly<Props>) {
               </div>
 
               <div>
-                <span>Total</span>
+                <span>Total original</span>
                 <p>
-                  {order.currency} {order.total_price}
+                  {order.currency} {originalTotal}
                 </p>
-              </div>
-
-              <div>
-                <span>Método de pago</span>
-                <p>{order.payment_gateway}</p>
               </div>
 
               <div>
@@ -92,92 +238,93 @@ export default function ContactOrderModal({ order, onClose }: Readonly<Props>) {
                 <span>Estado del pedido</span>
                 <p>{fulfillmentLabel(order.fulfillment_status)}</p>
               </div>
-
-              <div>
-                <span>Código de confirmación</span>
-                <p>{order.confirmation}</p>
-              </div>
             </div>
           </div>
 
           <div className="modal-divider" />
 
           {/* PRODUCTO */}
-
           <div className="order-modal-section">
             <h3>Producto</h3>
 
-            <div className="order-grid">
-              <div>
-                <span>Producto</span>
-                <p>{order.product?.name}</p>
+            <div className="product-card">
+              <div className="product-left">
+                <p className="product-name">{order.product?.name}</p>
+
+                <span className="product-sku">
+                  Cantidad inicial: {originalQty}
+                </span>
+
+                  <span className="product-sku">
+                  Vendedor: {order.product.vendor}
+                </span>
+
+                <span className="product-price">
+                  Precio real: {order.currency} {realPrice.toFixed(2)}
+                </span>
+
+                {order.total_discount > 0 && qty > 2 && (
+                  <span className="promo-label">
+                    🔥 Descuento aplicado: -{order.currency}{" "}
+                    {order.total_discount}
+                  </span>
+                )}
               </div>
 
-              <div>
-                <span>Cantidad</span>
-                <p>{order.product?.quantity}</p>
+              <div className="product-stepper">
+                <button onClick={decrease}>−</button>
+                <span className="qty">{qty}</span>
+                <button onClick={increase}>+</button>
               </div>
+            </div>
 
-              <div>
-                <span>Precio</span>
-                <p>{order.product?.price}</p>
-              </div>
-
-              <div>
-                <span>Proveedor</span>
-                <p>{order.product?.vendor}</p>
-              </div>
+            <div className="product-total">
+              <span>Total a cobrar</span>
+              <p>
+                {order.currency} {total.toFixed(2)}
+              </p>
             </div>
           </div>
 
           <div className="modal-divider" />
 
-          {/* CLIENTE */}
-
+          {/* ESTADOS */}
           <div className="order-modal-section">
-            <h3>Cliente</h3>
+            <h3>Estados del pedido</h3>
 
-            <div className="order-grid">
-              <div>
-                <span>Nombre</span>
-                <p>{order.customer?.name}</p>
-              </div>
+            <div className="status-grid">
+              {[
+                { label: "Llamada", key: "llamada" as const },
+                { label: "Confirmación", key: "confirmacion" as const },
+                { label: "Adelanto", key: "adelanto" as const },
+              ].map((item) => (
+                <button
+                  key={item.key}
+                  className="dropdown-card"
+                  onClick={() => setActiveSelector(item.key)}
+                  type="button"
+                >
+                  <span className="dropdown-label">{item.label}</span>
 
-              <div>
-                <span>Teléfono</span>
-                <p>{order.customer?.phone}</p>
-              </div>
+                  <div className="status-value">
+                    <span
+                      className={`chip ${getColorClass(
+                        statuses[item.key],
+                        item.key,
+                      )}`}
+                    >
+                      {statuses[item.key] || "Seleccionar"}
+                    </span>
 
-              <div>
-                <span>Departamento</span>
-                <p>{order.customer?.department}</p>
-              </div>
-
-              <div>
-                <span>Distrito</span>
-                <p>{order.customer?.district}</p>
-              </div>
-
-              <div>
-                <span>Ciudad</span>
-                <p>{order.customer?.city}</p>
-              </div>
-
-              <div>
-                <span>Tipo de región</span>
-                <p>{order.customer?.region_type}</p>
-              </div>
-
-              <div>
-                <span>Dirección</span>
-                <p>{order.customer?.address}</p>
-              </div>
+                    <span className="status-arrow">›</span>
+                  </div>
+                </button>
+              ))}
             </div>
           </div>
         </div>
 
         {/* FOOTER */}
-
         <div className="modal-footer contact-actions">
           <button
             className="btn-cancel"
@@ -187,25 +334,28 @@ export default function ContactOrderModal({ order, onClose }: Readonly<Props>) {
             Cancelar
           </button>
 
-          {/* NO RESPONDIÓ */}
-          <button
-            className="btn-warning"
-            onClick={() => update("no_response", "Cliente no respondió")}
-            disabled={loadingStatus}
-          >
-            {loadingStatus ? "Guardando..." : "⚠ No contestó"}
-          </button>
-
-          {/* RESPONDIÓ */}
           <button
             className="btn-success"
-            onClick={() => update("responded", "Cliente respondió")}
+            onClick={update}
             disabled={loadingStatus}
           >
-            ✔ Contestó
+            ✔ Actualizar
           </button>
         </div>
       </div>
+
+      {/* MODAL SELECTOR */}
+      {activeSelector && (
+        <StatusSelectorModal
+          title={`Seleccionar ${activeSelector}`}
+          options={STATUS_CONFIG[activeSelector as keyof typeof STATUS_CONFIG]}
+          onClose={() => setActiveSelector(null)}
+          onSelect={(value) => {
+            handleSelect(activeSelector, value);
+            setActiveSelector(null);
+          }}
+        />
+      )}
     </div>
   );
 }

@@ -48,8 +48,15 @@ export default function OrdersTable({ orders, activeTab }: Props) {
               const isChecked = selectedOrder?.order_id === order.order_id;
 
               return (
-                <tr key={order.order_id}>
-                  <td>
+                <tr
+                  key={order.order_id}
+                  className="clickable-row"
+                  onClick={() => handleSelect(order)}
+                >
+                  {/* CHECKBOX */}
+                  <td
+                    onClick={(e) => e.stopPropagation()} // 🔥 evita abrir modal
+                  >
                     <input
                       type="checkbox"
                       checked={isChecked}
@@ -82,7 +89,7 @@ export default function OrdersTable({ orders, activeTab }: Props) {
                   <td>
                     <span
                       className={`status ${fulfillmentClass(
-                        order.fulfillment_status,
+                        order.fulfillment_status
                       )}`}
                     >
                       ● {fulfillmentLabel(order.fulfillment_status)}

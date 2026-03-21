@@ -97,6 +97,16 @@ STATUS BADGES
     overflow-x: auto;
 }
 
+.clickable-row {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.clickable-row:hover {
+    background: #f8fafc;
+    transform: scale(1.002);
+}
+
 @media (max-width: 1024px) {
 
     .orders-table th,
