@@ -57,7 +57,8 @@ export default function ContactOrderModal({ order, onClose }: Readonly<Props>) {
     extraProducts.length > 0 || qty !== initialQty || !!customTotalMain;
 
   // 🔥 total principal
-  const mainTotal = customTotalMain ?? qty * basePrice;
+  const mainTotal =
+    customTotalMain ?? (qty === initialQty ? originalTotal : qty * basePrice);
 
   // 🔥 extras
   const extraTotal = extraProducts.reduce(
@@ -149,7 +150,7 @@ export default function ContactOrderModal({ order, onClose }: Readonly<Props>) {
     const region = order.customer?.region_type?.toLowerCase();
     const isProvince = region === "provincia";
     const isLima = region === "lima";
-    const isContactado = statuses.llamada === "Contactado"
+    const isContactado = statuses.llamada === "Contactado";
 
     if (!statuses.llamada || statuses.llamada === "") {
       alert("⚠️ Debe seleccionar Llamada en Estados del Pedido");

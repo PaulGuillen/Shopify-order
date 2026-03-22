@@ -17,6 +17,8 @@ export const useAgencies = () => {
             const data = await getShalomAgencies();
 
             setAgencies(data);
+
+              localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
         } catch (error) {
             console.error(error);
         } finally {
