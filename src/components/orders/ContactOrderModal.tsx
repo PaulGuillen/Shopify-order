@@ -100,8 +100,11 @@ export default function ContactOrderModal({ order, onClose }: Readonly<Props>) {
   ============================== */
 
   const STATUS_CONFIG = {
+    contactado : [
+      { label: "Sí", color: "green" },
+      { label: "No", color: "red" },
+    ],
     llamada: [
-      { label: "Contactado", color: "blue" },
       { label: "No contesta", color: "red" },
       { label: "Agendado", color: "yellow" },
       { label: "Corta llamada", color: "orange" },
@@ -121,6 +124,7 @@ export default function ContactOrderModal({ order, onClose }: Readonly<Props>) {
   };
 
   const [statuses, setStatuses] = useState({
+    contactado: "",
     llamada: "",
     confirmacion: "",
     adelanto: "",
@@ -150,7 +154,7 @@ export default function ContactOrderModal({ order, onClose }: Readonly<Props>) {
     const region = order.customer?.region_type?.toLowerCase();
     const isProvince = region === "provincia";
     const isLima = region === "lima";
-    const isContactado = statuses.llamada === "Contactado";
+    const isContactado = statuses.contactado === "Sí";
 
     if (!statuses.llamada || statuses.llamada === "") {
       alert("⚠️ Debe seleccionar Llamada en Estados del Pedido");
@@ -216,6 +220,7 @@ export default function ContactOrderModal({ order, onClose }: Readonly<Props>) {
         agency: selectedAgency,
       },
       tracking: {
+        contactado: statuses.contactado,
         llamada: statuses.llamada,
         confirmacion: statuses.confirmacion,
         adelanto: statuses.adelanto,
@@ -239,6 +244,7 @@ export default function ContactOrderModal({ order, onClose }: Readonly<Props>) {
 
     // estados
     setStatuses({
+      contactado: "",
       llamada: "",
       confirmacion: "",
       adelanto: "",
@@ -294,6 +300,45 @@ export default function ContactOrderModal({ order, onClose }: Readonly<Props>) {
 
         {/* BODY */}
         <div className="modal-content">
+          {/* ESTADOS */}
+          <div className="order-modal-section">
+            <h3>Estados del pedido</h3>
+
+            <div className="status-grid">
+              {[
+                { label: "Contactado", key: "contactado" as const },
+                { label: "Llamada", key: "llamada" as const },
+                { label: "Confirmación", key: "confirmacion" as const },
+                { label: "Adelanto", key: "adelanto" as const },
+              ].map((item) => (
+                <button
+                  key={item.key}
+                  className="dropdown-card"
+                  onClick={() => {
+                    if (item.key === "adelanto") {
+                      setShowAdvanceModal(true);
+                      return;
+                    }
+                    setActiveSelector(item.key);
+                  }}
+                >
+                  <span>{item.label}</span>
+
+                  <span
+                    className={`chip ${getColorClass(
+                      statuses[item.key],
+                      item.key,
+                    )}`}
+                  >
+                    {statuses[item.key] || "Seleccionar"}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="modal-divider" />
+
           {/* CLIENTE */}
           <div className="order-modal-section">
             <h3>Información del cliente</h3>
@@ -576,42 +621,6 @@ export default function ContactOrderModal({ order, onClose }: Readonly<Props>) {
           </div>
 
           <div className="modal-divider" />
-
-          {/* ESTADOS */}
-          <div className="order-modal-section">
-            <h3>Estados del pedido</h3>
-
-            <div className="status-grid">
-              {[
-                { label: "Llamada", key: "llamada" as const },
-                { label: "Confirmación", key: "confirmacion" as const },
-                { label: "Adelanto", key: "adelanto" as const },
-              ].map((item) => (
-                <button
-                  key={item.key}
-                  className="dropdown-card"
-                  onClick={() => {
-                    if (item.key === "adelanto") {
-                      setShowAdvanceModal(true);
-                      return;
-                    }
-                    setActiveSelector(item.key);
-                  }}
-                >
-                  <span>{item.label}</span>
-
-                  <span
-                    className={`chip ${getColorClass(
-                      statuses[item.key],
-                      item.key,
-                    )}`}
-                  >
-                    {statuses[item.key] || "Seleccionar"}
-                  </span>
-                </button>
-              ))}
-            </div>
-          </div>
         </div>
 
         {/* FOOTER */}
