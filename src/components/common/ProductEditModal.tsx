@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import "../../styles/components/productEditModal.css";
+import "../../styles/components/commons/productEditModal.css";
 
 type Props = {
   product: any;

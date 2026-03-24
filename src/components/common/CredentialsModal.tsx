@@ -1,5 +1,5 @@
 import { useState } from "react";
-import "../../styles/components/credentialsModal.css";
+import "../../styles/components/commons/credentialsModal.css";
 
 interface Props {
   email: string;

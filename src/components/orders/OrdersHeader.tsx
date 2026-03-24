@@ -1,17 +1,14 @@
 import "./../../styles/components/orders/ordersHeader.css";
 
-type Props = {
-  title: string;
-};
-
-export default function OrdersHeader({ title }: Props) {
+export default function OrdersHeader() {
   return (
     <div className="orders-header">
-      <h1>{title}</h1>
+      <h2>Gestión de Pedidos</h2>
 
       <div className="orders-actions">
         <button className="btn-secondary">Exportar</button>
-        <button className="btn-primary">Crear pedido</button>
+        <button className="btn-secondary">+ Pedido Rápido</button>
+        <button className="btn-primary">+ Crear Orden</button>
       </div>
     </div>
   );

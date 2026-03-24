@@ -1,5 +1,5 @@
 import { useState } from "react";
-import "../../styles/components/advanceModal.css";
+import "../../styles/components/commons/advanceModal.css";
 
 type Props = {
   order: any;

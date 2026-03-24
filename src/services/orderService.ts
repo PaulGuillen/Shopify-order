@@ -2,128 +2,130 @@ const API = import.meta.env.VITE_API_URL;
 
 export interface Order {
     /* =============================
-       🔥 FIREBASE DOC
+       🔥 IDENTIDAD
     ============================== */
+    id: string;
+    order_id: number;
+    order_number: number;
+    confirmation: string;
 
-    docId: string;
-    orderId: string;
-    orderNumber: number;
+    shopify_admin_id: string;
 
-    advisorId: string;
-    advisorEmail: string;
-    shop: string;
+    /* =============================
+       🔥 FECHAS
+    ============================== */
+    created_at: string;
+    created_day: string;
+    created_month: string;
 
-    status: string;
+    created_timestamp: FirebaseTimestamp;
+    updated_at: string;
+    updated_timestamp: FirebaseTimestamp;
 
-    assignedAt?: {
-        _seconds: number;
-        _nanoseconds: number;
+    /* =============================
+       🔥 ESTADO
+    ============================== */
+    status: "assigned" | "unassigned";
+
+    financial_status: "paid" | "pending" | string;
+    fulfillment_status: "fulfilled" | null;
+
+    cancelled: boolean;
+
+    /* =============================
+       🔥 FLAGS (YA VIENEN DEL BACK)
+    ============================== */
+    isUnassigned: boolean;
+    isPaid: boolean;
+    isDelivered: boolean;
+
+    /* =============================
+       🔥 PAGOS
+    ============================== */
+    currency: string;
+
+    total_price: number;
+    subtotal_price: number;
+    total_discount: number;
+
+    payment_gateway: string | null;
+
+    /* =============================
+       🔥 PRICING (CLAVE)
+    ============================== */
+    pricing: {
+        has_discount: boolean;
+        discount_amount: number;
+        original_total: number;
+        final_total: number;
+        promo_type: string | null;
     };
 
     /* =============================
-       🔥 ORDER DATA (CORE)
+       👤 CUSTOMER
     ============================== */
+    customer: {
+        name: string | null;
+        phone: string | null;
 
-    orderData: {
-        /* IDENTIDAD */
-        id: string;
-        order_id: number;
-        order_number: number;
-        confirmation: string;
+        department: string | null;
+        city: string | null;
+        district: string | null;
 
-        shopify_admin_id: string;
+        address: string | null;
+        region_type: "Lima" | "Provincia" | string | null;
 
-        /* FECHAS */
-        created_at: string;
-        created_day: string;
-        created_month: string;
+        dni: string | null;
+    };
 
-        created_timestamp: FirebaseTimestamp;
-        updated_at: string;
-        updated_timestamp: FirebaseTimestamp;
+    /* =============================
+       📦 PRODUCT PRINCIPAL
+    ============================== */
+    product: {
+        id: number;
+        name: string;
+        quantity: number;
+        price: number;
+        vendor: string;
 
-        /* ESTADO */
-        financial_status: string;
-        fulfillment_status: string | null;
-        cancelled: boolean;
+        total_line_price: number;
+        discount_allocated: number;
+    } | null;
 
-        status: string;
+    /* =============================
+       📦 ITEMS
+    ============================== */
+    items: Array<{
+        id: number;
+        name: string;
+        quantity: number;
+        price: number;
 
-        /* PAGOS */
-        currency: string;
+        total: number;
+        discount: number;
+    }>;
 
-        total_price: number;       // FINAL 🔥
-        subtotal_price: number;    // SIN DESCUENTO
-        total_discount: number;    // DESCUENTO
+    /* =============================
+       📊 UTM
+    ============================== */
+    utm: {
+        source: string | null;
+        medium: string | null;
+        campaign: string | null;
+        term: string | null;
+        content: string | null;
+    };
 
-        payment_gateway: string | null;
+    /* =============================
+       🧾 EXTRA
+    ============================== */
+    source: string;
+    tags: string | null;
 
-        /* 🔥 PRICING (CLAVE) */
-        pricing: {
-            has_discount: boolean;
-            discount_amount: number;
-            original_total: number;
-            final_total: number;
-            promo_type: string | null;
-        };
-
-        /* 👤 CUSTOMER */
-        customer: {
-            name: string | null;
-            phone: string | null;
-
-            department: string | null;
-            city: string | null;
-            district: string | null;
-
-            address: string | null;
-            region_type: string | null;
-
-            dni: string | null;
-        };
-
-        /* 📦 PRODUCT PRINCIPAL */
-        product: {
-            id: number;
-            name: string;
-            quantity: number;
-            price: number;
-            vendor: string;
-
-            total_line_price: number;
-            discount_allocated: number;
-        } | null;
-
-        /* 📦 MULTI ITEMS */
-        items: Array<{
-            id: number;
-            name: string;
-            quantity: number;
-            price: number;
-
-            total: number;
-            discount: number;
-        }>;
-
-        /* 📊 UTM */
-        utm: {
-            source: string | null;
-            medium: string | null;
-            campaign: string | null;
-            term: string | null;
-            content: string | null;
-        };
-
-        /* METADATA */
-        source: string;
-        tags: string | null;
-
-        /* DEBUG */
-        raw_min: {
-            total_price: string;
-            total_discounts: string;
-            total_line_items_price: string;
-        };
+    raw_min: {
+        total_price: string;
+        total_discounts: string;
+        total_line_items_price: string;
     };
 }
 
@@ -132,7 +134,7 @@ export interface FirebaseTimestamp {
     _nanoseconds: number;
 }
 export async function fetchOrders(shop: string): Promise<Order[]> {
-    const response = await fetch(`${API}/orders/orders-firebase/${shop}`);
+    const response = await fetch(`${API}/orders/orders-shopify/${shop}`);
 
     if (!response.ok) {
         throw new Error("Error obteniendo pedidos");
@@ -142,6 +144,18 @@ export async function fetchOrders(shop: string): Promise<Order[]> {
 
     return data.orders;
 }
+
+export const fetchOrdersByWorkflow = async (shop: string, status: string) => {
+    const url =
+        status === "all"
+            ? `/orders/orders-by-workflow-shopify/${shop}`
+            : `/orders/orders-by-workflow-shopify/${shop}?status=${status}`;
+
+    const res = await fetch(import.meta.env.VITE_API_URL + url);
+    const data = await res.json();
+
+    return data.orders;
+};
 
 export const getAdvisorOrders = async (
     advisorId: string,

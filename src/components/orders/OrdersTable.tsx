@@ -1,134 +1,58 @@
-import { useState } from "react";
 import "./../../styles/components/orders/ordersTable.css";
-import {
-  formatShopifyDate,
-  paymentLabel,
-  fulfillmentLabel,
-  paymentClass,
-  fulfillmentClass,
-} from "../../utils/ordersUtil";
 
-import OrderDetailModal from "./OrderDetailModal";
-import ContactOrderModal from "./ContactOrderModal";
-import DeliveredOrderModal from "./DeliveredOrderModal";
+interface Props {
+  orders: any[];
+  loading: boolean;
+}
 
-type Props = {
-  readonly orders: readonly any[];
-  readonly activeTab: string;
-};
+export default function OrdersTable({ orders, loading }: Props) {
 
-export default function OrdersTable({ orders, activeTab }: Props) {
-  const [selectedOrder, setSelectedOrder] = useState<any | null>(null);
+  if (loading) return <p>Cargando...</p>;
 
-  const handleSelect = (order: any) => {
-    setSelectedOrder(order);
-  };
+  if (!orders.length) return <p>No hay pedidos</p>;
 
   return (
-    <>
-      <div className="orders-table-wrapper">
-        <table className="orders-table">
-          <thead>
-            <tr>
-              <th></th>
-              <th>Pedido</th>
-              <th>Fecha</th>
-              <th>Cliente</th>
-              <th>Teléfono</th>
-              <th>Región</th>
-              <th>Total</th>
-              <th>Estado del pago</th>
-              <th>Estado de preparación</th>
-              <th>Artículos</th>
-            </tr>
-          </thead>
+    <div className="orders-table">
 
-          <tbody>
-            {orders.map((order) => {
-              const isChecked = selectedOrder?.order_id === order.order_id;
-
-              return (
-                <tr
-                  key={order.order_id}
-                  className="clickable-row"
-                  onClick={() => handleSelect(order)}
-                >
-                  {/* CHECKBOX */}
-                  <td
-                    onClick={(e) => e.stopPropagation()} // 🔥 evita abrir modal
-                  >
-                    <input
-                      type="checkbox"
-                      checked={isChecked}
-                      onChange={() => handleSelect(order)}
-                    />
-                  </td>
-
-                  <td className="order-id">#{order.order_number}</td>
-
-                  <td>{formatShopifyDate(order.created_at)}</td>
-
-                  <td>{order.customer?.name}</td>
-
-                  <td>{order.customer?.phone}</td>
-
-                  <td>{order.customer?.region_type}</td>
-
-                  <td className="order-total">
-                    {order.currency} {order.total_price}
-                  </td>
-
-                  <td>
-                    <span
-                      className={`status ${paymentClass(order.financial_status)}`}
-                    >
-                      ● {paymentLabel(order.financial_status)}
-                    </span>
-                  </td>
-
-                  <td>
-                    <span
-                      className={`status ${fulfillmentClass(
-                        order.fulfillment_status
-                      )}`}
-                    >
-                      ● {fulfillmentLabel(order.fulfillment_status)}
-                    </span>
-                  </td>
-
-                  <td>
-                    {order.product?.quantity}{" "}
-                    {order.product?.quantity === 1 ? "artículo" : "artículos"}
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+      <div className="table-header">
+        <span># Pedido</span>
+        <span>Cliente</span>
+        <span>Ubicación</span>
+        <span>Estado</span>
+        <span>Pago</span>
+        <span>Vendedor</span>
+        <span>Fecha</span>
       </div>
 
-      {/* MODAL SEGUN TAB */}
+      {orders.map((order) => (
+        <div key={order.id} className="table-row">
 
-      {selectedOrder && activeTab === "todos" && (
-        <OrderDetailModal
-          order={selectedOrder}
-          onClose={() => setSelectedOrder(null)}
-        />
-      )}
+          <span>#{order.order_number}</span>
 
-      {selectedOrder && activeTab === "mis_pedidos" && (
-        <ContactOrderModal
-          order={selectedOrder}
-          onClose={() => setSelectedOrder(null)}
-        />
-      )}
+          <div className="customer">
+            <p>{order.customer?.name}</p>
+            <span>{order.customer?.phone}</span>
+          </div>
 
-      {selectedOrder && activeTab === "contactado" && (
-        <DeliveredOrderModal
-          order={selectedOrder}
-          onClose={() => setSelectedOrder(null)}
-        />
-      )}
-    </>
+          <span>
+            {order.customer?.city} - {order.customer?.department}
+          </span>
+
+          <span className={`badge ${order.status}`}>
+            {order.status}
+          </span>
+
+          <div>
+            <p>S/ {order.total_price}</p>
+            <span>{order.payment_gateway}</span>
+          </div>
+
+          <span>{order.advisorEmail || "Sin asignar"}</span>
+
+          <span>{order.created_day}</span>
+
+        </div>
+      ))}
+    </div>
   );
 }

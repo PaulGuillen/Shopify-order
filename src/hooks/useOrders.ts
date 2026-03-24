@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { assignOrder, fetchOrders, getAdvisorOrders, getAdvisorOrdersContacted, updateOrderStatus } from "../services/orderService";
+import { assignOrder, fetchOrders, fetchOrdersByWorkflow, getAdvisorOrders, getAdvisorOrdersContacted, updateOrderStatus } from "../services/orderService";
 import type { Order } from "../services/orderService";
 
 export function useOrders(shop: string) {
@@ -19,6 +19,7 @@ export function useOrders(shop: string) {
                 const data = await fetchOrders(shop);
                 setOrders(data);
             } catch (err) {
+                console.error(err);
                 setError("Error cargando pedidos");
             } finally {
                 setLoading(false);
@@ -29,6 +30,31 @@ export function useOrders(shop: string) {
     }, [shop]);
 
     return { orders, loading, error };
+}
+
+export function useOrdersByFlow(shop: string) {
+    const [orders, setOrders] = useState<any[]>([]);
+    const [loading, setLoading] = useState(false);
+
+    const loadOrders = async (status = "all") => {
+        try {
+            setLoading(true);
+
+            const data = await fetchOrdersByWorkflow(shop, status);
+            setOrders(data);
+
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        if (shop) loadOrders("all");
+    }, [shop]);
+
+    return { orders, loadOrders, loading };
 }
 
 export const useAdvisorOrders = (

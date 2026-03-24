@@ -1,0 +1,66 @@
+.filters-container {
+    background: white;
+    padding: 16px;
+    border-radius: 12px;
+    margin-bottom: 16px;
+}
+
+/* FILAS */
+.filters-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+/* 🔥 SCROLL HORIZONTAL */
+.chips-scroll {
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+
+.chips-scroll::-webkit-scrollbar {
+    display: none;
+}
+
+/* CHIP */
+.chip {
+    border: none;
+    background: #f1f5f9;
+    padding: 6px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    white-space: nowrap;
+}
+
+.chip.active {
+    background: #0f172a;
+    color: white;
+}
+
+.chip span {
+    background: rgba(0, 0, 0, 0.1);
+    padding: 2px 6px;
+    border-radius: 6px;
+    font-size: 11px;
+}
+
+.chip.active span {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* INPUTS */
+.inputs-row {
+    flex-wrap: wrap;
+}
+
+.inputs-row input,
+.inputs-row select {
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    min-width: 160px;
+}

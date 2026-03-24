@@ -1,5 +1,5 @@
 import toast from "react-hot-toast";
-import "../../styles/customToast.css";
+import "../../styles/components/commons/customToast.css";
 
 
 type Props = {

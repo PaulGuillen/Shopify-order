@@ -1,20 +1,24 @@
-.orders-table {
-    background: white;
-    border-radius: 14px;
-    overflow: hidden;
-}
-
-.table-header {
+.table-row {
     display: grid;
     grid-template-columns: 120px 1.5fr 1fr 1fr 1fr 1fr 1fr;
     padding: 14px;
-    background: #f1f5f9;
-    font-weight: 600;
+    border-top: 1px solid #f1f5f9;
+    align-items: center;
 }
 
-/* =========================
-   BADGE BASE
-========================= */
+.table-row:hover {
+    background: #f8fafc;
+}
+
+.customer {
+    display: flex;
+    flex-direction: column;
+}
+
+.customer span {
+    font-size: 12px;
+    color: #64748b;
+}
 
 .badge {
     display: inline-flex;
@@ -29,18 +33,13 @@
 
     white-space: nowrap;
     width: fit-content;
-    /* 🔥 CLAVE */
-    max-width: 120px;
-    /* evita que crezca mucho */
 
+    max-width: 120px;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-/* =========================
-   VARIANTES
-========================= */
-
+/* VARIANTES */
 .badge.unassigned {
     background: #fef3c7;
     color: #92400e;
