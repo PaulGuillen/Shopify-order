@@ -5,15 +5,24 @@ interface Props {
   loading: boolean;
 }
 
-export default function OrdersTable({ orders, loading }: Props) {
+const statusLabel: Record<string, string> = {
+  unassigned: "Sin Asignar",
+  to_contact: "Por Contactar",
+  contacted: "Contactado",
+  confirmed: "Confirmado",
+  shipped: "Enviado",
+  delivered: "Entregado",
+  cancelled: "Cancelado",
+  not_delivered: "No entregado",
+};
 
+export default function OrdersTable({ orders, loading }: Props) {
   if (loading) return <p>Cargando...</p>;
 
   if (!orders.length) return <p>No hay pedidos</p>;
 
   return (
     <div className="orders-table">
-
       <div className="table-header">
         <span># Pedido</span>
         <span>Cliente</span>
@@ -26,7 +35,6 @@ export default function OrdersTable({ orders, loading }: Props) {
 
       {orders.map((order) => (
         <div key={order.id} className="table-row">
-
           <span>#{order.order_number}</span>
 
           <div className="customer">
@@ -39,7 +47,7 @@ export default function OrdersTable({ orders, loading }: Props) {
           </span>
 
           <span className={`badge ${order.status}`}>
-            {order.status}
+            {statusLabel[order.status] || order.status}
           </span>
 
           <div>
@@ -50,7 +58,6 @@ export default function OrdersTable({ orders, loading }: Props) {
           <span>{order.advisorEmail || "Sin asignar"}</span>
 
           <span>{order.created_day}</span>
-
         </div>
       ))}
     </div>

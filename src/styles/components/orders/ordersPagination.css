@@ -1,0 +1,96 @@
+.pagination-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    margin-top: 16px;
+    padding: 12px 16px;
+
+    background: white;
+    border-radius: 12px;
+}
+
+/* =========================
+   FILAS POR PÁGINA
+========================= */
+
+.rows-selector {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.rows-label {
+    font-size: 13px;
+    color: #64748b;
+    font-weight: 500;
+}
+
+/* 🔥 CONTENEDOR CLICKABLE */
+.rows-dropdown {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+
+    padding: 6px 30px 6px 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.rows-dropdown:hover {
+    border-color: #cbd5f5;
+    background: #f1f5f9;
+}
+
+/* 🔥 SELECT INVISIBLE PERO CLICKABLE */
+.rows-dropdown select {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+
+    opacity: 0;
+    cursor: pointer;
+}
+
+/* ICONO */
+.dropdown-icon {
+    position: absolute;
+    right: 10px;
+    font-size: 12px;
+    color: #64748b;
+    pointer-events: none;
+}
+
+.rows-value {
+    font-size: 14px;
+    font-weight: 600;
+    color: #0f172a;
+}
+
+/* =========================
+   CONTROLES
+========================= */
+
+.pagination-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.pagination-controls button {
+    padding: 6px 10px;
+    border: none;
+    border-radius: 8px;
+    background: #f1f5f9;
+    cursor: pointer;
+}
+
+.pagination-controls button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}

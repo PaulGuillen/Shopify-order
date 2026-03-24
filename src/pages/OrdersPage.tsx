@@ -4,6 +4,7 @@ import OrdersHeader from "../components/orders/OrdersHeader";
 import OrdersFilters from "../components/orders/OrdersFilters";
 import OrdersTable from "../components/orders/OrdersTable";
 import { useOrdersByFlow } from "../hooks/useOrders";
+import OrdersPagination from "../components/orders/OrdersPagination";
 
 export default function OrdersPage() {
   const [activeTab, setActiveTab] = useState("Todos");
@@ -14,6 +15,20 @@ export default function OrdersPage() {
   const shop = user.shop;
 
   const { orders = [], loadOrders, loading } = useOrdersByFlow(shop);
+
+  // 🔥 PAGINACIÓN
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(20);
+
+  /* 🔥 DATA PAGINADA */
+  const paginatedOrders = useMemo(() => {
+    const start = (currentPage - 1) * rowsPerPage;
+    const end = start + rowsPerPage;
+    return orders.slice(start, end);
+  }, [orders, currentPage, rowsPerPage]);
+
+  /* 🔥 TOTAL PÁGINAS */
+  const totalPages = Math.ceil(orders.length / rowsPerPage);
 
   /* 🔥 COUNTS */
   const counts = useMemo(
@@ -45,7 +60,16 @@ export default function OrdersPage() {
           loadOrders={loadOrders}
         />
 
-        <OrdersTable orders={orders} loading={loading} />
+        <OrdersTable orders={paginatedOrders} loading={loading} />
+
+        <OrdersPagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          rowsPerPage={rowsPerPage}
+          setCurrentPage={setCurrentPage}
+          setRowsPerPage={setRowsPerPage}
+        />
+        
       </div>
     </Layout>
   );
