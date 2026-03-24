@@ -100,7 +100,7 @@ export default function ContactOrderModal({ order, onClose }: Readonly<Props>) {
   ============================== */
 
   const STATUS_CONFIG = {
-    contactado : [
+    contactado: [
       { label: "Sí", color: "green" },
       { label: "No", color: "red" },
     ],
@@ -155,6 +155,13 @@ export default function ContactOrderModal({ order, onClose }: Readonly<Props>) {
     const isProvince = region === "provincia";
     const isLima = region === "lima";
     const isContactado = statuses.contactado === "Sí";
+    const isAgendado = statuses.llamada === "Agendado";
+    const isConfirmado = statuses.confirmacion === "Confirmado";
+
+    if (!statuses.contactado || statuses.contactado === "") {
+      alert("⚠️ Debe seleccionar Contactado en Estados del Pedido");
+      return;
+    }
 
     if (!statuses.llamada || statuses.llamada === "") {
       alert("⚠️ Debe seleccionar Llamada en Estados del Pedido");
@@ -165,14 +172,14 @@ export default function ContactOrderModal({ order, onClose }: Readonly<Props>) {
      VALIDACIONES 🔥
   ============================== */
 
-    if (isContactado && isLima) {
+    if (isContactado && isConfirmado && isLima) {
       if (!address || address == "") {
         alert("⚠️ Debe ingresar una direccion");
         return;
       }
     }
 
-    if (isContactado && isProvince) {
+    if (isContactado && isAgendado && isProvince) {
       // Adelanto obligatorio en provincia
       if (!statuses.adelanto || statuses.adelanto === "") {
         alert("⚠️ Debe registrar el adelanto antes de continuar");
