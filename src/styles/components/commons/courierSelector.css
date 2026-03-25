@@ -1,0 +1,40 @@
+/* COURIER BOX */
+.courier-box {
+  margin-top: 10px;
+}
+
+/* OPTIONS */
+.courier-options {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* PILL */
+.courier-pill {
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: #f1f5f9;
+  font-size: 13px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.courier-pill:hover {
+  background: #e2e8f0;
+}
+
+/* ACTIVE 🔥 */
+.courier-pill.active {
+  background: #6366f1;
+  color: white;
+}
+
+/* INPUT */
+.courier-input {
+  margin-top: 10px;
+  width: 100%;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+}

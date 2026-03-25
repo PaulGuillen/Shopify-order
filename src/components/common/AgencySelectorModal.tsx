@@ -66,9 +66,7 @@ export default function AgencySelectorModal({
                   onClick={() => onSelect(agency)}
                 >
                   <p className="agency-name">{agency.name}</p>
-                  <span className="agency-address">
-                    {agency.address}
-                  </span>
+                  <span className="agency-address">{agency.address}</span>
                 </div>
               ))
             ) : (

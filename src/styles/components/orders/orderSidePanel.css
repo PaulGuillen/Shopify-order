@@ -104,11 +104,12 @@
 /* TEXT */
 .main-text {
     font-weight: 600;
+    font-size: 17px;
 }
 
 .sub-text {
     color: #64748b;
-    font-size: 13px;
+    font-size: 14px;
 }
 
 /* ROW */
@@ -260,6 +261,97 @@
 .status-select.not_delivered {
     background: #f5f5f4;
     color: #44403c;
+}
+
+.clickable {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.clickable:hover {
+    opacity: 0.75;
+}
+
+/* AGENCY BOX */
+.agency-box {
+    border: 1px dashed #cbd5f5;
+    border-radius: 12px;
+    padding: 12px;
+    margin-top: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: #fafafa;
+}
+
+.agency-box:hover {
+    border-color: #6366f1;
+    background: #f8fafc;
+}
+
+/* CUANDO ESTÁ SELECCIONADO 🔥 */
+.agency-box.selected {
+    border: 1px solid #6366f1;
+    background: #eef2ff;
+}
+
+/* HEADER */
+.agency-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+/* BADGE */
+.agency-badge {
+    background: #6366f1;
+    color: white;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 8px;
+}
+
+/* TEXTOS */
+.agency-name {
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.agency-address {
+    font-size: 12px;
+    color: #64748b;
+}
+
+.agency-placeholder {
+    color: #64748b;
+    font-size: 13px;
+}
+
+/* DELIVERY */
+.delivery-box {
+    margin-top: 10px;
+}
+
+.delivery-header {
+    font-size: 13px;
+    color: #64748b;
+    margin-bottom: 6px;
+}
+
+/* INPUT */
+.delivery-input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    font-size: 14px;
+    transition: 0.2s;
+}
+
+.delivery-input:focus {
+    outline: none;
+    border-color: #6366f1;
+    background: #fafafa;
 }
 
 /* =========================
