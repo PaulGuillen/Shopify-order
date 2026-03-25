@@ -1,0 +1,106 @@
+.table-row {
+    display: grid;
+    grid-template-columns: 120px 1.5fr 1fr 1fr 1fr 1fr 1fr;
+    padding: 14px;
+    border-top: 1px solid #f1f5f9;
+    align-items: center;
+}
+
+.table-row:hover {
+    background: #f8fafc;
+}
+
+.customer {
+    display: flex;
+    flex-direction: column;
+}
+
+.customer span {
+    font-size: 12px;
+    color: #64748b;
+}
+
+
+
+/* =========================
+   STATUS BADGES 🔥
+========================= */
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 4px 10px;
+    border-radius: 999px;
+
+    font-size: 12px;
+    font-weight: 500;
+
+    white-space: nowrap;
+    width: fit-content;
+
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* SIN ASIGNAR */
+.badge.unassigned {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+/* POR CONTACTAR */
+.badge.to_contact {
+    background: #fef9c3;
+    color: #854d0e;
+}
+
+/* CONTACTADO */
+.badge.contacted {
+    background: #dcfce7;
+    color: #166534;
+}
+
+/* CONFIRMADO */
+.badge.confirmed {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+/* ENVIADO */
+.badge.shipped {
+    background: #e0f2fe;
+    color: #075985;
+}
+
+/* ENTREGADO */
+.badge.delivered {
+    background: #bbf7d0;
+    color: #166534;
+}
+
+/* CANCELADO */
+.badge.cancelled {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+/* NO ENTREGADO */
+.badge.not_delivered {
+    background: #f5f5f4;
+    color: #44403c;
+}
+
+/* PAGADO (extra si lo usas) */
+.badge.paid {
+    background: #dcfce7;
+    color: #166534;
+}
+
+/* PENDIENTE (extra si lo usas) */
+.badge.pending {
+    background: #e0f2fe;
+    color: #075985;
+}

@@ -1,138 +1,105 @@
-/* =============================
-TABLE
-============================= */
+
 
 .orders-table {
-    width: 100%;
-    border-collapse: collapse;
-
+    background: white;
+    border-radius: 14px;
+    overflow: hidden;
 }
 
-.orders-table th {
-    text-align: left;
-    font-size: 12px;
-    color: #6b7280;
-    padding: 12px;
-    border-bottom: 1px solid #e5e7eb;
+.table-header {
+    display: grid;
+    grid-template-columns: 120px 1.5fr 1fr 1fr 1fr 1fr 1fr;
+    padding: 14px;
+    background: #f1f5f9;
+    font-weight: 600;
+}
+
+/* =========================
+   ROWS 🔥 (ESTO TE FALTABA)
+========================= */
+
+.table-row {
+    display: grid;
+    grid-template-columns: 120px 1.5fr 1fr 1fr 1fr 1fr 1fr;
+    padding: 14px;
+    border-bottom: 1px solid #eee;
+    align-items: center;
+}
+
+/* Hover tipo Shopify */
+.table-row:hover {
+    background: #f9fafb;
+}
+
+.table-row span {
+    display: flex;
+    align-items: center;
+}
+
+.customer p {
+    margin: 0;
     font-weight: 500;
-
 }
 
-.orders-table td {
-    padding: 12px;
-    border-bottom: 1px solid #f3f4f6;
-    font-size: 14px;
-    color: #111827;
-
+.customer span {
+    font-size: 12px;
+    color: #64748b;
 }
 
-.orders-table tr:hover {
-    background: #fafafa;
-}
+/* =========================
+   BADGE BASE
+========================= */
 
-/* =============================
-ORDER ID
-============================= */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 
-.order-id {
-    color: #4f46e5;
-    font-weight: 600;
-    cursor: pointer;
-
-}
-
-/* =============================
-TOTAL
-============================= */
-
-.order-total {
-
-    font-weight: 600;
-
-}
-
-/* =============================
-STATUS BADGES
-============================= */
-
-.status {
     padding: 4px 10px;
-    border-radius: 6px;
+    border-radius: 999px;
+
     font-size: 12px;
     font-weight: 500;
 
+    white-space: nowrap;
+    width: fit-content;
+    /* 🔥 CLAVE */
+    max-width: 120px;
+    /* evita que crezca mucho */
+
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-/* PAGADO */
+/* =========================
+   VARIANTES
+========================= */
 
-.status-paid {
-    background: #dcfce7;
-    color: #166534;
-}
-
-/* PENDIENTE */
-
-.status-pending {
-    background: #e5e7eb;
-    color: #374151;
-}
-
-/* ENTREGADO */
-
-.status-delivered {
-    background: #dbeafe;
-    color: #1e40af;
-
-}
-
-/* POR CONFIRMAR */
-
-.status-confirm {
+.badge.unassigned {
     background: #fef3c7;
     color: #92400e;
 }
 
-.orders-table-wrapper {
-    width: 100%;
-    overflow-x: auto;
+.badge.paid {
+    background: #dcfce7;
+    color: #166534;
 }
 
-.clickable-row {
-    cursor: pointer;
-    transition: all 0.2s ease;
+.badge.pending {
+    background: #e0f2fe;
+    color: #075985;
 }
 
-.clickable-row:hover {
-    background: #f8fafc;
-    transform: scale(1.002);
+.badge.cancelled {
+    background: #fee2e2;
+    color: #991b1b;
 }
 
-@media (max-width: 1024px) {
-
-    .orders-table th,
-    .orders-table td {
-        padding: 10px;
-        font-size: 13px;
-
-    }
-
+.table-row.clickable {
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-@media (max-width: 768px) {
-
-    .orders-table th:nth-child(5),
-    .orders-table td:nth-child(5) {
-        display: none;
-    }
-
-    .orders-table th:nth-child(6),
-    .orders-table td:nth-child(6) {
-        display: none;
-    }
-
-    .orders-table th:nth-child(10),
-    .orders-table td:nth-child(10) {
-        display: none;
-    }
-
+.table-row.clickable:hover {
+  background: #f8fafc;
 }

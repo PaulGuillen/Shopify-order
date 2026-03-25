@@ -1,4 +1,4 @@
-import "../../styles/components/statusSelectorModal.css";
+import "../../styles/components/commons/statusSelectorModal.css";
 
 type Option = {
   label: string;

@@ -1,82 +1,96 @@
-/* =============================
-PAGINATION CONTAINER
-============================= */
-
-.orders-pagination {
+.pagination-container {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 15px;
-    font-size: 13px;
-    color: #6b7280;
+
+    margin-top: 16px;
+    padding: 12px 16px;
+
+    background: white;
+    border-radius: 12px;
 }
 
-/* =============================
-ROWS SELECTOR
-============================= */
+/* =========================
+   FILAS POR PÁGINA
+========================= */
 
 .rows-selector {
     display: flex;
     align-items: center;
-    gap: 8px;
-    margin-right: 20px;
+    gap: 10px;
 }
 
-.rows-selector select {
-    padding: 6px 10px;
-    border-radius: 6px;
-    border: 1px solid #ddd;
-    background: white;
-    font-size: 14px;
-}
-
-/* =============================
-PAGINATION BUTTONS
-============================= */
-
-.pagination {
-    display: flex;
-    gap: 5px;
-
-}
-
-.pagination button {
-    padding: 6px 10px;
-    border: 1px solid #e5e7eb;
-    background: white;
-    border-radius: 6px;
-    cursor: pointer;
+.rows-label {
     font-size: 13px;
+    color: #64748b;
+    font-weight: 500;
 }
 
-.pagination button:hover {
-    background: #f9fafb;
+/* 🔥 CONTENEDOR CLICKABLE */
+.rows-dropdown {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
 
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+
+    padding: 6px 30px 6px 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
-.pagination button.active {
-    background: #4f46e5;
-    color: white;
-    border-color: #4f46e5;
-
+.rows-dropdown:hover {
+    border-color: #cbd5f5;
+    background: #f1f5f9;
 }
 
-.pagination button:disabled {
-    opacity: 0.5;
+/* 🔥 SELECT INVISIBLE PERO CLICKABLE */
+.rows-dropdown select {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+
+    opacity: 0;
+    cursor: pointer;
+}
+
+/* ICONO */
+.dropdown-icon {
+    position: absolute;
+    right: 10px;
+    font-size: 12px;
+    color: #64748b;
+    pointer-events: none;
+}
+
+.rows-value {
+    font-size: 14px;
+    font-weight: 600;
+    color: #0f172a;
+}
+
+/* =========================
+   CONTROLES
+========================= */
+
+.pagination-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.pagination-controls button {
+    padding: 6px 10px;
+    border: none;
+    border-radius: 8px;
+    background: #f1f5f9;
+    cursor: pointer;
+}
+
+.pagination-controls button:disabled {
+    opacity: 0.4;
     cursor: not-allowed;
-}
-
-@media (max-width: 768px) {
-
-    .orders-pagination {
-        flex-direction: column;
-        gap: 10px;
-        align-items: flex-start;
-
-    }
-
-    .pagination {
-        flex-wrap: wrap;
-    }
-
 }

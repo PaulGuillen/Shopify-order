@@ -1,5 +1,5 @@
 import { useState } from "react";
-import "./../../styles/components/agencySelectorModal.css";
+import "./../../styles/components/commons/agencySelectorModal.css";
 
 type Props = {
   agencies: any[];

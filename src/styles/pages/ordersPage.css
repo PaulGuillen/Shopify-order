@@ -1,69 +1,246 @@
-/* =============================
-PAGE
-============================= */
-
 .orders-page {
-    padding: 30px;
-    background: #f9fafb;
-    min-height: 100vh;
+    padding: 20px 24px;
+    background: #f8fafc;
+    width: 100%;
+    max-width: 1600px;
+    /* 🔥 más ancho */
+    margin: 0 auto;
 }
 
-/* =============================
-CARD WRAPPER
-============================= */
-
-.orders-card {
-    background: white;
-    border-radius: 12px;
-    border: 1px solid #e5e7eb;
-    padding: 20px;
-}
-
-
-.orders-toolbar {
+/* HEADER */
+.orders-header {
     display: flex;
     justify-content: space-between;
-    align-items: stretch;
-    /* en vez de center */
-    gap: 12px;
+    align-items: center;
+    margin-bottom: 16px;
 }
 
-
-.orders-toolbar-left {
-  display: flex;
-  align-items: center;
-  padding: 10px;
+.orders-header h2 {
+    font-size: 20px;
+    font-weight: 600;
 }
 
-.orders-toolbar-right {
-  display: flex;
-  align-items: center;
-   padding: 10px;
+.orders-actions {
+    display: flex;
+    gap: 10px;
 }
 
+/* BOTONES */
+.btn-primary {
+    background: #0f172a;
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+}
 
+.btn-secondary {
+    background: white;
+    border: 1px solid #e2e8f0;
+    padding: 8px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+/* CONTENEDOR */
+.filters-container {
+    background: white;
+    padding: 18px;
+    border-radius: 14px;
+    margin-bottom: 16px;
+}
+
+/* ROW */
+.filters-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+/* 🔥 SCROLL HORIZONTAL PRO */
+.chips-scroll {
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+
+.chips-scroll::-webkit-scrollbar {
+    display: none;
+}
+
+/* CHIP */
+.chip {
+    border: none;
+    background: #f1f5f9;
+    padding: 6px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    white-space: nowrap;
+    transition: all 0.15s ease;
+}
+
+.chip:hover {
+    background: #e2e8f0;
+}
+
+.chip.active {
+    background: #0f172a;
+    color: white;
+}
+
+.chip span {
+    background: rgba(0, 0, 0, 0.1);
+    padding: 2px 6px;
+    border-radius: 6px;
+    font-size: 11px;
+}
+
+.chip.active span {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* INPUTS */
+.inputs-row {
+    flex-wrap: wrap;
+}
+
+.inputs-row input,
+.inputs-row select {
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    background: white;
+    font-size: 13px;
+    min-width: 160px;
+    flex: 1;
+}
+
+/* FOCUS FIX */
+button:focus {
+    outline: none;
+}
+
+input:focus,
+select:focus {
+    outline: none;
+    border-color: #0f172a;
+}
+
+/* =========================
+   TABLA BASE
+========================= */
+
+.orders-table {
+    background: white;
+    border-radius: 14px;
+    overflow: hidden;
+}
+
+/* HEADER */
+.table-header {
+    display: grid;
+    grid-template-columns: 120px 1.5fr 1fr 1fr 1fr 1fr 1fr;
+    padding: 14px;
+    background: #f1f5f9;
+    font-weight: 600;
+}
+
+/* 🔥 FIX CLAVE */
+.table-row {
+    display: grid;
+    grid-template-columns: 120px 1.5fr 1fr 1fr 1fr 1fr 1fr;
+    padding: 14px;
+    border-top: 1px solid #f1f5f9;
+    align-items: center;
+}
+
+/* hover bonito */
+.table-row:hover {
+    background: #f8fafc;
+}
+
+/* =========================
+   CLIENTE
+========================= */
+
+.customer {
+    display: flex;
+    flex-direction: column;
+}
+
+.customer p {
+    font-weight: 600;
+    margin: 0;
+}
+
+.customer span {
+    font-size: 12px;
+    color: #64748b;
+}
+
+/* =========================
+   ESTADO
+========================= */
+
+.badge {
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    background: #fef3c7;
+    color: #92400e;
+    width: fit-content;
+}
+
+/* =========================
+   PAGO
+========================= */
+
+.table-row div p {
+    margin: 0;
+    font-weight: 600;
+}
+
+.table-row div span {
+    font-size: 12px;
+    color: #64748b;
+}
+
+/* =========================
+   📱 RESPONSIVE
+========================= */
+
+@media (max-width: 1024px) {
+    .table-header {
+        grid-template-columns: 100px 1fr 1fr 1fr;
+        font-size: 12px;
+    }
+
+    .orders-actions {
+        flex-wrap: wrap;
+    }
+}
 
 @media (max-width: 768px) {
-
-    .orders-toolbar {
+    .orders-header {
         flex-direction: column;
-        align-items: stretch;
+        align-items: flex-start;
         gap: 10px;
     }
 
-    .orders-toolbar-left,
-    .orders-toolbar-right {
-        width: 100%;
+    .inputs-row input,
+    .inputs-row select {
+        min-width: 100%;
     }
 
-    .orders-toolbar-right {
-        flex-direction: column;
+    .table-header {
+        display: none;
     }
 
- .orders-search-input {
-  width: 100%;
-  max-width: 420px;
-}
-
-
+    .orders-table {
+        padding: 10px;
+    }
 }

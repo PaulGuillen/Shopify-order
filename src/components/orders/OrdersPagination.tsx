@@ -1,70 +1,72 @@
+import { useRef } from "react";
 import "./../../styles/components/orders/ordersPagination.css";
 
-type Props = {
-  readonly currentPage: number;
-  readonly setCurrentPage: (page: number) => void;
-  readonly rowsPerPage: number;
-  readonly setRowsPerPage: (rows: number) => void;
-  readonly totalPages: number;
-  readonly totalItems: number;
-};
+interface Props {
+  currentPage: number;
+  totalPages: number;
+  rowsPerPage: number;
+  setCurrentPage: (n: number) => void;
+  setRowsPerPage: (n: number) => void;
+}
 
 export default function OrdersPagination({
   currentPage,
-  setCurrentPage,
-  rowsPerPage,
-  setRowsPerPage,
   totalPages,
-  totalItems,
+  rowsPerPage,
+  setCurrentPage,
+  setRowsPerPage,
 }: Props) {
-  return (
-    <div className="orders-pagination">
-      <div className="rows-selector">
-        <span>Filas:</span>
+  const selectRef = useRef<HTMLSelectElement>(null);
 
-        <select
-          value={rowsPerPage}
-          onChange={(e) => {
-            setRowsPerPage(Number(e.target.value));
-            setCurrentPage(1);
-          }}
+  return (
+    <div className="pagination-container">
+      {/* 🔥 FILAS */}
+      <div className="rows-selector">
+        <span className="rows-label">Filas por página</span>
+
+        <div
+          className="rows-dropdown"
+          onClick={() => selectRef.current?.click()}
         >
-          <option value={10}>10</option>
-          <option value={25}>25</option>
-          <option value={50}>50</option>
-          <option value={100}>100</option>
-        </select>
+          {/* 🔥 ESTE ES EL VALOR VISIBLE */}
+          <span className="rows-value">{rowsPerPage}</span>
+
+          <select
+            ref={selectRef}
+            value={rowsPerPage}
+            onChange={(e) => {
+              setRowsPerPage(Number(e.target.value));
+              setCurrentPage(1);
+            }}
+          >
+            <option value={10}>10</option>
+            <option value={15}>15</option>
+            <option value={20}>20</option>
+            <option value={30}>30</option>
+          </select>
+
+          <span className="dropdown-icon">▾</span>
+        </div>
       </div>
 
-      <p>
-        Mostrando {(currentPage - 1) * rowsPerPage + 1} a{" "}
-        {Math.min(currentPage * rowsPerPage, totalItems)} de {totalItems}{" "}
-        pedidos
-      </p>
-
-      <div className="pagination">
+      {/* PAGINACIÓN */}
+      <div className="pagination-controls">
         <button
-          disabled={currentPage === 1}
           onClick={() => setCurrentPage(currentPage - 1)}
+          disabled={currentPage === 1}
         >
-          ‹
+          ←
         </button>
 
-        {Array.from({ length: totalPages }).map((_, index) => (
-          <button
-            key={index}
-            className={currentPage === index + 1 ? "active" : ""}
-            onClick={() => setCurrentPage(index + 1)}
-          >
-            {index + 1}
-          </button>
-        ))}
+        <span>
+          Página {currentPage} de {totalPages}
+        </span>
 
         <button
-          disabled={currentPage === totalPages}
           onClick={() => setCurrentPage(currentPage + 1)}
+          disabled={currentPage === totalPages}
         >
-          ›
+          →
         </button>
       </div>
     </div>

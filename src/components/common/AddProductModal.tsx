@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import "../../styles/components/addProductModal.css";
+import "../../styles/components/commons/AddProductModal.css";
 
 type Props = {
   onClose: () => void;

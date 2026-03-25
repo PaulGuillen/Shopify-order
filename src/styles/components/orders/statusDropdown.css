@@ -1,0 +1,153 @@
+/* =========================
+   WRAPPER
+========================= */
+.status-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+/* =========================
+   SELECTED (TOP)
+========================= */
+.status-selected {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 8px 14px 8px 24px;
+    border-radius: 10px;
+    background: #f9fafb;
+
+    cursor: pointer;
+
+    font-size: 14px;
+    font-weight: 500;
+
+    position: relative;
+}
+
+.status-selected:hover {
+    background: #f3f4f6;
+}
+
+/* =========================
+   DROPDOWN MENU
+========================= */
+.status-menu {
+    position: absolute;
+    top: 110%;
+    left: 0;
+    width: 240px;
+
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+
+    z-index: 999;
+    overflow: hidden;
+
+    animation: fadeIn 0.15s ease;
+}
+
+/* ANIMATION */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* =========================
+   ITEM
+========================= */
+.status-item {
+    padding: 12px 16px 12px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    cursor: pointer;
+
+    font-size: 14px;
+    font-weight: 500;
+
+    position: relative;
+}
+
+.status-item:hover {
+    background: #f9fafb;
+}
+
+/* =========================
+   DOT (PERFECT ALIGN 🔥)
+========================= */
+.status-selected::before,
+.status-item::before {
+    content: "";
+    position: absolute;
+    left: 8px;
+
+    /* 🔥 alineación visual perfecta */
+    top: 50%;
+    transform: translateY(-45%);
+
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+/* =========================
+   COLORES POR ESTADO
+========================= */
+.unassigned::before {
+    background: #facc15;
+}
+
+.to_contact::before {
+    background: #090909;
+}
+
+.contacted::before {
+    background: #22c55e;
+}
+
+.confirmed::before {
+    background: #3b82f6;
+}
+
+.shipped::before {
+    background: #8b5cf6;
+}
+
+.delivered::before {
+    background: #10b981;
+}
+
+.cancelled::before {
+    background: #ef4444;
+}
+
+.not_delivered::before {
+    background: #f97316;
+}
+
+/* =========================
+   CHECK ICON
+========================= */
+.check {
+    font-weight: bold;
+    font-size: 14px;
+}
+
+/* =========================
+   ARROW SELECT
+========================= */
+.arrow {
+    font-size: 11px;
+    color: #9ca3af;
+}
