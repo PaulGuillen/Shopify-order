@@ -36,13 +36,13 @@ export function useOrdersByFlow(shop: string) {
     const [orders, setOrders] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
 
+    const hasLoaded = useRef(false);
+
     const loadOrders = async (status = "all") => {
         try {
             setLoading(true);
-
             const data = await fetchOrdersByWorkflow(shop, status);
             setOrders(data);
-
         } catch (error) {
             console.error(error);
         } finally {
@@ -51,7 +51,12 @@ export function useOrdersByFlow(shop: string) {
     };
 
     useEffect(() => {
-        if (shop) loadOrders("all");
+        if (!shop) return;
+
+        if (hasLoaded.current) return;
+
+        hasLoaded.current = true;
+        loadOrders("all");
     }, [shop]);
 
     return { orders, loadOrders, loading };

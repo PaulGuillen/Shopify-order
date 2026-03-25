@@ -5,6 +5,7 @@ import OrdersFilters from "../components/orders/OrdersFilters";
 import OrdersTable from "../components/orders/OrdersTable";
 import { useOrdersByFlow } from "../hooks/useOrders";
 import OrdersPagination from "../components/orders/OrdersPagination";
+import OrderSidePanel from "../components/orders/OrderSidePanel";
 
 export default function OrdersPage() {
   const [activeTab, setActiveTab] = useState("Todos");
@@ -43,6 +44,8 @@ export default function OrdersPage() {
     [orders],
   );
 
+  const [selectedOrder, setSelectedOrder] = useState<any | null>(null);
+
   return (
     <Layout>
       <div className="orders-page">
@@ -60,7 +63,11 @@ export default function OrdersPage() {
           loadOrders={loadOrders}
         />
 
-        <OrdersTable orders={paginatedOrders} loading={loading} />
+        <OrdersTable
+          orders={paginatedOrders}
+          loading={loading}
+          onSelectOrder={(order) => setSelectedOrder(order)}
+        />
 
         <OrdersPagination
           currentPage={currentPage}
@@ -69,7 +76,13 @@ export default function OrdersPage() {
           setCurrentPage={setCurrentPage}
           setRowsPerPage={setRowsPerPage}
         />
-        
+
+        {selectedOrder && (
+          <OrderSidePanel
+            order={selectedOrder}
+            onClose={() => setSelectedOrder(null)}
+          />
+        )}
       </div>
     </Layout>
   );

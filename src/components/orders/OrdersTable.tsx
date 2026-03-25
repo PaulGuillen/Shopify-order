@@ -1,22 +1,13 @@
+import { statusLabelMap } from "../../utils/statusUtil";
 import "./../../styles/components/orders/ordersTable.css";
 
 interface Props {
-  orders: any[];
-  loading: boolean;
+  readonly orders: any[];
+  readonly loading: boolean;
+  readonly onSelectOrder?: (order: any) => void;
 }
 
-const statusLabel: Record<string, string> = {
-  unassigned: "Sin Asignar",
-  to_contact: "Por Contactar",
-  contacted: "Contactado",
-  confirmed: "Confirmado",
-  shipped: "Enviado",
-  delivered: "Entregado",
-  cancelled: "Cancelado",
-  not_delivered: "No entregado",
-};
-
-export default function OrdersTable({ orders, loading }: Props) {
+export default function OrdersTable({ orders, loading, onSelectOrder }: Props) {
   if (loading) return <p>Cargando...</p>;
 
   if (!orders.length) return <p>No hay pedidos</p>;
@@ -34,7 +25,11 @@ export default function OrdersTable({ orders, loading }: Props) {
       </div>
 
       {orders.map((order) => (
-        <div key={order.id} className="table-row">
+        <div
+          key={order.id}
+          className="table-row"
+          onClick={() => onSelectOrder?.(order)}
+        >
           <span>#{order.order_number}</span>
 
           <div className="customer">
@@ -47,7 +42,7 @@ export default function OrdersTable({ orders, loading }: Props) {
           </span>
 
           <span className={`badge ${order.status}`}>
-            {statusLabel[order.status] || order.status}
+            {statusLabelMap[order.status] || order.status}
           </span>
 
           <div>
