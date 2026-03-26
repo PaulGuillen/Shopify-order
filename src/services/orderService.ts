@@ -25,7 +25,16 @@ export interface Order {
     /* =============================
        🔥 ESTADO
     ============================== */
-    status: "assigned" | "unassigned";
+    status:
+    | "assigned"
+    | "unassigned"
+    | "to_contact"
+    | "contacted"
+    | "confirmed"
+    | "shipped"
+    | "delivered"
+    | "cancelled"
+    | "not_delivered";
 
     financial_status: "paid" | "pending" | string;
     fulfillment_status: "fulfilled" | null;
@@ -127,12 +136,46 @@ export interface Order {
         total_discounts: string;
         total_line_items_price: string;
     };
-}
 
+    dataUpdated?: {
+        cliente?: {
+            name?: string;
+            phone?: string;
+            phoneWithPrefix?: string;
+            region?: string;
+            dni?: string;
+        };
+
+        envio?: {
+            courier?: string;
+            agency?: string | null;
+            date?: string;
+        };
+
+        pago?: {
+            metodo?: string;
+            adelanto?: number;
+            totalOriginal?: number;
+            totalFinal?: number;
+        };
+
+        productos?: {
+            base?: any;
+            upsells?: any[]; // 🔥 FIX
+        };
+
+        vendedor?: {
+            advisor?: string;
+        };
+
+        status?: string;
+    };
+}
 export interface FirebaseTimestamp {
     _seconds: number;
     _nanoseconds: number;
 }
+
 export async function fetchOrders(shop: string): Promise<Order[]> {
     const response = await fetch(`${API}/orders/orders-shopify/${shop}`);
 
@@ -155,6 +198,39 @@ export const fetchOrdersByWorkflow = async (shop: string, status: string) => {
     const data = await res.json();
 
     return data.orders;
+};
+
+export const updateOrderService = async (
+    shop: string,
+    orderId: string,
+    data: any
+) => {
+    try {
+        const response = await fetch(
+            `${API}/orders/orders-update/${shop}/${orderId}`,
+            {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(data),
+            }
+        );
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error(result.error || "Error actualizando orden");
+        }
+
+        return result;
+    } catch (error: any) {
+        console.error("❌ updateOrderService:", error.message);
+        return {
+            success: false,
+            error: error.message,
+        };
+    }
 };
 
 export const getAdvisorOrders = async (

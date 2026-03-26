@@ -15,33 +15,54 @@ export default function OrdersPage() {
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   const shop = user.shop;
 
-  const { orders = [], loadOrders, loading } = useOrdersByFlow(shop);
+  const {
+    orders = [],
+    ordersBase = [],
+    loadOrders,
+    loading,
+  } = useOrdersByFlow(shop);
 
   // 🔥 PAGINACIÓN
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(20);
 
   /* 🔥 DATA PAGINADA */
+  const filteredOrders = useMemo(() => {
+    return orders
+      .filter((o) => {
+        if (activeCourier === "Todos") return true;
+        return o.courier === activeCourier;
+      })
+      .filter((o) => {
+        if (activeRegion === "Todos") return true;
+        return o.customer?.region_type === activeRegion;
+      });
+  }, [orders, activeCourier, activeRegion]);
+
   const paginatedOrders = useMemo(() => {
     const start = (currentPage - 1) * rowsPerPage;
     const end = start + rowsPerPage;
-    return orders.slice(start, end);
-  }, [orders, currentPage, rowsPerPage]);
+    return filteredOrders.slice(start, end);
+  }, [filteredOrders, currentPage, rowsPerPage]);
 
   /* 🔥 TOTAL PÁGINAS */
-  const totalPages = Math.ceil(orders.length / rowsPerPage);
+  const totalPages = Math.ceil(filteredOrders.length / rowsPerPage);
 
   /* 🔥 COUNTS */
   const counts = useMemo(
     () => ({
-      todos: orders.length,
-      sinAsignar: orders.filter((o) => o.status === "unassigned").length,
-      confirmado: orders.filter((o) => o.status === "confirmed").length,
-      enviado: orders.filter((o) => o.status === "shipped").length,
-      entregado: orders.filter((o) => o.status === "delivered").length,
-      cancelado: orders.filter((o) => o.status === "cancelled").length,
+      todos: ordersBase.length,
+      sinAsignar: ordersBase.filter((o) => o.status === "unassigned").length,
+      porContactar: ordersBase.filter((o) => o.status === "to_contact").length,
+      contactado: ordersBase.filter((o) => o.status === "contacted").length,
+      confirmado: ordersBase.filter((o) => o.status === "confirmed").length,
+      enviado: ordersBase.filter((o) => o.status === "shipped").length,
+      entregado: ordersBase.filter((o) => o.status === "delivered").length,
+      cancelado: ordersBase.filter((o) => o.status === "cancelled").length,
+      noEntregado: ordersBase.filter((o) => o.status === "not_delivered")
+        .length,
     }),
-    [orders],
+    [ordersBase],
   );
 
   const [selectedOrder, setSelectedOrder] = useState<any | null>(null);
@@ -52,6 +73,8 @@ export default function OrdersPage() {
         <OrdersHeader />
 
         <OrdersFilters
+          loadOrders={loadOrders}
+          counts={counts}
           activeTab={activeTab}
           setActiveTab={setActiveTab}
           activeCourier={activeCourier}
@@ -59,8 +82,6 @@ export default function OrdersPage() {
           activeRegion={activeRegion}
           setActiveRegion={setActiveRegion}
           orders={orders}
-          counts={counts}
-          loadOrders={loadOrders}
         />
 
         <OrdersTable

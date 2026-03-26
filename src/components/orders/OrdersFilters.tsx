@@ -54,13 +54,13 @@ export default function OrdersFilters({
         {[
           { label: "Todos", count: counts?.todos ?? 0 },
           { label: "Sin Asignar", count: counts?.sinAsignar ?? 0 },
-          { label: "Por Contactar", count: 0 },
-          { label: "Contactado", count: 0 },
+          { label: "Por Contactar", count: counts?.porContactar ?? 0 },
+          { label: "Contactado", count: counts?.contactado ?? 0 },
           { label: "Confirmado", count: counts?.confirmado ?? 0 },
           { label: "Enviado", count: counts?.enviado ?? 0 },
           { label: "Entregado", count: counts?.entregado ?? 0 },
           { label: "Cancelado", count: counts?.cancelado ?? 0 },
-          { label: "No entregado", count: 0 },
+          { label: "No entregado", count: counts?.noEntregado ?? 0 },
         ].map((item) => (
           <button
             key={item.label}

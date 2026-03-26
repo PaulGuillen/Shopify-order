@@ -117,6 +117,12 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding: 10px 0;
+}
+
+/* espacio entre productos */
+.row-between+.row-between {
+    border-top: 1px solid #f1f5f9;
 }
 
 .mt {
@@ -154,27 +160,6 @@
 .pill.green {
     background: #dcfce7;
     color: #16a34a;
-}
-
-/* STATUS BOX */
-.status-box {
-    background: #eef6ff;
-    border-radius: 12px;
-    padding: 12px;
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 14px;
-}
-
-/* PAYMENT */
-.payment-warning {
-    margin-top: 10px;
-    background: #fef3c7;
-    padding: 10px;
-    border-radius: 10px;
-    display: flex;
-    justify-content: space-between;
-    font-weight: 600;
 }
 
 /* BUTTONS */
@@ -434,5 +419,422 @@
         to {
             transform: translateY(0);
         }
+    }
+}
+
+/* =========================
+   BOTÓN UPSSELL PRO
+========================= */
+
+.upsell-btn {
+    width: 100%;
+    margin-top: 10px;
+    padding: 10px 12px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+
+    border-radius: 10px;
+    border: 1.5px dashed #c4b5fd;
+
+    background: #faf5ff;
+    color: #7c3aed;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+/* HOVER */
+.upsell-btn:hover {
+    background: #f3e8ff;
+    border-color: #a78bfa;
+}
+
+/* ICONO */
+.upsell-icon {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+/* ITEM */
+.product-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 12px 0;
+}
+
+/* separación elegante */
+.product-item+.product-item {
+    border-top: 1px solid #f1f5f9;
+}
+
+/* LEFT */
+.product-left {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    max-width: 70%;
+}
+
+/* TITLE */
+.product-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #0f172a;
+}
+
+/* META */
+.product-meta {
+    font-size: 12px;
+    color: #64748b;
+}
+
+/* RIGHT */
+.product-right {
+    display: flex;
+    flex-direction: column;
+    /* 🔥 vertical */
+    align-items: flex-end;
+    /* 🔥 pegado a la derecha */
+    gap: 4px;
+}
+
+/* PRECIO (🔥 IMPORTANTE) */
+.product-price {
+    font-size: 15px;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+/* UPSSELL highlight sutil */
+.product-item.upsell {
+    background: #fafafa;
+    border-radius: 2px;
+    padding-right: 1px;
+}
+
+.delete-text {
+    font-size: 12px;
+    color: #ef4444;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.delete-text:hover {
+    text-decoration: underline;
+}
+
+/* =========================
+PAYMENT METHODS
+========================= */
+.payment-methods {
+    display: flex;
+    gap: 8px;
+    padding: 5px 2px 0;
+}
+
+/* CHIP */
+.payment-chip {
+    padding: 6px 12px;
+    border-radius: 999px;
+
+    border: 1px solid #e5e7eb;
+    background: #f9fafb;
+
+    font-size: 12px;
+    font-weight: 500;
+
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+/* HOVER */
+.payment-chip:hover {
+    background: #f1f5f9;
+}
+
+/* ACTIVE */
+.payment-chip.active {
+    background: #6366f1;
+    color: white;
+    border-color: #6366f1;
+}
+
+/* =========================
+ADELANTO INPUT
+========================= */
+.adelanto-box {
+    padding: 12px 2px;
+}
+
+.adelanto-input {
+    width: 100%;
+    padding: 12px;
+
+    border-radius: 10px;
+    border: 1px solid #e5e7eb;
+
+    font-size: 14px;
+}
+
+.adelanto-input:focus {
+    outline: none;
+    border-color: #6366f1;
+    background: #fafafa;
+}
+
+.total-input {
+    width: 100px;
+    text-align: right;
+
+    font-size: 16px;
+    font-weight: 700;
+    color: #0f172a;
+
+    border: none;
+    border-bottom: 1px dashed #cbd5f5;
+    background: transparent;
+
+    outline: none;
+    transition: 0.2s;
+}
+
+/* hover */
+.total-input:hover {
+    border-bottom: 1px solid #6366f1;
+}
+
+/* focus */
+.total-input:focus {
+    border-bottom: 1px solid #6366f1;
+    background: #fafafa;
+}
+
+/* =========================
+CHIPS REGION
+========================= */
+.region-chips {
+    display: flex;
+    gap: 8px;
+    padding: 2px 0px 0;
+}
+
+.region-chip {
+    padding: 6px 12px;
+    border-radius: 999px;
+
+    border: 1px solid #e5e7eb;
+    background: #f9fafb;
+
+    font-size: 12px;
+    font-weight: 500;
+
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.region-chip:hover {
+    background: #f1f5f9;
+}
+
+/* ACTIVE */
+.region-chip.active {
+    background: #6366f1;
+    color: white;
+    border-color: #6366f1;
+}
+
+/* =========================
+CLIENTE BOX
+========================= */
+.cliente-box {
+    padding: 12px 0px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+/* NAME */
+.cliente-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: #0f172a;
+}
+
+/* PHONE INPUT */
+.cliente-phone {
+    border: none;
+    border-bottom: 1px dashed #cbd5f5;
+    background: transparent;
+
+    font-size: 13px;
+    color: #64748b;
+
+    padding: 4px 0;
+    outline: none;
+    transition: 0.2s;
+}
+
+.cliente-phone:focus {
+    border-bottom: 1px solid #6366f1;
+    color: #0f172a;
+}
+
+.dni-input {
+    width: 100%;
+    padding: 12px;
+
+    border-radius: 10px;
+    border: 1px solid #e5e7eb;
+
+    font-size: 14px;
+}
+
+/* CONTENEDOR */
+.phone-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+
+    padding: 8px 10px;
+    background: #fafafa;
+
+    transition: 0.2s;
+}
+
+/* FOCUS GLOBAL */
+.phone-container:focus-within {
+    border-color: #6366f1;
+    background: #ffffff;
+}
+
+/* PREFIX */
+.phone-prefix {
+    font-size: 13px;
+    font-weight: 600;
+    color: #0f172a;
+}
+
+/* INPUT */
+.phone-input {
+    border: none;
+    outline: none;
+    flex: 1;
+
+    font-size: 13px;
+    color: #0f172a;
+    background: transparent;
+}
+
+/* COPY BUTTON */
+.phone-copy {
+    border: none;
+    background: #f1f5f9;
+
+    width: 28px;
+    height: 28px;
+
+    border-radius: 8px;
+
+    cursor: pointer;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    transition: 0.2s;
+}
+
+/* HOVER */
+.phone-copy:hover {
+    background: #e2e8f0;
+    transform: scale(1.05);
+}
+
+/* =========================
+   FOOTER
+========================= */
+.sidepanel-footer {
+    padding: 16px;
+    border-top: 1px solid #eee;
+    background: white;
+}
+
+/* =========================
+   BOTÓN UPDATE PRO 🔥
+========================= */
+.update-btn {
+    width: 100%;
+    padding: 14px;
+
+    border-radius: 12px;
+    border: none;
+
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    color: white;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    cursor: pointer;
+    transition: all 0.25s ease;
+
+    box-shadow: 0 4px 14px rgba(34, 197, 94, 0.25);
+}
+
+/* HOVER */
+.update-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(34, 197, 94, 0.35);
+}
+
+/* ACTIVE */
+.update-btn:active {
+    transform: scale(0.98);
+}
+
+/* DISABLED */
+.update-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+/* ICON */
+.update-icon {
+    font-size: 16px;
+}
+
+/* =========================
+   LOADER 🔥
+========================= */
+.loader {
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    border-top: 2px solid white;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
     }
 }

@@ -2,8 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import "../../styles/components/commons/AddProductModal.css";
 
 type Props = {
-  onClose: () => void;
-  onSelect: (product: any) => void;
+  readonly onClose: () => void;
+  readonly onSelect: (product: any) => void;
 };
 
 export default function AddProductModal({ onClose, onSelect }: Props) {
@@ -12,13 +12,10 @@ export default function AddProductModal({ onClose, onSelect }: Props) {
 
   const [selectedProduct, setSelectedProduct] = useState<any | null>(null);
 
-  // 🔥 estados nuevos
   const [quantity, setQuantity] = useState(1);
   const [customTotal, setCustomTotal] = useState("");
 
-  /* =============================
-     LOAD CACHE
-  ============================== */
+  /* LOAD CACHE */
   useEffect(() => {
     const cache = localStorage.getItem("products_cache");
     if (cache) {
@@ -26,24 +23,18 @@ export default function AddProductModal({ onClose, onSelect }: Props) {
     }
   }, []);
 
-  /* =============================
-     FILTER
-  ============================== */
+  /* FILTER */
   const filtered = useMemo(() => {
     return products.filter((p) =>
       p.title.toLowerCase().includes(search.toLowerCase())
     );
   }, [products, search]);
 
-  /* =============================
-     PRODUCT DATA
-  ============================== */
+  /* PRODUCT DATA */
   const basePrice = Number(selectedProduct?.price || 0);
   const suggestedTotal = quantity * basePrice;
 
-  /* =============================
-     RESET CUANDO ABRE MODAL
-  ============================== */
+  /* RESET */
   useEffect(() => {
     if (selectedProduct) {
       setQuantity(1);
@@ -51,64 +42,78 @@ export default function AddProductModal({ onClose, onSelect }: Props) {
     }
   }, [selectedProduct]);
 
-  /* =============================
-     DIFERENCIA
-  ============================== */
+  /* DIFERENCIA */
   const difference = Number(customTotal || 0) - suggestedTotal;
 
   return (
-    <div className="add-product-overlay" onClick={onClose}>
-      <div className="add-product-modal" onClick={(e) => e.stopPropagation()}>
-        {/* HEADER */}
-        <div className="modal-header">
-          <h3>Agregar producto</h3>
-          <button className="close-btn" onClick={onClose}>
-            ✕
-          </button>
-        </div>
+    <>
+      {/* =========================
+         OVERLAY PRINCIPAL
+      ========================= */}
+      <div className="add-product-overlay">
+        <div
+          className="add-product-modal-container"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* HEADER */}
+          <div className="add-product-header">
+            <h3 className="add-product-title">Agregar producto</h3>
+            <button className="add-product-close" onClick={onClose}>
+              ✕
+            </button>
+          </div>
 
-        {/* SEARCH */}
-        <input
-          className="search-input"
-          placeholder="Buscar producto..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
+          {/* SEARCH */}
+          <div className="add-product-search">
+            <input
+              className="add-product-input"
+              placeholder="Buscar producto..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
 
-        {/* LIST */}
-        <div className="product-list">
-          {filtered.map((p) => (
-            <div
-              key={p.id}
-              className="product-item"
-              onClick={() => {
-                setSelectedProduct(p);
-              }}
-            >
-              <img src={p.image} alt="" />
-              <div>
-                <p>{p.title}</p>
-                <span>PEN {p.price}</span>
+          {/* LIST */}
+          <div className="add-product-list">
+            {filtered.map((p) => (
+              <div
+                key={p.id}
+                className="add-product-item"
+                onClick={() => setSelectedProduct(p)}
+              >
+                <img
+                  src={p.image}
+                  alt=""
+                  className="add-product-img"
+                />
+
+                <div className="add-product-info">
+                  <p className="add-product-name">{p.title}</p>
+                  <span className="add-product-price">
+                    PEN {p.price}
+                  </span>
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
 
       {/* =========================
-         MINI MODAL PRODUCTO
-      ========================== */}
+         MODAL DETALLE PRODUCTO
+      ========================= */}
       {selectedProduct && (
-        <div className="product-detail-overlay">
+        <div className="add-product-detail-overlay">
           <div
-            className="product-detail-modal"
+            className="add-product-detail-modal"
             onClick={(e) => e.stopPropagation()}
           >
             {/* HEADER */}
-            <div className="product-detail-header">
+            <div className="add-product-detail-header">
               <h3>Agregar producto</h3>
+
               <button
-                className="close-btn"
+                className="add-product-close"
                 onClick={() => setSelectedProduct(null)}
               >
                 ✕
@@ -116,26 +121,30 @@ export default function AddProductModal({ onClose, onSelect }: Props) {
             </div>
 
             {/* CONTENT */}
-            <div className="product-detail-content">
-              <img src={selectedProduct.image} alt="" />
+            <div className="add-product-detail-content">
+              <img
+                src={selectedProduct.image}
+                alt=""
+                className="add-product-detail-img"
+              />
 
-              <p className="product-title">{selectedProduct.title}</p>
+              <p className="add-product-detail-title">
+                {selectedProduct.title}
+              </p>
 
-              {/* PRECIO TIENDA */}
-              <div className="product-price-box">
+              {/* PRECIO */}
+              <div className="add-product-price-box">
                 <span>Precio tienda</span>
                 <p>PEN {basePrice.toFixed(2)}</p>
               </div>
 
-              {/* =============================
-                 CANTIDAD
-              ============================== */}
-              <div className="quantity-box">
+              {/* CANTIDAD */}
+              <div className="add-product-quantity-box">
                 <label>Cantidad</label>
 
-                <div className="stepper">
+                <div className="add-product-stepper">
                   <button
-                    className="stepper-btn"
+                    className="add-product-stepper-btn"
                     onClick={() =>
                       setQuantity((q) => Math.max(1, q - 1))
                     }
@@ -143,10 +152,12 @@ export default function AddProductModal({ onClose, onSelect }: Props) {
                     −
                   </button>
 
-                  <span className="stepper-value">{quantity}</span>
+                  <span className="add-product-stepper-value">
+                    {quantity}
+                  </span>
 
                   <button
-                    className="stepper-btn"
+                    className="add-product-stepper-btn"
                     onClick={() => setQuantity((q) => q + 1)}
                   >
                     +
@@ -155,18 +166,18 @@ export default function AddProductModal({ onClose, onSelect }: Props) {
               </div>
 
               {/* TOTAL SUGERIDO */}
-              <div className="price-box">
+              <div className="add-product-price-box">
                 <span>Total sugerido</span>
                 <p>PEN {suggestedTotal.toFixed(2)}</p>
               </div>
 
-              {/* 🔥 TOTAL EDITABLE */}
-              <div className="price-box">
+              {/* TOTAL EDITABLE */}
+              <div className="add-product-price-box">
                 <label>Total a cobrar</label>
 
                 <input
                   type="text"
-                  className="price-input"
+                  className="add-product-price-input"
                   value={customTotal}
                   onChange={(e) => {
                     const value = e.target.value
@@ -179,7 +190,7 @@ export default function AddProductModal({ onClose, onSelect }: Props) {
               </div>
 
               {/* DIFERENCIA */}
-              <p className="product-total-preview">
+              <p className="add-product-total-preview">
                 {difference < 0
                   ? `Descuento: PEN ${Math.abs(difference).toFixed(2)}`
                   : difference > 0
@@ -189,23 +200,23 @@ export default function AddProductModal({ onClose, onSelect }: Props) {
             </div>
 
             {/* FOOTER */}
-            <div className="product-detail-footer">
+            <div className="add-product-detail-footer">
               <button
-                className="btn-cancel"
+                className="add-product-btn-cancel"
                 onClick={() => setSelectedProduct(null)}
               >
                 Cancelar
               </button>
 
               <button
-                className="btn-confirm"
+                className="add-product-btn-confirm"
                 disabled={!customTotal || Number(customTotal) <= 0}
                 onClick={() => {
                   onSelect({
                     ...selectedProduct,
                     quantity,
-                    price: basePrice, // referencia
-                    total: Number(customTotal), // 🔥 real
+                    price: basePrice,
+                    total: Number(customTotal),
                   });
 
                   setSelectedProduct(null);
@@ -218,6 +229,6 @@ export default function AddProductModal({ onClose, onSelect }: Props) {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }

@@ -3,8 +3,12 @@ import "./../../styles/components/orders/orderSidePanel.css";
 import StatusDropdown from "./StatusDropdown";
 import AgencySelectorModal from "../common/AgencySelectorModal";
 import CourierSelector from "../common/CourierSelector";
+import AddProductModal from "../common/AddProductModal";
+import { useUpdateOrder } from "../../hooks/useOrders";
 
 export default function OrderSidePanel({ order, onClose }: any) {
+  const { updateOrder, loading } = useUpdateOrder();
+
   const [status, setStatus] = useState(order.status);
 
   // 🔥 COURIER
@@ -30,6 +34,9 @@ export default function OrderSidePanel({ order, onClose }: any) {
     order.delivery_date || order.created_day,
   );
 
+  const [showAddProduct, setShowAddProduct] = useState(false);
+  const [extraProducts, setExtraProducts] = useState<any[]>([]);
+
   useEffect(() => {
     if (order?.agency) {
       setSelectedAgency(order.agency);
@@ -42,24 +49,135 @@ export default function OrderSidePanel({ order, onClose }: any) {
     }
   };
 
-  const handleUpdate = () => {
-    const finalCourier = courier === "Otros" ? customCourier : courier;
+  const baseTotal = Number(order.total_price || 0);
 
+  const extraTotal = extraProducts.reduce(
+    (acc, p) => acc + Number(p.total || 0),
+    0,
+  );
+
+  const finalTotal = baseTotal + extraTotal;
+
+  const [adelanto, setAdelanto] = useState("");
+  const [dni, setDni] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState("yape"); // default
+
+  const [editableTotal, setEditableTotal] = useState("");
+
+  const adelantoNumber = Number(adelanto || 0);
+  const totalEditableNumber = Number(editableTotal || 0);
+  const totalFinalConAdelanto = Math.max(
+    totalEditableNumber - adelantoNumber,
+    0,
+  );
+
+  const [phone, setPhone] = useState(() => {
+    const raw = order.customer?.phone || "";
+    return raw.replace(/^(\+51|51)/, "").slice(0, 9);
+  });
+
+  const [regionType, setRegionType] = useState(
+    order.customer?.region_type || "lima",
+  );
+
+  useEffect(() => {
+    setEditableTotal(finalTotal.toFixed(2));
+  }, [finalTotal]);
+
+  const handleUpdateClick = async () => {
+    const payload = handleUpdate();
+
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+
+    const success = await updateOrder(user.shop, order.id, payload);
+
+    if (success) {
+      alert("✅ Orden actualizada");
+    }
+  };
+
+  const handleUpdate = () => {
     const payload = {
-      ...order,
-      status,
-      courier: finalCourier,
-      agency: courier === "Shalom" ? selectedAgency : null,
+      /* =========================
+       CLIENTE
+    ========================= */
+      cliente: {
+        name: order.customer?.name,
+        phone: phone,
+        phoneWithPrefix: `+51${phone}`,
+        region: regionType,
+        dni: dni || "",
+      },
+
+      /* =========================
+       VENDEDOR
+    ========================= */
+      vendedor: {
+        advisor: order.advisor || "Sin asignar",
+      },
+
+      /* =========================
+       STATUS
+    ========================= */
+      status: status,
+
+      /* =========================
+       ENVÍO
+    ========================= */
+      envio: {
+        courier: courier === "Otros" ? customCourier : courier,
+        agency: selectedAgency || null,
+        date: deliveryDate,
+      },
+
+      /* =========================
+       PRODUCTOS
+    ========================= */
+      productos: {
+        base: {
+          name: order.product?.name,
+          quantity: order.product?.quantity,
+          total: order.total_price,
+        },
+
+        upsells: extraProducts,
+      },
+
+      /* =========================
+       PAGO
+    ========================= */
+      pago: {
+        metodo: paymentMethod,
+        adelanto: Number(adelanto || 0),
+        totalOriginal: finalTotal,
+        totalFinal: totalFinalConAdelanto,
+      },
+
+      /* =========================
+       META
+    ========================= */
+      meta: {
+        shop: order.shop,
+        orderId: order.id,
+        updatedAt: new Date().toISOString(),
+      },
     };
 
-    console.log("🚀 UPDATE:", payload);
+    /* =========================
+     🔥 LOG PRO
+  ========================= */
 
-    alert("✅ Estado actualizado correctamente");
+    console.log("========================================");
+    console.log("🚀 UPDATE ORDER PAYLOAD");
+    console.log(JSON.stringify(payload, null, 2));
+    console.log("========================================");
+
+    return payload;
   };
 
   return (
     <>
-      <div className="sidepanel-overlay" onClick={onClose}>
+      <div className="sidepanel-overlay">
         <div className="sidepanel" onClick={(e) => e.stopPropagation()}>
           {/* HEADER */}
           <div className="sidepanel-header">
@@ -95,8 +213,70 @@ export default function OrderSidePanel({ order, onClose }: any) {
                 <span>👤 Cliente</span>
               </div>
 
-              <p className="main-text">{order.customer?.name}</p>
-              <span className="sub-text">{order.customer?.phone}</span>
+              {/* =========================
+                    CHIPS REGION
+                ========================= */}
+              <div className="region-chips">
+                {["lima", "provincia"].map((region) => (
+                  <button
+                    key={region}
+                    className={`region-chip ${
+                      regionType === region ? "active" : ""
+                    }`}
+                    onClick={() => setRegionType(region)}
+                  >
+                    {region === "lima" ? "Lima" : "Provincia"}
+                  </button>
+                ))}
+              </div>
+
+              {/* =========================
+                  INFO CLIENTE
+              ========================= */}
+              <div className="cliente-box">
+                <p className="cliente-name">
+                  {order.customer?.name || "Cliente"}
+                </p>
+
+                <input
+                  type="text"
+                  className="dni-input"
+                  placeholder="Ingresar DNI"
+                  value={dni}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/[^0-9]/g, "");
+
+                    setDni(value);
+                  }}
+                />
+
+                <div className="phone-container">
+                  <span className="phone-prefix">+51</span>
+
+                  <input
+                    type="text"
+                    className="phone-input"
+                    value={phone}
+                    onChange={(e) => {
+                      const value = e.target.value
+                        .replace(/[^0-9]/g, "")
+                        .slice(0, 9);
+
+                      setPhone(value);
+                    }}
+                    placeholder="987654321"
+                  />
+
+                  <button
+                    className="phone-copy"
+                    onClick={() => {
+                      navigator.clipboard.writeText(phone);
+                    }}
+                  >
+                    📋
+                  </button>
+                </div>
+              </div>
             </div>
 
             {/* ENVÍO */}
@@ -107,8 +287,6 @@ export default function OrderSidePanel({ order, onClose }: any) {
 
               {/* COURIER */}
               <div>
-                <span>Courier</span>
-
                 <CourierSelector
                   value={courier}
                   onChange={(val) => setCourier(val)}
@@ -174,25 +352,84 @@ export default function OrderSidePanel({ order, onClose }: any) {
             {/* PRODUCTOS */}
             <div className="card">
               <div className="card-header">
-                <span>📦 Productos (1)</span>
+                <span>📦 Productos ({1 + extraProducts.length})</span>
               </div>
 
-              <div className="row-between">
-                <div>
-                  <p className="main-text">
+              {/* PRODUCTO BASE */}
+              <div className="product-item">
+                <div className="product-left">
+                  <p className="product-title">
                     {order.product?.name || "Producto"}
                   </p>
-                  <span className="sub-text">1 x S/ {order.total_price}</span>
+
+                  <span className="product-meta">
+                    {order.product?.quantity || 1} x S/ {order.total_price}
+                  </span>
                 </div>
 
-                <span>S/ {order.total_price}</span>
+                <div className="product-right">
+                  <span className="product-price">S/ {order.total_price}</span>
+                </div>
               </div>
+
+              {/* UPSSELLS */}
+              {extraProducts.map((p, i) => (
+                <div key={i} className="product-item upsell">
+                  <div className="product-left">
+                    <p className="product-title">{p.title}</p>
+
+                    <span className="product-meta">
+                      {p.quantity} x S/ {p.price}
+                    </span>
+                  </div>
+
+                  <div className="product-right">
+                    <span className="product-price">S/ {p.total}</span>
+
+                    <button
+                      className="delete-text"
+                      onClick={() =>
+                        setExtraProducts((prev) =>
+                          prev.filter((_, idx) => idx !== i),
+                        )
+                      }
+                    >
+                      🗑 Eliminar
+                    </button>
+                  </div>
+                </div>
+              ))}
+
+              {/* =========================
+                  BOTÓN AGREGAR
+                ========================= */}
+              <button
+                className="upsell-btn"
+                onClick={() => setShowAddProduct(true)}
+              >
+                <span className="upsell-icon">＋</span>
+                <span>Agregar Producto</span>
+              </button>
 
               <div className="divider" />
 
+              {/* =========================
+              TOTAL (AÚN ORIGINAL)
+              👉 luego lo mejoramos
+            ========================= */}
               <div className="row-between total">
                 <span>Total a Cobrar</span>
-                <span>S/ {order.total_price}</span>
+                <input
+                  type="text"
+                  className="total-input"
+                  value={editableTotal}
+                  onChange={(e) => {
+                    const value = e.target.value
+                      .replace(/[^0-9.]/g, "")
+                      .replace(/(\..*)\./g, "$1");
+                    setEditableTotal(value);
+                  }}
+                />
               </div>
 
               <span className="hint">
@@ -200,38 +437,77 @@ export default function OrderSidePanel({ order, onClose }: any) {
               </span>
             </div>
 
-            {/* ESTADO */}
-            <div className="status-box">
-              <span>🚚 Estado Shalom</span>
-              <span className="pill green">Terrestre</span>
-            </div>
-
-            {/* PAGO */}
             <div className="card">
-              <div className="card-header row-between">
-                <span>💳 Pago</span>
-                <button className="btn-light">Registrar Pago</button>
+              <div className="card-header">
+                <span>💰 Adelanto</span>
               </div>
 
-              <div className="row-between">
-                <span>Total del pedido</span>
-                <span>S/ {order.total_price}</span>
+              {/* =========================
+                MÉTODOS DE PAGO (CHIPS)
+            ========================= */}
+              <div className="payment-methods">
+                {["yape", "plin", "transferencia"].map((method) => (
+                  <button
+                    key={method}
+                    className={`payment-chip ${
+                      paymentMethod === method ? "active" : ""
+                    }`}
+                    onClick={() => setPaymentMethod(method)}
+                  >
+                    {method === "yape" && "Yape"}
+                    {method === "plin" && "Plin"}
+                    {method === "transferencia" && "Transferencia"}
+                  </button>
+                ))}
               </div>
 
-              <div className="payment-warning">
-                Pendiente (COD)
-                <span>S/ {order.total_price}</span>
+              {/* =========================
+                  INPUT ADELANTO
+              ========================= */}
+              <div className="adelanto-box">
+                <input
+                  type="text"
+                  className="adelanto-input"
+                  placeholder="Ingresar adelanto"
+                  value={adelanto}
+                  onChange={(e) => {
+                    const value = e.target.value
+                      .replace(/[^0-9.]/g, "")
+                      .replace(/(\..*)\./g, "$1");
+
+                    setAdelanto(value);
+                  }}
+                />
+              </div>
+
+              <div className="divider" />
+
+              {/* =========================
+                  TOTAL FINAL
+              ========================= */}
+              <div className="row-between total">
+                <span>Total Final</span>
+                <span>S/ {totalFinalConAdelanto.toFixed(2)}</span>
               </div>
             </div>
           </div>
 
           {/* FOOTER */}
           <div className="sidepanel-footer">
-            <button className="btn-primary full" onClick={handleUpdate}>
-              🔗 Actualizar
+            <button
+              className="update-btn"
+              onClick={handleUpdateClick}
+              disabled={loading}
+            >
+              {loading ? (
+                <span className="loader" />
+              ) : (
+                <>
+                  <span className="update-icon">✓</span>
+                  <span>Actualizar Pedido</span>
+                </>
+              )}
             </button>
-
-            <button className="btn-link">Ver historial de actividad</button>
           </div>
         </div>
       </div>
@@ -244,6 +520,31 @@ export default function OrderSidePanel({ order, onClose }: any) {
           onSelect={(agency) => {
             setSelectedAgency(agency);
             setShowAgencyModal(false);
+          }}
+        />
+      )}
+
+      {showAddProduct && (
+        <AddProductModal
+          onClose={() => setShowAddProduct(false)}
+          onSelect={(product) => {
+            setExtraProducts((prev) => {
+              const exist = prev.find((p) => p.id === product.id);
+
+              if (exist) {
+                return prev.map((p) =>
+                  p.id === product.id
+                    ? {
+                        ...p,
+                        quantity: p.quantity + product.quantity,
+                        total: p.total + product.total,
+                      }
+                    : p,
+                );
+              }
+
+              return [...prev, product];
+            });
           }}
         />
       )}

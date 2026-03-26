@@ -1,4 +1,4 @@
-import { statusLabelMap } from "../../utils/statusUtil";
+import { statusConfig } from "../../utils/statusUtil";
 import "./../../styles/components/orders/ordersTable.css";
 
 interface Props {
@@ -41,9 +41,35 @@ export default function OrdersTable({ orders, loading, onSelectOrder }: Props) {
             {order.customer?.city} - {order.customer?.department}
           </span>
 
-          <span className={`badge ${order.status}`}>
-            {statusLabelMap[order.status] || order.status}
-          </span>
+          {(() => {
+            const safeStatus =
+              order?.status || order?.data?.status || "unassigned";
+
+            const status =
+              statusConfig[safeStatus] || statusConfig["unassigned"];
+
+            return (
+              <span
+                className="badge"
+                style={{
+                  backgroundColor: `${status.color}15`,
+                  color: status.color,
+                }}
+              >
+                <span
+                  style={{
+                    width: 6,
+                    height: 6,
+                    borderRadius: "50%",
+                    backgroundColor: status.color,
+                    display: "inline-block",
+                    marginRight: 6,
+                  }}
+                />
+                {status.label}
+              </span>
+            );
+          })()}
 
           <div>
             <p>S/ {order.total_price}</p>

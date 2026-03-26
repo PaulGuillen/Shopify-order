@@ -22,7 +22,7 @@
 
     font-size: 14px;
     font-weight: 500;
-
+    gap: 8px;
     position: relative;
 }
 
@@ -42,7 +42,7 @@
     background: white;
     border-radius: 12px;
     border: 1px solid #e5e7eb;
-    box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
 
     z-index: 999;
     overflow: hidden;
@@ -56,6 +56,7 @@
         opacity: 0;
         transform: translateY(-6px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -101,40 +102,26 @@
     border-radius: 50%;
 }
 
+
+/* DOT */
+.status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+
+/* ITEM */
+.status-item-content {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
 /* =========================
    COLORES POR ESTADO
 ========================= */
-.unassigned::before {
-    background: #facc15;
-}
-
-.to_contact::before {
-    background: #090909;
-}
-
-.contacted::before {
-    background: #22c55e;
-}
-
-.confirmed::before {
-    background: #3b82f6;
-}
-
-.shipped::before {
-    background: #8b5cf6;
-}
-
-.delivered::before {
-    background: #10b981;
-}
-
-.cancelled::before {
-    background: #ef4444;
-}
-
-.not_delivered::before {
-    background: #f97316;
-}
 
 /* =========================
    CHECK ICON

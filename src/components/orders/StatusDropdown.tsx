@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { statusLabelMap } from "../../utils/statusUtil";
+import { statusConfig } from "../../utils/statusUtil";
 import "./../../styles/components/orders/statusDropdown.css";
 
 interface Props {
@@ -19,8 +19,7 @@ export default function StatusDropdown({ value, onChange }: Props) {
     };
 
     document.addEventListener("mousedown", handleClickOutside);
-    return () =>
-      document.removeEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   return (
@@ -30,14 +29,26 @@ export default function StatusDropdown({ value, onChange }: Props) {
         className={`status-selected ${value}`}
         onClick={() => setOpen(!open)}
       >
-        <span>{statusLabelMap[value]}</span>
+        {(() => {
+          const config = statusConfig[value] || statusConfig["unassigned"];
+
+          return (
+            <>
+              <span
+                className="status-dot"
+                style={{ backgroundColor: config.color }}
+              />
+              <span>{config.label}</span>
+            </>
+          );
+        })()}
         <span className="arrow">▾</span>
       </div>
 
       {/* MENU */}
       {open && (
         <div className="status-menu">
-          {Object.entries(statusLabelMap).map(([key, label]) => (
+          {Object.entries(statusConfig).map(([key, label]) => (
             <div
               key={key}
               className={`status-item ${key}`}
@@ -46,9 +57,15 @@ export default function StatusDropdown({ value, onChange }: Props) {
                 setOpen(false);
               }}
             >
-              <span>{label}</span>
+              <div className="status-item-content">
+                <span
+                  className="status-dot"
+                  style={{ backgroundColor: label.color }}
+                />
+                <span>{label.label}</span>
+              </div>
 
-              {value === key && <span className="check">✓</span>}
+              
             </div>
           ))}
         </div>

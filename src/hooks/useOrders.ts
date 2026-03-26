@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import { assignOrder, fetchOrders, fetchOrdersByWorkflow, getAdvisorOrders, getAdvisorOrdersContacted, updateOrderStatus } from "../services/orderService";
+import { assignOrder, fetchOrders, fetchOrdersByWorkflow, getAdvisorOrders, getAdvisorOrdersContacted, updateOrderService, updateOrderStatus } from "../services/orderService";
 import type { Order } from "../services/orderService";
 
+//New Flow
 export function useOrders(shop: string) {
     const [orders, setOrders] = useState<Order[]>([]);
     const [loading, setLoading] = useState(true);
@@ -35,6 +36,7 @@ export function useOrders(shop: string) {
 export function useOrdersByFlow(shop: string) {
     const [orders, setOrders] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
+    const [ordersBase, setOrdersBase] = useState<any[]>([]);
 
     const hasLoaded = useRef(false);
 
@@ -43,6 +45,10 @@ export function useOrdersByFlow(shop: string) {
             setLoading(true);
             const data = await fetchOrdersByWorkflow(shop, status);
             setOrders(data);
+
+            if (status === "all") {
+                setOrdersBase(data);
+            }
         } catch (error) {
             console.error(error);
         } finally {
@@ -59,8 +65,50 @@ export function useOrdersByFlow(shop: string) {
         loadOrders("all");
     }, [shop]);
 
-    return { orders, loadOrders, loading };
+    return { orders, ordersBase, loadOrders, loading };
 }
+
+export const useUpdateOrder = () => {
+    const [loading, setLoading] = useState(false);
+
+    const updateOrder = async (
+        shop: string,
+        orderId: string,
+        payload: any
+    ) => {
+        try {
+            setLoading(true);
+
+            console.log("🚀 ENVIANDO UPDATE...");
+            console.log(JSON.stringify(payload, null, 2));
+
+            const result = await updateOrderService(
+                shop,
+                orderId,
+                payload
+            );
+
+            if (!result.success) {
+                alert(result.error || "Error actualizando");
+                return false;
+            }
+
+            console.log("✅ ORDEN ACTUALIZADA");
+
+            return true;
+        } catch (error) {
+            console.error("❌ ERROR HOOK:", error);
+            return false;
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return {
+        updateOrder,
+        loading,
+    };
+};
 
 export const useAdvisorOrders = (
     advisorId: string,
