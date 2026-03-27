@@ -7,6 +7,9 @@ import AddProductModal from "../common/AddProductModal";
 import { useUpdateOrder } from "../../hooks/useOrders";
 
 export default function OrderSidePanel({ order, onClose }: any) {
+  const advisors = JSON.parse(localStorage.getItem("advisors_cache") || "[]");
+  const [selectedAdvisor, setSelectedAdvisor] = useState<any>(null);
+
   const { updateOrder, loading } = useUpdateOrder();
 
   const [status, setStatus] = useState(order.status);
@@ -113,7 +116,7 @@ export default function OrderSidePanel({ order, onClose }: any) {
        VENDEDOR
     ========================= */
       vendedor: {
-        advisor: order.advisor || "Sin asignar",
+        advisor: selectedAdvisor?.name || "Sin asignar",
       },
 
       /* =========================
@@ -200,11 +203,34 @@ export default function OrderSidePanel({ order, onClose }: any) {
           {/* VENDEDOR */}
           <div className="seller-row">
             <span>Vendedor:</span>
-            <div className="select-like">
-              {order.advisorEmail || "Sin asignar"}
-            </div>
-          </div>
 
+            {/* 🔥 SI YA TIENE ASESORA */}
+            {order.advisorEmail ? (
+              <div className="select-like">{order.advisorEmail}</div>
+            ) : (
+              /* 🔥 SI NO TIENE → DROPDOWN */
+              <select
+                className="advisor-select"
+                value={selectedAdvisor?.id || ""}
+                onChange={(e) => {
+                  const advisor = advisors.find(
+                    (a: any) => a.id === e.target.value,
+                  );
+                  setSelectedAdvisor(advisor);
+                }}
+              >
+                <option value="">Seleccionar asesora</option>
+
+                {advisors
+                  .filter((a: any) => a.status === "activo") // 🔥 opcional
+                  .map((a: any) => (
+                    <option key={a.id} value={a.id}>
+                      {a.name}
+                    </option>
+                  ))}
+              </select>
+            )}
+          </div>
           {/* BODY */}
           <div className="sidepanel-body">
             {/* CLIENTE */}

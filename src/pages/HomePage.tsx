@@ -1,9 +1,10 @@
 import { useEffect, useState, useRef } from "react";
 import Layout from "../layout/Layout";
 import "../styles/pages/homePage.css";
-import { useAgencies, useProducts } from "../hooks/useHome";
+import { useAdvisors, useAgencies, useProducts } from "../hooks/useHome";
 import toast from "react-hot-toast";
 import { notify } from "../utils/notify";
+
 
 export default function Home() {
   /* =========================
@@ -21,12 +22,16 @@ export default function Home() {
 
   const { products, loadingProducts, hasLoadedProducts } = useProducts(shop);
 
+  const { advisors, loadingAdvisors, hasLoadedAdvisors } = useAdvisors(shop);
+  
+
   /* =========================
      TOAST CONTROL
   ========================= */
 
   const hasShownAgenciesToast = useRef(false);
   const hasShownProductsToast = useRef(false);
+  const hasShownAdvisorsToast = useRef(false);
 
   // 🔥 AGENCIAS
   useEffect(() => {
@@ -57,6 +62,22 @@ export default function Home() {
       }
     }
   }, [hasLoadedProducts]);
+
+  // 🔥 ASESORAS
+  useEffect(() => {
+    if (hasShownAdvisorsToast.current) return;
+
+    if (hasLoadedAdvisors) {
+      hasShownAdvisorsToast.current = true;
+
+      if (advisors.length > 0) {
+        notify.success("Asesoras cargadas correctamente 👩‍💼");
+      } else {
+        notify.error("Error al cargar asesoras ❌");
+      }
+    }
+  }, [hasLoadedAdvisors]);
+
 
   /* =========================
      BANNERS
@@ -226,6 +247,8 @@ export default function Home() {
                   <p>No hay productos disponibles</p>
                 )}
               </div>
+
+        
             </div>
           </div>
         </div>

@@ -1,7 +1,6 @@
 import toast from "react-hot-toast";
 import "../../styles/components/commons/customToast.css";
 
-
 type Props = {
   type: "success" | "error" | "warning" | "info";
   message: string;

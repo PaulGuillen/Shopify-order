@@ -18,7 +18,7 @@ export const useAgencies = () => {
 
             setAgencies(data);
 
-              localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
         } catch (error) {
             console.error(error);
         } finally {
@@ -91,5 +91,70 @@ export const useProducts = (shop: string) => {
         products,
         loadingProducts,
         hasLoadedProducts,
+    };
+};
+
+export const useAdvisors = (shop: string) => {
+    const [advisors, setAdvisors] = useState<any[]>([]);
+    const [loadingAdvisors, setLoadingAdvisors] = useState(false);
+    const [hasLoadedAdvisors, setHasLoadedAdvisors] = useState(false);
+
+    const loaded = useRef(false);
+
+    const STORAGE_KEY = `advisors_cache`;
+
+    const loadAdvisors = async () => {
+        try {
+            setLoadingAdvisors(true);
+
+            const API = import.meta.env.VITE_API_URL;
+
+            const response = await fetch(`${API}/users?shop=${shop}`);
+            const data = await response.json();
+
+            /* 🔥 FILTRAR SOLO ASESORAS */
+            const advisorsOnly = data
+                .filter((u: any) => u.role !== "admin")
+                .map((u: any) => ({
+                    id: u.id,
+                    name: u.email.split("@")[0],
+                    email: u.email,
+                    status: u.active ? "activo" : "suspendido",
+                }));
+
+            setAdvisors(advisorsOnly);
+
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(advisorsOnly));
+        } catch (error) {
+            console.error("Error loading advisors", error);
+
+            const cached = localStorage.getItem(STORAGE_KEY);
+            if (cached) {
+                setAdvisors(JSON.parse(cached));
+            }
+        } finally {
+            setLoadingAdvisors(false);
+            setHasLoadedAdvisors(true);
+        }
+    };
+
+    useEffect(() => {
+        if (!shop || loaded.current) return;
+
+        loaded.current = true;
+
+        const cached = localStorage.getItem(STORAGE_KEY);
+
+        if (cached) {
+            setAdvisors(JSON.parse(cached));
+        }
+
+        loadAdvisors();
+    }, [shop]);
+
+    return {
+        advisors,
+        loadingAdvisors,
+        hasLoadedAdvisors,
     };
 };
