@@ -14,6 +14,7 @@ export default function OrdersTable({ orders, loading, onSelectOrder }: Props) {
 
   return (
     <div className="orders-table">
+      {/* HEADER (solo desktop) */}
       <div className="table-header">
         <span># Pedido</span>
         <span>Cliente</span>
@@ -24,31 +25,33 @@ export default function OrdersTable({ orders, loading, onSelectOrder }: Props) {
         <span>Fecha</span>
       </div>
 
-      {orders.map((order) => (
-        <div
-          key={order.id}
-          className="table-row"
-          onClick={() => onSelectOrder?.(order)}
-        >
-          <span>#{order.order_number}</span>
+      {orders.map((order) => {
+        const safeStatus = order?.status || order?.data?.status || "unassigned";
 
-          <div className="customer">
-            <p>{order.customer?.name}</p>
-            <span>{order.customer?.phone}</span>
-          </div>
+        const status = statusConfig[safeStatus] || statusConfig["unassigned"];
 
-          <span>
-            {order.customer?.city} - {order.customer?.department}
-          </span>
+        return (
+          <div
+            key={order.id}
+            className="table-row"
+            onClick={() => onSelectOrder?.(order)}
+          >
+            {/* PEDIDO */}
+            <span data-label="# Pedido">#{order.order_number}</span>
 
-          {(() => {
-            const safeStatus =
-              order?.status || order?.data?.status || "unassigned";
+            {/* CLIENTE */}
+            <div className="customer" data-label="Cliente">
+              <p>{order.customer?.name}</p>
+              <span>{order.customer?.phone}</span>
+            </div>
 
-            const status =
-              statusConfig[safeStatus] || statusConfig["unassigned"];
+            {/* UBICACIÓN */}
+            <span data-label="Ubicación">
+              {order.customer?.city} - {order.customer?.department}
+            </span>
 
-            return (
+            {/* ESTADO */}
+            <span data-label="Estado">
               <span
                 className="badge"
                 style={{
@@ -68,19 +71,22 @@ export default function OrdersTable({ orders, loading, onSelectOrder }: Props) {
                 />
                 {status.label}
               </span>
-            );
-          })()}
+            </span>
 
-          <div>
-            <p>S/ {order.total_price}</p>
-            <span>{order.payment_gateway}</span>
+            {/* PAGO */}
+            <div data-label="Pago">
+              <p>S/ {order.total_price}</p>
+              <span>{order.payment_gateway}</span>
+            </div>
+
+            {/* VENDEDOR */}
+            <span data-label="Vendedor">{order.advisor || "Sin asignar"}</span>
+
+            {/* FECHA */}
+            <span data-label="Fecha">{order.created_day}</span>
           </div>
-
-          <span>{order.advisorEmail || "Sin asignar"}</span>
-
-          <span>{order.created_day}</span>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }

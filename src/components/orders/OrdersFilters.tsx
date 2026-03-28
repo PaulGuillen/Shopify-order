@@ -244,13 +244,11 @@ export default function OrdersFilters({
         >
           <option value="Todas">Todas las tiendas</option>
 
-          {[...new Set(orders.map((o) => o.product?.vendor))].map(
-            (shop: any) => (
-              <option key={shop} value={shop}>
-                {shop}
-              </option>
-            ),
-          )}
+          {[...new Set(orders.map((o) =>  o.product?.vendor))].map((shop: any) => (
+            <option key={shop} value={shop}>
+              {shop}
+            </option>
+          ))}
         </select>
 
         {/* COURIER */}
