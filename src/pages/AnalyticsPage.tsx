@@ -1,5 +1,4 @@
 import { useState } from "react";
-import Layout from "../layout/Layout";
 import "../styles/pages/analyticsPage.css";
 
 import {
@@ -60,7 +59,6 @@ export default function AnalyticsPage() {
   const [period, setPeriod] = useState("day");
 
   return (
-    <Layout>
       <div className="analytics-container">
         {/* HEADER */}
 
@@ -210,6 +208,5 @@ export default function AnalyticsPage() {
           </div>
         </div>
       </div>
-    </Layout>
   );
 }

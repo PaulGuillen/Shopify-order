@@ -1,11 +1,12 @@
-import { useState, useMemo } from "react";
-import Layout from "../layout/Layout";
+import { useState, useMemo, useEffect, useRef } from "react";
 import OrdersHeader from "../components/orders/OrdersHeader";
 import OrdersFilters from "../components/orders/OrdersFilters";
 import OrdersTable from "../components/orders/OrdersTable";
 import { useOrdersByFlow } from "../hooks/useOrders";
 import OrdersPagination from "../components/orders/OrdersPagination";
 import OrderSidePanel from "../components/orders/OrderSidePanel";
+import { notify } from "../utils/notify";
+import { useAdvisors, useAgencies, useProducts } from "../hooks/useHome";
 
 export default function OrdersPage() {
   const [search, setSearch] = useState("");
@@ -227,9 +228,71 @@ export default function OrdersPage() {
   );
 
   const [selectedOrder, setSelectedOrder] = useState<any | null>(null);
+  /* =========================
+       HOOKS
+    ========================= */
+
+  const { agencies, loadingAgencies, hasLoaded } = useAgencies();
+
+  const { products, loadingProducts, hasLoadedProducts } = useProducts(shop);
+
+  const { advisors, loadingAdvisors, hasLoadedAdvisors } = useAdvisors(shop);
+
+  /* =========================
+       TOAST CONTROL
+    ========================= */
+
+  const hasShownAgenciesToast = useRef(false);
+  const hasShownProductsToast = useRef(false);
+  const hasShownAdvisorsToast = useRef(false);
+
+  // 🔥 AGENCIAS
+  useEffect(() => {
+    if (hasShownAgenciesToast.current) return;
+
+    if (hasLoaded) {
+      hasShownAgenciesToast.current = true;
+
+      if (agencies.length > 0) {
+        notify.success("Agencias cargadas correctamente 🚚");
+      } else {
+        notify.error("Error al cargar agencias ❌");
+      }
+    }
+  }, [hasLoaded]);
+
+  // 🔥 PRODUCTOS
+  useEffect(() => {
+    if (hasShownProductsToast.current) return;
+
+    if (hasLoadedProducts) {
+      hasShownProductsToast.current = true;
+
+      if (products.length > 0) {
+        notify.success("Productos cargados correctamente 🛍️");
+      } else {
+        notify.error("Error al cargar productos ❌");
+      }
+    }
+  }, [hasLoadedProducts]);
+
+  // 🔥 ASESORAS
+  useEffect(() => {
+    if (hasShownAdvisorsToast.current) return;
+
+    if (hasLoadedAdvisors) {
+      hasShownAdvisorsToast.current = true;
+
+      if (advisors.length > 0) {
+        notify.success("Asesoras cargadas correctamente 👩‍💼");
+      } else {
+        notify.error("Error al cargar asesoras ❌");
+      }
+    }
+  }, [hasLoadedAdvisors]);
 
   return (
-    <Layout>
+
       <div className="orders-page">
         <OrdersHeader />
 
@@ -282,6 +345,6 @@ export default function OrdersPage() {
           />
         )}
       </div>
-    </Layout>
+  
   );
 }

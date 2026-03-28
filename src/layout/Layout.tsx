@@ -1,17 +1,14 @@
 import { useState } from "react";
+import { Outlet } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
 import "../styles/layout/layout.css";
 
-interface LayoutProps {
-  children: React.ReactNode;
-}
-
-export default function Layout({ children }: LayoutProps) {
+export default function Layout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const toggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen);
+    setSidebarOpen((prev) => !prev);
   };
 
   const closeSidebar = () => {
@@ -20,15 +17,23 @@ export default function Layout({ children }: LayoutProps) {
 
   return (
     <div className="app-shell">
+      {/* SIDEBAR (PERSISTENTE 🔥) */}
       <Sidebar open={sidebarOpen} closeSidebar={closeSidebar} />
 
+      {/* OVERLAY MOBILE */}
       {sidebarOpen && (
         <div className="sidebar-overlay" onClick={closeSidebar} />
       )}
 
+      {/* MAIN */}
       <div className="app-main">
+        {/* HEADER */}
         <Header toggleSidebar={toggleSidebar} />
-        <div className="app-content">{children}</div>
+
+        {/* CONTENIDO DINÁMICO */}
+        <div className="app-content">
+          <Outlet />
+        </div>
       </div>
     </div>
   );

@@ -1,5 +1,4 @@
 import { useState, useMemo } from "react";
-import Layout from "../layout/Layout";
 import "../styles/pages/productsPage.css";
 
 interface Product {
@@ -198,7 +197,6 @@ export default function ProductsPage() {
   const zeroStock = products.filter((p) => p.inventario === 0).length;
 
   return (
-    <Layout>
       <div className="products-container">
         {/* HEADER */}
 
@@ -206,8 +204,6 @@ export default function ProductsPage() {
           <h1>Productos</h1>
 
           <div className="products-actions">
-            <button className="btn">Exportar</button>
-            <button className="btn">Importar</button>
             <button className="btn-primary">+ Agregar producto</button>
           </div>
         </div>
@@ -351,6 +347,6 @@ export default function ProductsPage() {
           </div>
         )}
       </div>
-    </Layout>
+
   );
 }

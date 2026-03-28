@@ -1,5 +1,4 @@
 import { useState, useMemo } from "react";
-import Layout from "../layout/Layout";
 import { useUsers } from "../hooks/useUsers";
 import UsersTable from "../components/customers/UsersTable";
 import CreateUserModal from "../components/customers/CreateUserModal";
@@ -39,7 +38,7 @@ export default function CustomersPage() {
   };
 
   return (
-    <Layout>
+
       <div className="users-page">
         <div className="users-header">
           <div>
@@ -73,6 +72,5 @@ export default function CustomersPage() {
           />
         )}
       </div>
-    </Layout>
   );
 }

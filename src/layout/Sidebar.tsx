@@ -1,12 +1,6 @@
-import { NavLink } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { NavLink, useLocation } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
 import "../styles/layout/sidebar.css";
-
-interface User {
-  email: string;
-  role: string;
-  shop: string;
-}
 
 interface SidebarProps {
   open: boolean;
@@ -14,21 +8,66 @@ interface SidebarProps {
 }
 
 export default function Sidebar({ open, closeSidebar }: SidebarProps) {
-  const [role, setRole] = useState<string>("");
+  const location = useLocation();
 
-  useEffect(() => {
-    const storedUser = localStorage.getItem("user");
+  /* ================================
+     🔐 AUTH LOCAL (AUTÓNOMO)
+  ================================= */
+  const auth = useMemo(() => {
+    try {
+      const user = JSON.parse(localStorage.getItem("user") || "{}");
 
-    if (storedUser) {
-      const parsedUser: User = JSON.parse(storedUser);
-      setRole(parsedUser.role);
+      const role = user?.role?.trim().toLowerCase() || "";
+
+      return {
+        user,
+        role,
+        isAdmin: role === "admin",
+        isAsesora: role === "asesora",
+        isAuthenticated: !!user?.email,
+      };
+    } catch {
+      return {
+        user: null,
+        role: "",
+        isAdmin: false,
+        isAsesora: false,
+        isAuthenticated: false,
+      };
     }
   }, []);
 
+  /* ================================
+     📂 DROPDOWN PEDIDOS
+  ================================= */
+  const [ordersOpen, setOrdersOpen] = useState(false);
+
+  /* 🔥 AUTO OPEN SEGÚN RUTA */
+  useEffect(() => {
+    if (
+      location.pathname.startsWith("/orders") ||
+      location.pathname.startsWith("/draft-orders")
+    ) {
+      setOrdersOpen(true);
+    }
+  }, [location.pathname]);
+
+  const toggleOrders = () => {
+    setOrdersOpen((prev) => !prev);
+  };
+
+  /* ================================
+     🎯 ACTIVE PARENT
+  ================================= */
+  const isOrdersActive =
+    location.pathname.startsWith("/orders") ||
+    location.pathname.startsWith("/draft-orders");
+
   return (
     <aside className={`sidebar ${open ? "open" : ""}`}>
-      {/* BRAND */}
-
+      {/* ================================
+         🏷️ BRAND
+      ================================= */}
       <div className="sidebar-brand">
         <div className="brand-icon">🛍️</div>
         <div>
@@ -37,10 +76,12 @@ export default function Sidebar({ open, closeSidebar }: SidebarProps) {
         </div>
       </div>
 
+      {/* ================================
+         📌 NAV
+      ================================= */}
       <nav className="sidebar-nav">
-        {/* ADMIN */}
-
-        {role === "admin" && (
+        {/* ================= ADMIN ================= */}
+        {auth.isAdmin && (
           <>
             <NavLink
               to="/home"
@@ -52,15 +93,42 @@ export default function Sidebar({ open, closeSidebar }: SidebarProps) {
               <span>🏠</span> Inicio
             </NavLink>
 
-            <NavLink
-              to="/orders"
-              className={({ isActive }) =>
-                isActive ? "nav-item active" : "nav-item"
-              }
-              onClick={closeSidebar}
+            {/* 🔥 DROPDOWN PEDIDOS */}
+            <div
+              className={`nav-item dropdown ${isOrdersActive ? "active" : ""}`}
+              onClick={toggleOrders}
             >
-              <span>🧾</span> Pedidos
-            </NavLink>
+              <div className="nav-left">
+                <span>🧾</span>
+                <span>Pedidos</span>
+              </div>
+
+              <span className={`arrow ${ordersOpen ? "open" : ""}`}>▾</span>
+            </div>
+
+            {ordersOpen && (
+              <div className="submenu">
+                <NavLink
+                  to="/orders"
+                  className={({ isActive }) =>
+                    isActive ? "nav-subitem active" : "nav-subitem"
+                  }
+                  onClick={closeSidebar}
+                >
+                  Todas las órdenes
+                </NavLink>
+
+                <NavLink
+                  to="/draft-orders"
+                  className={({ isActive }) =>
+                    isActive ? "nav-subitem active" : "nav-subitem"
+                  }
+                  onClick={closeSidebar}
+                >
+                  Borradores
+                </NavLink>
+              </div>
+            )}
 
             <NavLink
               to="/products"
@@ -101,22 +169,11 @@ export default function Sidebar({ open, closeSidebar }: SidebarProps) {
             >
               <span>📣</span> Agencias
             </NavLink>
-
-            <NavLink
-              to="/discounts"
-              className={({ isActive }) =>
-                isActive ? "nav-item active" : "nav-item"
-              }
-              onClick={closeSidebar}
-            >
-              <span>🏷️</span> Descuentos
-            </NavLink>
           </>
         )}
 
-        {/* ASESORA */}
-
-        {role === "asesora" && (
+        {/* ================= ASESORA ================= */}
+        {auth.isAsesora && (
           <>
             <NavLink
               to="/home"
@@ -128,15 +185,42 @@ export default function Sidebar({ open, closeSidebar }: SidebarProps) {
               <span>🏠</span> Inicio
             </NavLink>
 
-            <NavLink
-              to="/orders"
-              className={({ isActive }) =>
-                isActive ? "nav-item active" : "nav-item"
-              }
-              onClick={closeSidebar}
+            {/* 🔥 DROPDOWN */}
+            <div
+              className={`nav-item dropdown ${isOrdersActive ? "active" : ""}`}
+              onClick={toggleOrders}
             >
-              <span>🧾</span> Pedidos
-            </NavLink>
+              <div className="nav-left">
+                <span>🧾</span>
+                <span>Pedidos</span>
+              </div>
+
+              <span className={`arrow ${ordersOpen ? "open" : ""}`}>▾</span>
+            </div>
+
+            {ordersOpen && (
+              <div className="submenu">
+                <NavLink
+                  to="/orders"
+                  className={({ isActive }) =>
+                    isActive ? "nav-subitem active" : "nav-subitem"
+                  }
+                  onClick={closeSidebar}
+                >
+                  Órdenes
+                </NavLink>
+
+                <NavLink
+                  to="/draft-orders"
+                  className={({ isActive }) =>
+                    isActive ? "nav-subitem active" : "nav-subitem"
+                  }
+                  onClick={closeSidebar}
+                >
+                  Borradores
+                </NavLink>
+              </div>
+            )}
 
             <NavLink
               to="/products"
@@ -161,9 +245,8 @@ export default function Sidebar({ open, closeSidebar }: SidebarProps) {
         )}
       </nav>
 
-      {/* FOOTER SOLO ADMIN */}
-
-      {role === "admin" && (
+      {/* ================= FOOTER ================= */}
+      {auth.isAdmin && (
         <div className="sidebar-footer">
           <NavLink to="/settings" className="nav-item" onClick={closeSidebar}>
             <span>⚙️</span> Configuración
