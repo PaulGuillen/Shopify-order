@@ -7,16 +7,21 @@ import AddProductModal from "../common/AddProductModal";
 import { useUpdateOrder } from "../../hooks/useOrders";
 import { generatePDF } from "../../utils/generateDocument";
 import { buildMessage, copyMessage } from "../../utils/messageUtil";
+import ProductEditModal from "../common/ProductEditModal";
 
 export default function OrderSidePanel({ order, onClose }: any) {
   const [documentType, setDocumentType] = useState<"boleta" | "factura" | null>(
     null,
   );
 
-  const [messageType, setMessageType] = useState<"lima" | "provincia" | null>(
-    null,
-  );
-  const [generatedMessage, setGeneratedMessage] = useState("");
+  const [showEditProduct, setShowEditProduct] = useState(false);
+
+  const [baseProduct, setBaseProduct] = useState(() => ({
+    name: order.product?.name,
+    quantity: order.product?.quantity || 1,
+    price: Number(order.total_price) / (order.product?.quantity || 1),
+    total: Number(order.total_price),
+  }));
 
   const advisors = JSON.parse(localStorage.getItem("advisors_cache") || "[]");
   const [selectedAdvisor, setSelectedAdvisor] = useState<any>(null);
@@ -63,7 +68,7 @@ export default function OrderSidePanel({ order, onClose }: any) {
     }
   };
 
-  const baseTotal = Number(order.total_price || 0);
+  const baseTotal = Number(baseProduct.total || 0);
 
   const extraTotal = extraProducts.reduce(
     (acc, p) => acc + Number(p.total || 0),
@@ -155,6 +160,30 @@ export default function OrderSidePanel({ order, onClose }: any) {
       setAdelanto(String(data.pago.adelanto || ""));
       setEditableTotal(String(data.pago.totalOriginal || ""));
     }
+
+    /* UPSSELLS */
+    if (data.productos?.upsells) {
+      setExtraProducts(data.productos.upsells || []);
+    }
+
+    /* 🔥 BASE PRODUCT (ESTO TE FALTABA) */
+    if (data.productos?.base) {
+      const base = data.productos.base;
+
+      // 🔥 defensivo
+      if (base.total != null) {
+        const quantity = base.quantity || 1;
+        const total = Number(base.total);
+        const price = total / quantity;
+
+        setBaseProduct({
+          name: base.name || order.product?.name,
+          quantity,
+          total,
+          price,
+        });
+      }
+    }
   }, [order]);
 
   useEffect(() => {
@@ -203,9 +232,9 @@ export default function OrderSidePanel({ order, onClose }: any) {
     ========================= */
       productos: {
         base: {
-          name: order.product?.name,
-          quantity: order.product?.quantity,
-          total: order.total_price,
+          name: baseProduct.name,
+          quantity: baseProduct.quantity,
+          total: baseProduct.total,
         },
 
         upsells: extraProducts,
@@ -263,6 +292,7 @@ export default function OrderSidePanel({ order, onClose }: any) {
         : "📋 Mensaje Provincia copiado",
     );
   };
+
   return (
     <>
       <div className="sidepanel-overlay">
@@ -289,7 +319,6 @@ export default function OrderSidePanel({ order, onClose }: any) {
             💬 MENSAJES
           ========================= */}
           <div className="sidepanel-body">
-            
             <div className="messages-card">
               <div className="messages-header">
                 <span>💬 Mensajes rápidos</span>
@@ -531,16 +560,26 @@ export default function OrderSidePanel({ order, onClose }: any) {
               <div className="product-item">
                 <div className="product-left">
                   <p className="product-title">
-                    {order.product?.name || "Producto"}
+                    {baseProduct.name || "Producto"}
                   </p>
 
                   <span className="product-meta">
-                    {order.product?.quantity || 1} x S/ {order.total_price}
+                    {baseProduct.quantity} x S/ {baseProduct.price.toFixed(2)}
                   </span>
                 </div>
 
                 <div className="product-right">
-                  <span className="product-price">S/ {order.total_price}</span>
+                  <span className="product-price">
+                    S/ {baseProduct.total.toFixed(2)}
+                  </span>
+
+                  {/* 🔥 NUEVO BOTÓN */}
+                  <button
+                    className="modify-text"
+                    onClick={() => setShowEditProduct(true)}
+                  >
+                    ✏️ Modificar
+                  </button>
                 </div>
               </div>
 
@@ -717,6 +756,31 @@ export default function OrderSidePanel({ order, onClose }: any) {
 
               return [...prev, product];
             });
+          }}
+        />
+      )}
+
+      {showEditProduct && (
+        <ProductEditModal
+          product={{
+            name: baseProduct.name,
+            quantity: baseProduct.quantity,
+            price: baseProduct.price,
+            total: baseProduct.total,
+            originalPrice: baseProduct.price,
+          }}
+          onClose={() => setShowEditProduct(false)}
+          onConfirm={({ quantity, total }) => {
+            const priceUnit = total / quantity;
+
+            setBaseProduct({
+              ...baseProduct,
+              quantity,
+              total,
+              price: priceUnit,
+            });
+
+            setShowEditProduct(false);
           }}
         />
       )}

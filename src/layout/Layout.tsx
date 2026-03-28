@@ -27,9 +27,6 @@ export default function Layout() {
 
       {/* MAIN */}
       <div className="app-main">
-        {/* HEADER */}
-        <Header toggleSidebar={toggleSidebar} />
-
         {/* CONTENIDO DINÁMICO */}
         <div className="app-content">
           <Outlet />

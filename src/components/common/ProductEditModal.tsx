@@ -14,8 +14,6 @@ export default function ProductEditModal({
 }: Props) {
   const basePrice = product.originalPrice || product.price;
 
-  console.log("Product", product)
-
   const [quantity, setQuantity] = useState(product.quantity || 1);
 
   const calculatedTotal = useMemo(() => {
@@ -97,11 +95,12 @@ export default function ProductEditModal({
               <strong>PEN {calculatedTotal.toFixed(2)}</strong>
             </div>
 
-            <div className="field">
+            <div className="field total-center">
               <label>Total a cobrar</label>
+
               <input
                 type="text"
-                className="total-input"
+                className="total-input center"
                 value={customTotal}
                 onChange={(e) => {
                   const value = e.target.value

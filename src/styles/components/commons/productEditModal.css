@@ -196,6 +196,7 @@
         transform: scale(0.95);
         opacity: 0;
     }
+
     to {
         transform: scale(1);
         opacity: 1;
@@ -212,4 +213,24 @@ input[type="number"]::-webkit-inner-spin-button {
 /* ❌ quitar flechas en Firefox */
 input[type="number"] {
     -moz-appearance: textfield;
+}
+
+/* 🔥 CENTRAR BLOQUE TOTAL */
+.total-center {
+    align-items: center;
+}
+
+/* 🔥 INPUT CENTRADO PRO */
+.total-input.center {
+    width: 140px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 16px;
+    margin: 0 auto;
+    display: block;
+}
+
+/* 🔥 LABEL TAMBIÉN CENTRADO */
+.total-center label {
+    text-align: center;
 }
