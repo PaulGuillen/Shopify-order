@@ -9,6 +9,10 @@
 }
 
 /* HTML ROOT */
+html, body {
+    height: 100%;
+    overflow: hidden; /* 🔥 CLAVE */
+}
 
 html {
     font-size: 16px;

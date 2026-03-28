@@ -73,12 +73,50 @@ export default function OrdersTable({ orders, loading, onSelectOrder }: Props) {
               </span>
             </span>
 
-            {/* PAGO */}
-            <div data-label="Pago">
-              <p>S/ {order.total_price}</p>
-              <span>{order.payment_gateway}</span>
-            </div>
+            <div data-label="Pago" className="payment-box">
+              {/* TOTAL */}
+              <span className="payment-total">
+                 Total: S/ {Number(order.total_price || 0).toFixed(2)}
+              </span>
 
+              <div className="payment-divider" />
+
+              {/* ADELANTO */}
+              {order.adelanto > 0 && (
+                <span className="payment-adelanto">
+                  💰 Adelanto: S/ {order.adelanto}
+                </span>
+              )}
+
+              {/* SALDO */}
+              {order.total_final != null && (
+                <span className="payment-saldo">
+                  🧾 Cobrar: S/ {order.total_final}
+                </span>
+              )}
+
+              {/* MÉTODO */}
+              {(() => {
+                const method = (
+                  order.metodo ||
+                  order.payment_gateway ||
+                  ""
+                ).toLowerCase();
+
+                let methodClass = "method-default";
+
+                if (method.includes("yape")) methodClass = "method-yape";
+                else if (method.includes("plin")) methodClass = "method-plin";
+                else if (method.includes("transfer"))
+                  methodClass = "method-transferencia";
+
+                return (
+                  <span className={`payment-method ${methodClass}`}>
+                    {method}
+                  </span>
+                );
+              })()}
+            </div>
             {/* VENDEDOR */}
             <span data-label="Vendedor">{order.advisor || "Sin asignar"}</span>
 

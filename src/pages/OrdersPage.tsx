@@ -21,6 +21,7 @@ export default function OrdersPage() {
   const [activeTab, setActiveTab] = useState("Todos");
   const [activeCourier, setActiveCourier] = useState("Todos");
   const [activeRegion, setActiveRegion] = useState("Todos");
+  const [selectedAdelanto, setSelectedAdelanto] = useState("Todos");
 
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   const shop = user.shop;
@@ -61,7 +62,11 @@ export default function OrdersPage() {
 
         advisor: o.dataUpdated?.vendedor?.advisor || o.advisor,
 
-        total_price: o.dataUpdated?.pago?.totalFinal || o.total_price,
+        /* 💰 PAGO NORMALIZADO */
+        total_price: o.dataUpdated?.pago?.totalOriginal || o.total_price, // 👉 TOTAL A COBRAR
+        total_final: o.dataUpdated?.pago?.totalFinal, // 👉 SALDO
+        adelanto: o.dataUpdated?.pago?.adelanto, // 👉 ADELANTO
+        metodo: o.dataUpdated?.pago?.metodo, // 👉 MÉTODO
       };
     });
   }, [orders]);
@@ -142,6 +147,25 @@ export default function OrdersPage() {
         })
 
         /* =========================
+         💰 Adelanto
+      ========================= */
+        .filter((o) => {
+          if (selectedAdelanto === "Todos") return true;
+
+          const adelanto = o.adelanto || 0;
+
+          if (selectedAdelanto === "si") {
+            return adelanto > 0;
+          }
+
+          if (selectedAdelanto === "no") {
+            return adelanto === 0;
+          }
+
+          return true;
+        })
+
+        /* =========================
          👩‍💼 VENDEDOR
       ========================= */
         .filter((o) => {
@@ -199,6 +223,7 @@ export default function OrdersPage() {
     selectedShop,
     selectedCourierSelect,
     selectedProduct,
+    selectedAdelanto,
   ]);
 
   const paginatedOrders = useMemo(() => {
@@ -292,59 +317,59 @@ export default function OrdersPage() {
   }, [hasLoadedAdvisors]);
 
   return (
+    <div className="orders-page">
+      <OrdersHeader />
 
-      <div className="orders-page">
-        <OrdersHeader />
+      <OrdersFilters
+        loadOrders={loadOrders}
+        counts={counts}
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        activeCourier={activeCourier}
+        setActiveCourier={setActiveCourier}
+        activeRegion={activeRegion}
+        setActiveRegion={setActiveRegion}
+        orders={normalizedOrders}
+        search={search}
+        setSearch={setSearch}
+        selectedDate={selectedDate}
+        setSelectedDate={setSelectedDate}
+        selectedStatus={selectedStatus}
+        setSelectedStatus={setSelectedStatus}
+        selectedPayment={selectedPayment}
+        setSelectedPayment={setSelectedPayment}
+        selectedAdvisor={selectedAdvisor}
+        setSelectedAdvisor={setSelectedAdvisor}
+        selectedShop={selectedShop}
+        setSelectedShop={setSelectedShop}
+        selectedCourierSelect={selectedCourierSelect}
+        setSelectedCourierSelect={setSelectedCourierSelect}
+        selectedProduct={selectedProduct}
+        setSelectedProduct={setSelectedProduct}
+        selectedAdelanto={selectedAdelanto}
+        setSelectedAdelanto={setSelectedAdelanto}
+      />
 
-        <OrdersFilters
-          loadOrders={loadOrders}
-          counts={counts}
-          activeTab={activeTab}
-          setActiveTab={setActiveTab}
-          activeCourier={activeCourier}
-          setActiveCourier={setActiveCourier}
-          activeRegion={activeRegion}
-          setActiveRegion={setActiveRegion}
-          orders={normalizedOrders}
-          search={search}
-          setSearch={setSearch}
-          selectedDate={selectedDate}
-          setSelectedDate={setSelectedDate}
-          selectedStatus={selectedStatus}
-          setSelectedStatus={setSelectedStatus}
-          selectedPayment={selectedPayment}
-          setSelectedPayment={setSelectedPayment}
-          selectedAdvisor={selectedAdvisor}
-          setSelectedAdvisor={setSelectedAdvisor}
-          selectedShop={selectedShop}
-          setSelectedShop={setSelectedShop}
-          selectedCourierSelect={selectedCourierSelect}
-          setSelectedCourierSelect={setSelectedCourierSelect}
-          selectedProduct={selectedProduct}
-          setSelectedProduct={setSelectedProduct}
+      <OrdersTable
+        orders={paginatedOrders}
+        loading={loading}
+        onSelectOrder={(order) => setSelectedOrder(order)}
+      />
+
+      <OrdersPagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        rowsPerPage={rowsPerPage}
+        setCurrentPage={setCurrentPage}
+        setRowsPerPage={setRowsPerPage}
+      />
+
+      {selectedOrder && (
+        <OrderSidePanel
+          order={selectedOrder}
+          onClose={() => setSelectedOrder(null)}
         />
-
-        <OrdersTable
-          orders={paginatedOrders}
-          loading={loading}
-          onSelectOrder={(order) => setSelectedOrder(order)}
-        />
-
-        <OrdersPagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          rowsPerPage={rowsPerPage}
-          setCurrentPage={setCurrentPage}
-          setRowsPerPage={setRowsPerPage}
-        />
-
-        {selectedOrder && (
-          <OrderSidePanel
-            order={selectedOrder}
-            onClose={() => setSelectedOrder(null)}
-          />
-        )}
-      </div>
-  
+      )}
+    </div>
   );
 }

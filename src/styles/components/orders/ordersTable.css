@@ -19,83 +19,8 @@
 .table-row {
     display: grid;
     grid-template-columns: 120px 1.5fr 1fr 1fr 1fr 1fr 1fr;
-    padding: 14px;
-    border-bottom: 1px solid #eee;
-    align-items: center;
-}
-
-/* Hover tipo Shopify */
-.table-row:hover {
-    background: #f9fafb;
-}
-
-.table-row span {
-    display: flex;
-    align-items: center;
-}
-
-.customer p {
-    margin: 0;
-    font-weight: 500;
-}
-
-.customer span {
-    font-size: 12px;
-    color: #64748b;
-}
-
-/* =========================
-   BADGE BASE
-========================= */
-
-.badge {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-
     padding: 4px 10px;
-    border-radius: 999px;
-
-    font-size: 12px;
-    font-weight: 500;
-
-    white-space: nowrap;
-    width: fit-content;
-    /* 🔥 CLAVE */
-    max-width: 120px;
-    /* evita que crezca mucho */
-
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-/* =========================
-   VARIANTES
-========================= */
-
-.orders-table {
-    background: white;
-    border-radius: 14px;
-    overflow: hidden;
-}
-
-.table-header {
-    display: grid;
-    grid-template-columns: 120px 1.5fr 1fr 1fr 1fr 1fr 1fr;
-    padding: 14px;
-    background: #f1f5f9;
-    font-weight: 600;
-}
-
-/* =========================
-   ROWS 🔥 (ESTO TE FALTABA)
-========================= */
-
-.table-row {
-    display: grid;
-    grid-template-columns: 120px 1.5fr 1fr 1fr 1fr 1fr 1fr;
-    padding: 14px;
-    border-bottom: 1px solid #eee;
+    border-bottom: 2px solid #eee;
     align-items: center;
 }
 
@@ -202,3 +127,69 @@
     }
 }
 
+/* =========================
+   💰 PAYMENT COMPACT
+========================= */
+
+.payment-box {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+/* TOTAL */
+.payment-total {
+    font-size: 14px;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+/* ADELANTO */
+.payment-adelanto {
+    font-size: 13px;
+    color: #059669;
+}
+
+/* SALDO */
+.payment-saldo {
+    font-size: 13px;
+    color: #64748b;
+}
+
+/* =========================
+   💳 PAYMENT METHODS COLORS
+========================= */
+
+.payment-method {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: capitalize;
+    width: fit-content;
+    padding: 2px 6px;
+    border-radius: 6px;
+    font-size: 13px;
+}
+
+/* YAPE (morado) */
+.method-yape {
+    background: #ede9fe;
+    color: #6d28d9;
+}
+
+/* PLIN (verde) */
+.method-plin {
+    background: #ecfdf5;
+    color: #059669;
+}
+
+/* TRANSFERENCIA (azul) */
+.method-transferencia {
+    background: #eff6ff;
+    color: #2563eb;
+}
+
+/* DEFAULT */
+.method-default {
+    background: #f1f5f9;
+    color: #64748b;
+}

@@ -30,6 +30,9 @@ interface Props {
   selectedAdvisor: string;
   setSelectedAdvisor: (v: string) => void;
 
+  selectedAdelanto: string;
+  setSelectedAdelanto: (v: string) => void;
+
   /* FILA 5 */
   selectedShop: string;
   setSelectedShop: (v: string) => void;
@@ -77,6 +80,9 @@ export default function OrdersFilters({
   setSelectedCourierSelect,
   selectedProduct,
   setSelectedProduct,
+  selectedAdelanto,
+  setSelectedAdelanto,
+
 }: Props) {
   const handleClick = (label: string) => {
     setActiveTab(label);
@@ -219,6 +225,14 @@ export default function OrdersFilters({
           <option value="transferencia">Transferencia</option>
         </select>
 
+        <select
+          value={selectedAdelanto}
+          onChange={(e) => setSelectedAdelanto(e.target.value)}
+        >
+          <option value="Todos">Adelanto</option>
+          <option value="si">Con adelanto</option>
+          <option value="no">Sin adelanto</option>
+        </select>
         {/* VENDEDOR */}
         <select
           value={selectedAdvisor}
@@ -244,11 +258,13 @@ export default function OrdersFilters({
         >
           <option value="Todas">Todas las tiendas</option>
 
-          {[...new Set(orders.map((o) =>  o.product?.vendor))].map((shop: any) => (
-            <option key={shop} value={shop}>
-              {shop}
-            </option>
-          ))}
+          {[...new Set(orders.map((o) => o.product?.vendor))].map(
+            (shop: any) => (
+              <option key={shop} value={shop}>
+                {shop}
+              </option>
+            ),
+          )}
         </select>
 
         {/* COURIER */}
