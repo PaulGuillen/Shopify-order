@@ -99,6 +99,60 @@ export default function OrderSidePanel({ order, onClose }: any) {
     }
   };
 
+  useEffect(() => {
+    if (!order?.dataUpdated) return;
+
+    const data = order.dataUpdated;
+
+    console.log("🔥 APPLY dataUpdated", data);
+
+    /* CLIENTE */
+    if (data.cliente) {
+      setPhone((data.cliente.phone || "").replace(/^(\+51|51)/, ""));
+      setRegionType((data.cliente.region || "lima").toLowerCase());
+      setDni(data.cliente.dni || "");
+    }
+
+    /* VENDEDOR */
+    if (data.vendedor?.advisor && data.vendedor.advisor !== "Sin asignar") {
+      const advisor = advisors.find(
+        (a: any) => a.name === data.vendedor.advisor,
+      );
+      if (advisor) setSelectedAdvisor(advisor);
+    }
+
+    /* STATUS */
+    if (data.status) {
+      setStatus(data.status);
+    }
+
+    /* ENVÍO */
+    if (data.envio) {
+      setCourier(data.envio.courier || "Shalom");
+      setSelectedAgency(data.envio.agency || null);
+      setDeliveryDate(data.envio.date || order.created_day);
+    }
+
+    /* UPSSELLS */
+    if (data.productos?.upsells) {
+      setExtraProducts(data.productos.upsells || []);
+    }
+
+    /* PAGO */
+    if (data.pago) {
+      setPaymentMethod(data.pago.metodo || "yape");
+      setAdelanto(String(data.pago.adelanto || ""));
+      setEditableTotal(String(data.pago.totalOriginal || ""));
+    }
+  }, [order]);
+
+  useEffect(() => {
+    if (!order) return;
+
+    setCourier(order.courier || "Shalom");
+    setDeliveryDate(order.delivery_date || order.created_day);
+  }, [order]);
+
   const handleUpdate = () => {
     const payload = {
       /* =========================
@@ -205,8 +259,8 @@ export default function OrderSidePanel({ order, onClose }: any) {
             <span>Vendedor:</span>
 
             {/* 🔥 SI YA TIENE ASESORA */}
-            {order.advisorEmail ? (
-              <div className="select-like">{order.advisorEmail}</div>
+            {order.advisor && order.advisor !== "Sin asignar" ? (
+              <div className="select-like">{order.advisor}</div>
             ) : (
               /* 🔥 SI NO TIENE → DROPDOWN */
               <select

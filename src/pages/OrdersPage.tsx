@@ -8,6 +8,15 @@ import OrdersPagination from "../components/orders/OrdersPagination";
 import OrderSidePanel from "../components/orders/OrderSidePanel";
 
 export default function OrdersPage() {
+  const [search, setSearch] = useState("");
+  const [selectedDate, setSelectedDate] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState("Todos");
+  const [selectedPayment, setSelectedPayment] = useState("Todos");
+  const [selectedAdvisor, setSelectedAdvisor] = useState("Todos");
+  const [selectedShop, setSelectedShop] = useState("Todas");
+  const [selectedCourierSelect, setSelectedCourierSelect] = useState("Todos");
+  const [selectedProduct, setSelectedProduct] = useState("Todos");
+
   const [activeTab, setActiveTab] = useState("Todos");
   const [activeCourier, setActiveCourier] = useState("Todos");
   const [activeRegion, setActiveRegion] = useState("Todos");
@@ -26,18 +35,170 @@ export default function OrdersPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(20);
 
+  const normalizedOrders = useMemo(() => {
+    return orders.map((o) => {
+      return {
+        ...o,
+
+        customer: {
+          ...o.customer,
+          name: o.dataUpdated?.cliente?.name || o.customer?.name,
+          phone: o.dataUpdated?.cliente?.phoneWithPrefix || o.customer?.phone,
+          region_type:
+            o.dataUpdated?.cliente?.region || o.customer?.region_type,
+          dni: o.dataUpdated?.cliente?.dni || o.customer?.dni,
+        },
+
+        courier: o.dataUpdated?.envio?.courier || o.courier || "Sin courier",
+
+        agency: o.dataUpdated?.envio?.agency || o.agency,
+
+        delivery_date:
+          o.dataUpdated?.envio?.date || o.delivery_date || o.created_day,
+
+        status: o.dataUpdated?.status || o.status,
+
+        advisor: o.dataUpdated?.vendedor?.advisor || o.advisor,
+
+        total_price: o.dataUpdated?.pago?.totalFinal || o.total_price,
+      };
+    });
+  }, [orders]);
+
   /* 🔥 DATA PAGINADA */
   const filteredOrders = useMemo(() => {
-    return orders
-      .filter((o) => {
-        if (activeCourier === "Todos") return true;
-        return o.courier === activeCourier;
-      })
-      .filter((o) => {
-        if (activeRegion === "Todos") return true;
-        return o.customer?.region_type === activeRegion;
-      });
-  }, [orders, activeCourier, activeRegion]);
+    return (
+      normalizedOrders
+
+        /* =========================
+         COURIER (CHIPS)
+      ========================= */
+        .filter((o) => {
+          if (activeCourier === "Todos") return true;
+
+          const courier = o.courier;
+
+          if (activeCourier === "Otros") {
+            return !["Shalom", "Olva", "Zeus"].includes(courier);
+          }
+
+          return courier === activeCourier;
+        })
+
+        /* =========================
+         REGION
+      ========================= */
+        .filter((o) => {
+          if (activeRegion === "Todos") return true;
+
+          if (activeRegion === "Provincias") {
+            return o.customer?.region_type === "Provincia";
+          }
+
+          return o.customer?.region_type === activeRegion;
+        })
+
+        /* =========================
+         🔍 SEARCH
+      ========================= */
+        .filter((o) => {
+          if (!search) return true;
+
+          const text = search.toLowerCase();
+
+          return (
+            o.customer?.name?.toLowerCase().includes(text) ||
+            o.customer?.phone?.includes(text) ||
+            String(o.order_number).includes(text)
+          );
+        })
+
+        /* =========================
+         📅 FECHA
+      ========================= */
+        .filter((o) => {
+          if (!selectedDate) return true;
+
+          return o.created_day === selectedDate;
+        })
+
+        /* =========================
+         📊 STATUS
+      ========================= */
+        .filter((o) => {
+          if (selectedStatus === "Todos") return true;
+
+          return o.status === selectedStatus;
+        })
+
+        /* =========================
+         💰 PAGO
+      ========================= */
+        .filter((o) => {
+          if (selectedPayment === "Todos") return true;
+
+          return o.dataUpdated?.pago?.metodo === selectedPayment;
+        })
+
+        /* =========================
+         👩‍💼 VENDEDOR
+      ========================= */
+        .filter((o) => {
+          if (selectedAdvisor === "Todos") return true;
+
+          if (selectedAdvisor === "Sin asignar") {
+            return !o.advisor || o.advisor === "Sin asignar";
+          }
+
+          return o.advisor === selectedAdvisor;
+        })
+
+        /* =========================
+         🏪 TIENDA (FILA 5)
+      ========================= */
+        .filter((o) => {
+          if (selectedShop === "Todas") return true;
+
+          return o.product?.vendor === selectedShop;
+        })
+
+        /* =========================
+         🚚 COURIER SELECT (FILA 5)
+      ========================= */
+        .filter((o) => {
+          if (selectedCourierSelect === "Todos") return true;
+
+          const courier = o.courier;
+
+          if (selectedCourierSelect === "Otros") {
+            return !["Shalom", "Olva", "Zeus"].includes(courier);
+          }
+
+          return courier === selectedCourierSelect;
+        })
+
+        /* =========================
+         📦 PRODUCTO (FILA 5)
+      ========================= */
+        .filter((o) => {
+          if (selectedProduct === "Todos") return true;
+
+          return o.product?.name === selectedProduct;
+        })
+    );
+  }, [
+    normalizedOrders,
+    activeCourier,
+    activeRegion,
+    search,
+    selectedDate,
+    selectedStatus,
+    selectedPayment,
+    selectedAdvisor,
+    selectedShop,
+    selectedCourierSelect,
+    selectedProduct,
+  ]);
 
   const paginatedOrders = useMemo(() => {
     const start = (currentPage - 1) * rowsPerPage;
@@ -62,7 +223,7 @@ export default function OrdersPage() {
       noEntregado: ordersBase.filter((o) => o.status === "not_delivered")
         .length,
     }),
-    [ordersBase],
+    [normalizedOrders],
   );
 
   const [selectedOrder, setSelectedOrder] = useState<any | null>(null);
@@ -81,7 +242,23 @@ export default function OrdersPage() {
           setActiveCourier={setActiveCourier}
           activeRegion={activeRegion}
           setActiveRegion={setActiveRegion}
-          orders={orders}
+          orders={normalizedOrders}
+          search={search}
+          setSearch={setSearch}
+          selectedDate={selectedDate}
+          setSelectedDate={setSelectedDate}
+          selectedStatus={selectedStatus}
+          setSelectedStatus={setSelectedStatus}
+          selectedPayment={selectedPayment}
+          setSelectedPayment={setSelectedPayment}
+          selectedAdvisor={selectedAdvisor}
+          setSelectedAdvisor={setSelectedAdvisor}
+          selectedShop={selectedShop}
+          setSelectedShop={setSelectedShop}
+          selectedCourierSelect={selectedCourierSelect}
+          setSelectedCourierSelect={setSelectedCourierSelect}
+          selectedProduct={selectedProduct}
+          setSelectedProduct={setSelectedProduct}
         />
 
         <OrdersTable
