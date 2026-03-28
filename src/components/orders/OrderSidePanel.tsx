@@ -5,8 +5,19 @@ import AgencySelectorModal from "../common/AgencySelectorModal";
 import CourierSelector from "../common/CourierSelector";
 import AddProductModal from "../common/AddProductModal";
 import { useUpdateOrder } from "../../hooks/useOrders";
+import { generatePDF } from "../../utils/generateDocument";
+import { buildMessage, copyMessage } from "../../utils/messageUtil";
 
 export default function OrderSidePanel({ order, onClose }: any) {
+  const [documentType, setDocumentType] = useState<"boleta" | "factura" | null>(
+    null,
+  );
+
+  const [messageType, setMessageType] = useState<"lima" | "provincia" | null>(
+    null,
+  );
+  const [generatedMessage, setGeneratedMessage] = useState("");
+
   const advisors = JSON.parse(localStorage.getItem("advisors_cache") || "[]");
   const [selectedAdvisor, setSelectedAdvisor] = useState<any>(null);
 
@@ -232,6 +243,26 @@ export default function OrderSidePanel({ order, onClose }: any) {
     return payload;
   };
 
+  const handleCopyMessage = (type: "lima" | "provincia") => {
+    const message = buildMessage(
+      {
+        order,
+        dni,
+        phone,
+        extraProducts,
+        total: totalFinalConAdelanto,
+      },
+      type,
+    );
+
+    copyMessage(message);
+
+    alert(
+      type === "lima"
+        ? "📋 Mensaje Lima copiado"
+        : "📋 Mensaje Provincia copiado",
+    );
+  };
   return (
     <>
       <div className="sidepanel-overlay">
@@ -254,39 +285,100 @@ export default function OrderSidePanel({ order, onClose }: any) {
             </div>
           </div>
 
-          {/* VENDEDOR */}
-          <div className="seller-row">
-            <span>Vendedor:</span>
-
-            {/* 🔥 SI YA TIENE ASESORA */}
-            {order.advisor && order.advisor !== "Sin asignar" ? (
-              <div className="select-like">{order.advisor}</div>
-            ) : (
-              /* 🔥 SI NO TIENE → DROPDOWN */
-              <select
-                className="advisor-select"
-                value={selectedAdvisor?.id || ""}
-                onChange={(e) => {
-                  const advisor = advisors.find(
-                    (a: any) => a.id === e.target.value,
-                  );
-                  setSelectedAdvisor(advisor);
-                }}
-              >
-                <option value="">Seleccionar asesora</option>
-
-                {advisors
-                  .filter((a: any) => a.status === "activo") // 🔥 opcional
-                  .map((a: any) => (
-                    <option key={a.id} value={a.id}>
-                      {a.name}
-                    </option>
-                  ))}
-              </select>
-            )}
-          </div>
-          {/* BODY */}
+          {/* =========================
+            💬 MENSAJES
+          ========================= */}
           <div className="sidepanel-body">
+            
+            <div className="messages-card">
+              <div className="messages-header">
+                <span>💬 Mensajes rápidos</span>
+
+                <div className="messages-actions">
+                  <button
+                    className="chip-btn"
+                    onClick={() => handleCopyMessage("lima")}
+                  >
+                    📍 Lima
+                  </button>
+
+                  <button
+                    className="chip-btn"
+                    onClick={() => handleCopyMessage("provincia")}
+                  >
+                    🚚 Provincia
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* =========================
+            🧾 DODCUMENTOS
+          ========================= */}
+            <div className="doc-row-modern">
+              <span className="doc-label">Comprobante:</span>
+
+              <div className="doc-actions">
+                <button
+                  className={`chip-btn ${documentType === "boleta" ? "active" : ""}`}
+                  onClick={() => {
+                    setDocumentType("boleta");
+
+                    const payload = handleUpdate();
+                    generatePDF("boleta", order, payload);
+                  }}
+                >
+                  🧾 Boleta
+                </button>
+
+                <button
+                  className={`chip-btn ${documentType === "factura" ? "active" : ""}`}
+                  onClick={() => {
+                    setDocumentType("factura");
+
+                    const payload = handleUpdate();
+                    generatePDF("factura", order, payload);
+                  }}
+                >
+                  🧾 Factura
+                </button>
+              </div>
+            </div>
+
+            {/* VENDEDOR */}
+            <div className="seller-row">
+              <span>Vendedor:</span>
+
+              {/* 🔥 SI YA TIENE ASESORA */}
+              {order.advisor && order.advisor !== "Sin asignar" ? (
+                <div className="select-like">{order.advisor}</div>
+              ) : (
+                /* 🔥 SI NO TIENE → DROPDOWN */
+                <select
+                  className="advisor-select"
+                  value={selectedAdvisor?.id || ""}
+                  onChange={(e) => {
+                    const advisor = advisors.find(
+                      (a: any) => a.id === e.target.value,
+                    );
+                    setSelectedAdvisor(advisor);
+                  }}
+                >
+                  <option value="">Seleccionar asesora</option>
+
+                  {advisors
+                    .filter((a: any) => a.status === "activo") // 🔥 opcional
+                    .map((a: any) => (
+                      <option key={a.id} value={a.id}>
+                        {a.name}
+                      </option>
+                    ))}
+                </select>
+              )}
+            </div>
+
+            {/* BODY */}
+
             {/* CLIENTE */}
             <div className="card">
               <div className="card-header">
