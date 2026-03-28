@@ -50,6 +50,7 @@ export const useAgencies = () => {
 export const useProducts = (shop: string) => {
     const [products, setProducts] = useState<any[]>([]);
     const [loadingProducts, setLoadingProducts] = useState(false);
+
     const [hasLoadedProducts, setHasLoadedProducts] = useState(false);
 
     const hasFetched = useRef(false);
@@ -91,6 +92,7 @@ export const useProducts = (shop: string) => {
         products,
         loadingProducts,
         hasLoadedProducts,
+         loadProducts: fetchProducts,
     };
 };
 

@@ -368,6 +368,7 @@ export default function OrdersPage() {
         <OrderSidePanel
           order={selectedOrder}
           onClose={() => setSelectedOrder(null)}
+          onSuccess={() => loadOrders()}
         />
       )}
     </div>

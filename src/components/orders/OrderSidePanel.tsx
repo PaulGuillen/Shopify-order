@@ -9,7 +9,7 @@ import { generatePDF } from "../../utils/generateDocument";
 import { buildMessage, copyMessage } from "../../utils/messageUtil";
 import ProductEditModal from "../common/ProductEditModal";
 
-export default function OrderSidePanel({ order, onClose }: any) {
+export default function OrderSidePanel({ order, onSuccess, onClose }: any) {
   const [documentType, setDocumentType] = useState<"boleta" | "factura" | null>(
     null,
   );
@@ -111,6 +111,8 @@ export default function OrderSidePanel({ order, onClose }: any) {
     const success = await updateOrder(user.shop, order.id, payload);
 
     if (success) {
+      onSuccess(); // 🔥 refresca lista
+      onClose(); // 🔥 cierra panel
       alert("✅ Orden actualizada");
     }
   };

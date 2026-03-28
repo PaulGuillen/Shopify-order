@@ -1,352 +1,201 @@
 import { useState, useMemo } from "react";
 import "../styles/pages/productsPage.css";
-
-interface Product {
-  id: number;
-  nombre: string;
-  estado: "activo" | "borrador" | "archivado";
-  inventario: number;
-  categoria: string;
-  tipo: string;
-  proveedor: string;
-}
-
-const productsData: Product[] = [
-  {
-    id: 1,
-    nombre: "Leggings Compresión Aura",
-    estado: "activo",
-    inventario: 42,
-    categoria: "Ropa",
-    tipo: "Leggings",
-    proveedor: "Aura Sports",
-  },
-  {
-    id: 2,
-    nombre: "Chaqueta Velocity Pro",
-    estado: "borrador",
-    inventario: 0,
-    categoria: "Ropa",
-    tipo: "Abrigo",
-    proveedor: "Velocity",
-  },
-  {
-    id: 3,
-    nombre: "Smartwatch Lunar v2",
-    estado: "activo",
-    inventario: 124,
-    categoria: "Electrónicos",
-    tipo: "Wearables",
-    proveedor: "LunarTech",
-  },
-  {
-    id: 4,
-    nombre: "Audífonos Zen Wireless",
-    estado: "archivado",
-    inventario: 12,
-    categoria: "Electrónicos",
-    tipo: "Audio",
-    proveedor: "Zen Labs",
-  },
-  {
-    id: 5,
-    nombre: "Bolso Titan Gym",
-    estado: "activo",
-    inventario: 0,
-    categoria: "Accesorios",
-    tipo: "Bolsos",
-    proveedor: "Titan Gear",
-  },
-  {
-    id: 6,
-    nombre: "Zapatillas Run Pro",
-    estado: "activo",
-    inventario: 10,
-    categoria: "Calzado",
-    tipo: "Running",
-    proveedor: "Nike",
-  },
-  {
-    id: 7,
-    nombre: "Casaca Winter Max",
-    estado: "borrador",
-    inventario: 5,
-    categoria: "Ropa",
-    tipo: "Abrigo",
-    proveedor: "North Face",
-  },
-  {
-    id: 8,
-    nombre: "Tablet TechPad",
-    estado: "activo",
-    inventario: 50,
-    categoria: "Electrónicos",
-    tipo: "Tablet",
-    proveedor: "TechPad",
-  },
-  {
-    id: 9,
-    nombre: "Mouse Gamer RGB",
-    estado: "activo",
-    inventario: 70,
-    categoria: "Electrónicos",
-    tipo: "Gaming",
-    proveedor: "Logitech",
-  },
-  {
-    id: 10,
-    nombre: "Bolso Urbano",
-    estado: "archivado",
-    inventario: 3,
-    categoria: "Accesorios",
-    tipo: "Bolsos",
-    proveedor: "Urban Co",
-  },
-  {
-    id: 11,
-    nombre: "Polo Training",
-    estado: "activo",
-    inventario: 22,
-    categoria: "Ropa",
-    tipo: "Polo",
-    proveedor: "Adidas",
-  },
-];
-
-const ITEMS_PER_PAGE = 5;
+import { useProducts } from "../hooks/useHome";
+import SidePanelProduct from "../components/products/SidePanelProduct";
 
 export default function ProductsPage() {
-  const [products] = useState(productsData);
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const shop = user.shop;
+
+  const { products, loadingProducts, loadProducts } = useProducts(shop);
+
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("todos");
-  const [sortBy, setSortBy] = useState("nombre");
-  const [currentPage, setCurrentPage] = useState(1);
+  const [tab, setTab] = useState("todos");
+
+  const [openPanel, setOpenPanel] = useState(false);
 
   /* =============================
-        FILTRADO
+        NORMALIZAR DATA 🔥
   ============================= */
 
+  const mappedProducts = useMemo(() => {
+    return products.map((p: any) => ({
+      id: p.id,
+      title: p.title,
+      image: p.image,
+      price: Number(p.price || 0),
+      stock: Number(p.stock || 0),
+      status: p.status || "active",
+      source: p.source || "shopify", // 🔥 FIX REAL
+    }));
+  }, [products]);
+
+  /* =============================
+        FILTROS
+  ============================= */
   const filteredProducts = useMemo(() => {
-    let data = [...products];
+    let data = [...mappedProducts];
 
-    if (statusFilter !== "todos") {
-      data = data.filter((p) => p.estado === statusFilter);
+    if (tab === "shopify") {
+      data = data.filter((p) => p.source === "shopify");
     }
 
-    if (search) {
-      data = data.filter((p) =>
-        p.nombre.toLowerCase().includes(search.toLowerCase()),
-      );
-    }
-
-    return data;
-  }, [products, search, statusFilter]);
-
-  /* =============================
-        ORDENAMIENTO
-  ============================= */
-
-  const sortedProducts = useMemo(() => {
-    let data = [...filteredProducts];
-
-    switch (sortBy) {
-      case "nombre":
-        data.sort((a, b) => a.nombre.localeCompare(b.nombre));
-        break;
-
-      case "inventario":
-        data.sort((a, b) => b.inventario - a.inventario);
-        break;
-
-      case "categoria":
-        data.sort((a, b) => a.categoria.localeCompare(b.categoria));
-        break;
+    if (tab === "mios") {
+      data = data.filter((p) => p.source === "mios");
     }
 
     return data;
-  }, [filteredProducts, sortBy]);
+  }, [mappedProducts, tab]);
 
   /* =============================
-        PAGINACIÓN
+        ESTADOS VISUALES
   ============================= */
 
-  const totalPages = Math.ceil(sortedProducts.length / ITEMS_PER_PAGE);
+  const getStatus = (p: any) => {
+    if (p.stock <= 0) return "sin_stock";
+    if (p.stock < 5) return "bajo_stock";
+    return "activo";
+  };
 
-  const paginatedProducts = sortedProducts.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE,
-  );
-
-  /* =============================
-        ESTADO VISUAL
-  ============================= */
-
-  const estadoClass = (estado: string) => {
-    switch (estado) {
+  const statusLabel = (status: string) => {
+    switch (status) {
       case "activo":
-        return "estado-activo";
-      case "borrador":
-        return "estado-borrador";
-      case "archivado":
-        return "estado-archivado";
+        return "ACTIVO";
+      case "bajo_stock":
+        return "STOCK BAJO";
+      case "sin_stock":
+        return "SIN STOCK";
       default:
-        return "";
+        return "ACTIVO";
     }
   };
 
-  const zeroStock = products.filter((p) => p.inventario === 0).length;
+  const statusColor = (status: string) => {
+    switch (status) {
+      case "activo":
+        return "green";
+      case "bajo_stock":
+        return "orange";
+      case "sin_stock":
+        return "red";
+      default:
+        return "green";
+    }
+  };
+
+  /* =============================
+        RENDER
+  ============================= */
 
   return (
-      <div className="products-container">
-        {/* HEADER */}
-
-        <div className="products-header">
+    <div className="products-page">
+      {/* HEADER */}
+      <div className="products-page__header">
+        <div>
           <h1>Productos</h1>
-
-          <div className="products-actions">
-            <button className="btn-primary">+ Agregar producto</button>
-          </div>
+          <p>Gestiona tu catálogo desde Shopify y productos propios.</p>
         </div>
 
-        {/* TABS */}
+        <button
+          className="products-page__btn-primary"
+          onClick={() => setOpenPanel(true)}
+        >
+          + Agregar producto
+        </button>
+      </div>
 
-        <div className="products-tabs">
-          <button
-            className={statusFilter === "todos" ? "tab active" : "tab"}
-            onClick={() => setStatusFilter("todos")}
-          >
-            Todos
-          </button>
+      {/* TABS */}
+      <div className="products-page__tabs">
+        <button
+          className={
+            tab === "todos" ? "products-page__tab active" : "products-page__tab"
+          }
+          onClick={() => setTab("todos")}
+        >
+          Todos
+        </button>
 
-          <button
-            className={statusFilter === "activo" ? "tab active" : "tab"}
-            onClick={() => setStatusFilter("activo")}
-          >
-            Activos
-          </button>
+        <button
+          className={
+            tab === "shopify"
+              ? "products-page__tab active"
+              : "products-page__tab"
+          }
+          onClick={() => setTab("shopify")}
+        >
+          Shopify
+        </button>
 
-          <button
-            className={statusFilter === "borrador" ? "tab active" : "tab"}
-            onClick={() => setStatusFilter("borrador")}
-          >
-            Borradores
-          </button>
+        <button
+          className={
+            tab === "mios" ? "products-page__tab active" : "products-page__tab"
+          }
+          onClick={() => setTab("mios")}
+        >
+          Propios
+        </button>
+      </div>
 
-          <button
-            className={statusFilter === "archivado" ? "tab active" : "tab"}
-            onClick={() => setStatusFilter("archivado")}
-          >
-            Archivados
-          </button>
+      {/* BUSCADOR */}
+      <div className="products-page__filter">
+        <input
+          placeholder="Buscar productos..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+      </div>
+
+      {/* TABLA */}
+      <div className="products-page__table">
+        <div className="products-page__table-header">
+          <span>DETALLE DEL PRODUCTO</span>
+          <span>ORIGEN</span>
+          <span>PRECIO</span>
+          <span>ESTADO</span>
         </div>
 
-        {/* FILTROS */}
+        {loadingProducts ? (
+          <p style={{ padding: 20 }}>Cargando...</p>
+        ) : (
+          filteredProducts.map((p) => {
+            const status = getStatus(p);
 
-        <div className="products-filter">
-          <input
-            className="search-input"
-            placeholder="Buscar productos..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
+            return (
+              <div className="products-page__row" key={p.id}>
+                <div className="products-page__product">
+                  <img src={p.image} alt="" />
 
-          <select
-            className="select-filter"
-            onChange={(e) => setSortBy(e.target.value)}
-          >
-            <option value="nombre">Ordenar por nombre</option>
-            <option value="inventario">Ordenar por inventario</option>
-            <option value="categoria">Ordenar por categoría</option>
-          </select>
-        </div>
+                  <div>
+                    <p>{p.title}</p>
+                    <span>ID: {p.id}</span>
+                  </div>
+                </div>
 
-        {/* TABLA */}
+                <div>
+                  <span className={`products-page__badge ${p.source}`}>
+                    {p.source === "mios" ? "PROPIO" : "SHOPIFY"}
+                  </span>
+                </div>
 
-        <div className="products-table">
-          <table>
-            <thead>
-              <tr>
-                <th></th>
-                <th>Producto</th>
-                <th>Estado</th>
-                <th>Inventario</th>
-                <th>Categoría</th>
-                <th>Tipo</th>
-                <th>Proveedor</th>
-              </tr>
-            </thead>
+                <div>
+                  <strong>S/ {p.price.toFixed(2)}</strong>
+                </div>
 
-            <tbody>
-              {paginatedProducts.map((product) => (
-                <tr key={product.id}>
-                  <td>
-                    <input type="checkbox" />
-                  </td>
-
-                  <td className="product-name">
-                    <div className="product-avatar"></div>
-                    {product.nombre}
-                  </td>
-
-                  <td>
-                    <span className={`estado ${estadoClass(product.estado)}`}>
-                      {product.estado}
-                    </span>
-                  </td>
-
-                  <td>
-                    {product.inventario === 0 ? (
-                      <span className="sin-stock">⚠ 0 en stock</span>
-                    ) : (
-                      `${product.inventario} en stock`
-                    )}
-                  </td>
-
-                  <td>{product.categoria}</td>
-                  <td>{product.tipo}</td>
-                  <td>{product.proveedor}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-
-          {/* PAGINACION */}
-
-          <div className="products-pagination">
-            <span>
-              Mostrando {(currentPage - 1) * ITEMS_PER_PAGE + 1} a{" "}
-              {Math.min(currentPage * ITEMS_PER_PAGE, sortedProducts.length)} de{" "}
-              {sortedProducts.length} productos
-            </span>
-
-            <div className="pagination-buttons">
-              <button
-                disabled={currentPage === 1}
-                onClick={() => setCurrentPage((prev) => prev - 1)}
-              >
-                {"<"}
-              </button>
-
-              <button
-                disabled={currentPage === totalPages}
-                onClick={() => setCurrentPage((prev) => prev + 1)}
-              >
-                {">"}
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* ALERTA */}
-
-        {zeroStock > 0 && (
-          <div className="inventory-warning">
-            ⚠ Tienes {zeroStock} productos sin inventario. Considera reabastecer
-            pronto.
-            <span> Administrar inventario</span>
-          </div>
+                <div className={`products-page__status ${statusColor(status)}`}>
+                  ● {statusLabel(status)}
+                </div>
+              </div>
+            );
+          })
         )}
       </div>
 
+      <SidePanelProduct
+        open={openPanel}
+        onClose={() => setOpenPanel(false)}
+        shop={shop}
+        onSuccess={() => loadProducts()}
+      />
+    </div>
   );
 }
