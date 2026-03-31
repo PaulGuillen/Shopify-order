@@ -3,6 +3,7 @@ import CredentialsModal from "../components/common/CredentialsModal";
 import "../styles/pages/loginPage.css";
 import { useNavigate } from "react-router-dom";
 import { API_URL } from "../config/api";
+import Loading from "../components/common/Loading";
 
 /* =====================================
    EXTRAER SHOP DESDE EMAIL
@@ -15,7 +16,7 @@ const extractShopFromEmail = (email: string) => {
 
 export default function LoginPage() {
   const navigate = useNavigate();
-
+  const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [shop, setShop] = useState<string | null>(null);
@@ -60,9 +61,7 @@ export default function LoginPage() {
   const handleModalLogin = async (email: string, password: string) => {
     const shopFromEmail = extractShopFromEmail(email);
 
-    setEmail(email);
-    setPassword(password);
-    setShop(shopFromEmail);
+    setLoading(true); // 🔥
 
     try {
       const res = await fetch(`${API_URL}/auth/login`, {
@@ -81,15 +80,15 @@ export default function LoginPage() {
 
       if (data.success) {
         localStorage.setItem("user", JSON.stringify(data.user));
-
         setShowModal(false);
-
         navigate("/home");
       } else {
         alert(data.message);
       }
     } catch (error) {
       console.error("Error login:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -99,6 +98,8 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    setLoading(true);
 
     const shopFromEmail = extractShopFromEmail(email);
 
@@ -135,11 +136,15 @@ export default function LoginPage() {
       }
     } catch (error) {
       console.error("Error login:", error);
+    } finally {
+      setLoading(false); // 🔥 END
     }
   };
 
   return (
     <div className="login-wrapper">
+      {loading && <Loading fullscreen text="Ingresando..." />}
+
       {/* MODAL CREDENCIALES */}
 
       {showModal && (
@@ -223,7 +228,9 @@ export default function LoginPage() {
 
         {/* LOGIN BUTTON */}
 
-        <button className="login-button">Iniciar sesión →</button>
+        <button className="login-button" disabled={loading}>
+          {loading ? "Ingresando..." : "Iniciar sesión →"}
+        </button>
 
         {/* FOOTER */}
 

@@ -1,4 +1,4 @@
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import "../styles/layout/sidebar.css";
 
@@ -9,7 +9,7 @@ interface SidebarProps {
 
 export default function Sidebar({ open, closeSidebar }: SidebarProps) {
   const location = useLocation();
-
+  const navigate = useNavigate();
   /* ================================
      🔐 AUTH LOCAL (AUTÓNOMO)
   ================================= */
@@ -63,6 +63,12 @@ export default function Sidebar({ open, closeSidebar }: SidebarProps) {
     location.pathname.startsWith("/orders") ||
     location.pathname.startsWith("/draft-orders");
 
+  /* 🔥 LOGOUT */
+  const handleLogout = () => {
+    localStorage.clear();
+    navigate("/", { replace: true });
+  };
+
   return (
     <aside className={`sidebar ${open ? "open" : ""}`}>
       {/* ================================
@@ -91,6 +97,26 @@ export default function Sidebar({ open, closeSidebar }: SidebarProps) {
               onClick={closeSidebar}
             >
               <span>🏠</span> Inicio
+            </NavLink>
+
+            <NavLink
+              to="/analytics"
+              className={({ isActive }) =>
+                isActive ? "nav-item active" : "nav-item"
+              }
+              onClick={closeSidebar}
+            >
+              <span>📈</span> Dashboard
+            </NavLink>
+
+            <NavLink
+              to="/products"
+              className={({ isActive }) =>
+                isActive ? "nav-item active" : "nav-item"
+              }
+              onClick={closeSidebar}
+            >
+              <span>📦</span> Almacén
             </NavLink>
 
             {/* 🔥 DROPDOWN PEDIDOS */}
@@ -131,13 +157,13 @@ export default function Sidebar({ open, closeSidebar }: SidebarProps) {
             )}
 
             <NavLink
-              to="/products"
+              to="/agency"
               className={({ isActive }) =>
                 isActive ? "nav-item active" : "nav-item"
               }
               onClick={closeSidebar}
             >
-              <span>📦</span> Productos
+              <span>📣</span> Mis envíos
             </NavLink>
 
             <NavLink
@@ -147,27 +173,37 @@ export default function Sidebar({ open, closeSidebar }: SidebarProps) {
               }
               onClick={closeSidebar}
             >
-              <span>👥</span> Usuarios
+              <span>👥</span> Mis Usuarios
             </NavLink>
 
             <NavLink
-              to="/analytics"
+              to="/catalog"
               className={({ isActive }) =>
                 isActive ? "nav-item active" : "nav-item"
               }
               onClick={closeSidebar}
             >
-              <span>📈</span> Analítica
+              <span>📚</span> Catálogo
             </NavLink>
 
             <NavLink
-              to="/agency"
+              to="/settings"
               className={({ isActive }) =>
                 isActive ? "nav-item active" : "nav-item"
               }
               onClick={closeSidebar}
             >
-              <span>📣</span> Agencias
+              <span>⚙️</span> Configuración
+            </NavLink>
+
+            <NavLink
+              to="/integrations"
+              className={({ isActive }) =>
+                isActive ? "nav-item active" : "nav-item"
+              }
+              onClick={closeSidebar}
+            >
+              <span>🔌</span> Integraciones
             </NavLink>
           </>
         )}
@@ -223,36 +259,24 @@ export default function Sidebar({ open, closeSidebar }: SidebarProps) {
             )}
 
             <NavLink
-              to="/products"
-              className={({ isActive }) =>
-                isActive ? "nav-item active" : "nav-item"
-              }
-              onClick={closeSidebar}
-            >
-              <span>📦</span> Productos
-            </NavLink>
-
-            <NavLink
               to="/agency"
               className={({ isActive }) =>
                 isActive ? "nav-item active" : "nav-item"
               }
               onClick={closeSidebar}
             >
-              <span>📣</span> Agencia
+              <span>📣</span> Mis envíos
             </NavLink>
           </>
         )}
       </nav>
 
-      {/* ================= FOOTER ================= */}
-      {auth.isAdmin && (
-        <div className="sidebar-footer">
-          <NavLink to="/settings" className="nav-item" onClick={closeSidebar}>
-            <span>⚙️</span> Configuración
-          </NavLink>
-        </div>
-      )}
+      {/* FOOTER */}
+      <div className="sidebar-footer">
+        <button className="logout-btn" onClick={handleLogout}>
+          ⏻ Cerrar sesión
+        </button>
+      </div>
     </aside>
   );
 }

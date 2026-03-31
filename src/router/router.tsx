@@ -1,14 +1,17 @@
 import { createHashRouter } from "react-router-dom";
 import Layout from "../layout/Layout";
-
 import LoginPage from "../pages/LoginPage";
 import HomePage from "../pages/HomePage";
 import OrdersPage from "../pages/OrdersPage";
-import ProductsPage from "../pages/ProductsPage";
+import WareHoseProducts from "../pages/WareHoseProducts";
 import CustomersPage from "../pages/CustomersPage";
-import AnalyticsPage from "../pages/AnalyticsPage";
-import AgencyPage from "../pages/AgencyPage";
+import DashboardPage from "../pages/DashboardPage";
+import ShipmentsPage from "../pages/ShipmentsPage";
 import DraftOrdersPage from "../pages/DrafOrdersPage";
+import SettingsPage from "../pages/SettingsPage";
+import CatalogPage from "../pages/CatalogPage";
+import IntegrationsPage from "../pages/IntegrationsPage";
+import PrivateRoute from "../layout/PrivateRoute";
 
 export const router = createHashRouter([
   {
@@ -16,15 +19,22 @@ export const router = createHashRouter([
     element: <LoginPage />,
   },
   {
-    element: <Layout />,
+    element: (
+      <PrivateRoute>
+        <Layout />
+      </PrivateRoute>
+    ),
     children: [
       { path: "/home", element: <HomePage /> },
+      { path: "/analytics", element: <DashboardPage /> },
+      { path: "/products", element: <WareHoseProducts /> },
       { path: "/orders", element: <OrdersPage /> },
       { path: "/draft-orders", element: <DraftOrdersPage /> },
-      { path: "/products", element: <ProductsPage /> },
+      { path: "/agency", element: <ShipmentsPage /> },
       { path: "/customers", element: <CustomersPage /> },
-      { path: "/analytics", element: <AnalyticsPage /> },
-      { path: "/agency", element: <AgencyPage /> },
+      { path: "/catalog", element: <CatalogPage /> },
+      { path: "/settings", element: <SettingsPage /> },
+      { path: "/integrations", element: <IntegrationsPage /> },
     ],
   },
 ]);

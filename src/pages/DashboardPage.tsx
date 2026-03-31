@@ -55,7 +55,7 @@ const products = [
    COMPONENT
 ============================ */
 
-export default function AnalyticsPage() {
+export default function DashboardPage() {
   const [period, setPeriod] = useState("day");
 
   return (

@@ -1,4 +1,4 @@
-export default function AgencyPage() {
+export default function ShipmentsPage() {
   return (
     <div className="agency-page">
       <h1>Agencias</h1>

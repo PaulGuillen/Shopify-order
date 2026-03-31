@@ -3,7 +3,7 @@ import "../styles/pages/productsPage.css";
 import { useProducts } from "../hooks/useHome";
 import SidePanelProduct from "../components/products/SidePanelProduct";
 
-export default function ProductsPage() {
+export default function WareHoseProducts() {
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   const shop = user.shop;
 

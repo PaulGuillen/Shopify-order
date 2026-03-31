@@ -8,13 +8,24 @@ interface BuildMessageParams {
     total: number;
 }
 
-export const buildMessage = ({
-    order,
-    dni,
-    phone,
-    extraProducts,
-    total,
-}: BuildMessageParams, type: MessageType): string => {
+export const buildMessage = (
+    {
+        order,
+        dni,
+        phone,
+        extraProducts,
+        total,
+    }: BuildMessageParams,
+    type: MessageType
+): string => {
+
+    /* =========================
+       🔥 NOMBRE (PRIORIDAD)
+    ========================= */
+    const nombre =
+        order.dataUpdated?.cliente?.name ||
+        order.customer?.name ||
+        "Cliente";
 
     const productoBase = order.product?.name || "Producto";
     const cantidadBase = order.product?.quantity || 1;
@@ -22,60 +33,92 @@ export const buildMessage = ({
     /* =========================
        PRODUCTOS
     ========================= */
-    const extraText = extraProducts.map((p) => p.title).join(" - ");
 
-    const extraQty = extraProducts
-        .map((p) => `${p.quantity} ${p.title}`)
-        .join(" - ");
+    const productos = [
+        `${productoBase}`,
+        ...extraProducts.map((p) => p.title),
+    ];
 
-    const productosFinal = extraText
-        ? `${productoBase} - ${extraText}`
-        : productoBase;
+    const cantidades = [
+        `${cantidadBase} ${productoBase}`,
+        ...extraProducts.map((p) => `${p.quantity} ${p.title}`),
+    ];
 
-    const cantidadFinal = extraQty
-        ? `${cantidadBase} ${productoBase} - ${extraQty}`
-        : `${cantidadBase} ${productoBase}`;
+    const productosFinal = productos.join("\n• ");
+    const cantidadFinal = cantidades.join("\n• ");
 
     /* =========================
        DATOS
     ========================= */
+
     const direccion = `${order.customer?.city || ""}, ${order.customer?.province || ""
         }, ${order.customer?.district || ""}`;
 
     const telefono = `+51${phone}`;
-
     const totalFormatted = total.toFixed(2);
+
+    /* =========================
+       VALIDACIÓN HORARIO LIMA
+    ========================= */
+
+    let deliveryText = "";
+
+    if (type === "lima") {
+        const now = new Date();
+        const hour = now.getHours();
+
+        const isNextDay = hour >= 18;
+
+        deliveryText = isNextDay
+            ? `El delivery será para el día *MAÑANA* entre 10:00 am y 9:00 pm 🚚`
+            : `El delivery será para el día *HOY* entre 10:00 am y 9:00 pm 🚚`;
+    }
 
     /* =========================
        MENSAJES
     ========================= */
+
     if (type === "provincia") {
-        return `¡Hola soy Marcia Meza García DNI ${dni}! 🙌 
+        return `¡Hola ${nombre}! 🙌
 
 Gracias por tu pedido:
-📦 Producto: ${productosFinal}
-🔢 Cantidad: ${cantidadFinal}
-💵 Total: S/. ${totalFormatted}
+──────────────
+📦 *Producto:*
+• ${productosFinal}
 
-📍 Dirección: ${direccion} 🗺️
-📞 Teléfono: ${telefono}
+🔢 *Cantidad:*
+• ${cantidadFinal}
+──────────────
 
-Estoy a la espera de tu confirmación ✨
-¡Gracias por confiar en nosotros!`;
+💵 *Total:* S/ ${totalFormatted}
+
+📍 *Dirección:* ${direccion} 🗺️
+📞 *Teléfono:* ${telefono}
+
+Estoy a la espera de tu confirmación ✨  
+¡Gracias por confiar en nosotros! 💖`;
     }
 
-    return `¡Hola ${dni}! 🙌 Te saluda Gaela, soy del equipo de Velure.es ❤
+    return `¡Hola ${nombre}! 🙌  
+Te saluda Gaela, soy del equipo de Velure.es ❤
 
 Gracias por tu pedido:
-📦 Producto: ${productosFinal}
-🔢 Cantidad: ${cantidadFinal}
-💵 Total: S/ ${totalFormatted}
+──────────────
+📦 *Producto:*
+• ${productosFinal}
 
-📍 Dirección: ${direccion} 🗺️
+🔢 *Cantidad:*
+• ${cantidadFinal}
+──────────────
 
-El delivery sería para el día HOY de 10 am a 6 pm, el motorizado se comunicará con usted para coordinar 🚚
+💵 *Total:* S/ ${totalFormatted}
 
-En caso tengas alguna duda me comentas por este medio 🤝 estaré atenta a ayudarte👇`;
+📍 *Dirección:* ${direccion} 🗺️
+
+${deliveryText}
+
+En caso tengas alguna duda me comentas por este medio 🤝  
+Estaré atenta a ayudarte 👇`;
 };
 
 /* =========================

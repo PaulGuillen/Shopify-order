@@ -215,3 +215,20 @@
     align-items: center;
     justify-content: space-between;
 }
+
+/* LOGOUT BUTTON */
+.logout-btn {
+    width: 100%;
+    background: #ef4444;
+    color: #ffffff;
+    border: none;
+    padding: 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.2s;
+}
+
+.logout-btn:hover {
+    background: #dc2626;
+}

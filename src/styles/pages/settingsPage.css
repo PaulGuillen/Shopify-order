@@ -1,0 +1,242 @@
+.settings-page {
+    padding: 30px;
+    background: #f8fafc;
+    min-height: 100vh;
+}
+
+/* =========================
+   HEADER
+========================= */
+.settings-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.settings-header h1 {
+    font-size: 26px;
+    font-weight: 700;
+}
+
+.settings-header p {
+    color: #64748b;
+    font-size: 14px;
+    margin-top: 4px;
+}
+
+/* =========================
+   BUTTON
+========================= */
+.btn-primary {
+    background: linear-gradient(135deg, #6366f1, #4f46e5);
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: 0.2s;
+}
+
+.btn-primary:hover {
+    opacity: 0.9;
+}
+
+
+/* CARD */
+.store-card {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    transition: 0.2s;
+}
+
+.store-card:hover {
+    transform: translateY(-3px);
+}
+
+/* ICON */
+.store-icon {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+/* TITLE */
+.store-card h3 {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+/* ADDRESS */
+.store-address {
+    font-size: 13px;
+    color: #64748b;
+    margin-top: 4px;
+}
+
+/* FOOTER */
+.store-footer {
+    margin-top: 12px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+}
+
+.status-active {
+    color: #10b981;
+    font-weight: 500;
+}
+
+/* ADD CARD */
+.add-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border: 2px dashed #e2e8f0;
+    cursor: pointer;
+}
+
+.add-icon {
+    font-size: 22px;
+    margin-bottom: 6px;
+}
+
+/* =========================
+   STATUS SECTION
+========================= */
+.status-section {
+    background: white;
+    border-radius: 18px;
+    padding: 24px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* HEADER */
+.status-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.status-header h2 {
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.status-header p {
+    font-size: 13px;
+    color: #64748b;
+    margin-top: 4px;
+}
+
+/* =========================
+   STATUS GRID
+========================= */
+.status-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin-top: 20px;
+}
+
+/* CARD */
+.status-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #f1f5f9;
+    padding: 16px;
+    border-radius: 14px;
+    transition: 0.2s;
+}
+
+.status-card:hover {
+    background: #e2e8f0;
+}
+
+/* DOT */
+.status-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+}
+
+/* INFO */
+.status-info {
+    flex: 1;
+    margin-left: 12px;
+}
+
+.identifier {
+    font-size: 11px;
+    color: #64748b;
+}
+
+.status-info h4 {
+    font-size: 14px;
+    font-weight: 600;
+    margin-top: 2px;
+}
+
+/* TAG */
+.status-tag {
+    font-size: 11px;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-weight: 500;
+}
+
+/* =========================
+   🚚 COURIERS
+========================= */
+.courier-section {
+    margin-top: 30px;
+    background: white;
+    border-radius: 18px;
+    padding: 24px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* LISTA */
+.courier-list {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 15px;
+}
+
+/* CHIP */
+.courier-chip {
+    background: #eef2ff;
+    color: #4f46e5;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.courier-chip button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+/* ADD */
+.courier-add {
+    margin-top: 15px;
+    display: flex;
+    gap: 10px;
+}
+
+.courier-add input {
+    flex: 1;
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+}
