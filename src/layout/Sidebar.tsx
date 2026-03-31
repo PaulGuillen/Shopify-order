@@ -173,7 +173,7 @@ export default function Sidebar({ open, closeSidebar }: SidebarProps) {
               }
               onClick={closeSidebar}
             >
-              <span>👥</span> Mis Usuarios
+              <span>👥</span> Mis usuarios
             </NavLink>
 
             <NavLink
