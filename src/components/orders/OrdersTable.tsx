@@ -1,20 +1,27 @@
-import { statusConfig } from "../../utils/statusUtil";
 import "./../../styles/components/orders/ordersTable.css";
 
 interface Props {
   readonly orders: any[];
   readonly loading: boolean;
   readonly onSelectOrder?: (order: any) => void;
+
+  /* 🔥 NUEVO */
+  readonly statusConfig: any;
 }
 
-export default function OrdersTable({ orders, loading, onSelectOrder }: Props) {
+export default function OrdersTable({
+  orders,
+  loading,
+  onSelectOrder,
+  statusConfig,
+}: Props) {
   if (loading) return <p>Cargando...</p>;
 
   if (!orders.length) return <p>No hay pedidos</p>;
 
   return (
     <div className="orders-table">
-      {/* HEADER (solo desktop) */}
+      {/* HEADER */}
       <div className="table-header">
         <span># Pedido</span>
         <span>Cliente</span>
@@ -26,9 +33,12 @@ export default function OrdersTable({ orders, loading, onSelectOrder }: Props) {
       </div>
 
       {orders.map((order) => {
-        const safeStatus = order?.status || order?.data?.status || "unassigned";
+        const safeStatus =
+          order?.status || order?.data?.status || "unassigned";
 
-        const status = statusConfig[safeStatus] || statusConfig["unassigned"];
+        const status =
+          statusConfig?.[safeStatus] ||
+          statusConfig?.["unassigned"];
 
         return (
           <div
@@ -50,13 +60,13 @@ export default function OrdersTable({ orders, loading, onSelectOrder }: Props) {
               {order.customer?.city} - {order.customer?.department}
             </span>
 
-            {/* ESTADO */}
+            {/* 🔥 ESTADO DINÁMICO */}
             <span data-label="Estado">
               <span
                 className="badge"
                 style={{
-                  backgroundColor: `${status.color}15`,
-                  color: status.color,
+                  backgroundColor: `${status?.color}15`,
+                  color: status?.color,
                 }}
               >
                 <span
@@ -64,38 +74,35 @@ export default function OrdersTable({ orders, loading, onSelectOrder }: Props) {
                     width: 6,
                     height: 6,
                     borderRadius: "50%",
-                    backgroundColor: status.color,
+                    backgroundColor: status?.color,
                     display: "inline-block",
                     marginRight: 6,
                   }}
                 />
-                {status.label}
+                {status?.label}
               </span>
             </span>
 
+            {/* 💰 PAGO */}
             <div data-label="Pago" className="payment-box">
-              {/* TOTAL */}
               <span className="payment-total">
-                 Total: S/ {Number(order.total_price || 0).toFixed(2)}
+                Total: S/ {Number(order.total_price || 0).toFixed(2)}
               </span>
 
               <div className="payment-divider" />
 
-              {/* ADELANTO */}
               {order.adelanto > 0 && (
                 <span className="payment-adelanto">
                   💰 Adelanto: S/ {order.adelanto}
                 </span>
               )}
 
-              {/* SALDO */}
               {order.total_final != null && (
                 <span className="payment-saldo">
                   🧾 Cobrar: S/ {order.total_final}
                 </span>
               )}
 
-              {/* MÉTODO */}
               {(() => {
                 const method = (
                   order.metodo ||
@@ -117,8 +124,11 @@ export default function OrdersTable({ orders, loading, onSelectOrder }: Props) {
                 );
               })()}
             </div>
+
             {/* VENDEDOR */}
-            <span data-label="Vendedor">{order.advisor || "Sin asignar"}</span>
+            <span data-label="Vendedor">
+              {order.advisor || "Sin asignar"}
+            </span>
 
             {/* FECHA */}
             <span data-label="Fecha">{order.created_day}</span>

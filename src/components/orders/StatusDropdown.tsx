@@ -1,13 +1,17 @@
 import { useState, useRef, useEffect } from "react";
-import { statusConfig } from "../../utils/statusUtil";
 import "./../../styles/components/orders/statusDropdown.css";
 
 interface Props {
   value: string;
   onChange: (value: string) => void;
+  statusConfig: any; // 🔥 nuevo
 }
 
-export default function StatusDropdown({ value, onChange }: Props) {
+export default function StatusDropdown({
+  value,
+  onChange,
+  statusConfig,
+}: Props) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -19,8 +23,11 @@ export default function StatusDropdown({ value, onChange }: Props) {
     };
 
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    return () =>
+      document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  const current = statusConfig?.[value] || statusConfig?.["unassigned"];
 
   return (
     <div className="status-wrapper" ref={ref}>
@@ -29,26 +36,19 @@ export default function StatusDropdown({ value, onChange }: Props) {
         className={`status-selected ${value}`}
         onClick={() => setOpen(!open)}
       >
-        {(() => {
-          const config = statusConfig[value] || statusConfig["unassigned"];
+        <span
+          className="status-dot"
+          style={{ backgroundColor: current?.color }}
+        />
+        <span>{current?.label}</span>
 
-          return (
-            <>
-              <span
-                className="status-dot"
-                style={{ backgroundColor: config.color }}
-              />
-              <span>{config.label}</span>
-            </>
-          );
-        })()}
         <span className="arrow">▾</span>
       </div>
 
       {/* MENU */}
       {open && (
         <div className="status-menu">
-          {Object.entries(statusConfig).map(([key, label]) => (
+          {Object.entries(statusConfig || {}).map(([key, val]: any) => (
             <div
               key={key}
               className={`status-item ${key}`}
@@ -60,12 +60,10 @@ export default function StatusDropdown({ value, onChange }: Props) {
               <div className="status-item-content">
                 <span
                   className="status-dot"
-                  style={{ backgroundColor: label.color }}
+                  style={{ backgroundColor: val.color }}
                 />
-                <span>{label.label}</span>
+                <span>{val.label}</span>
               </div>
-
-              
             </div>
           ))}
         </div>

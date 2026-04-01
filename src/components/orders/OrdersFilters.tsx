@@ -14,7 +14,6 @@ interface Props {
 
   orders: any[];
 
-  /* 🔥 NUEVOS */
   search: string;
   setSearch: (v: string) => void;
 
@@ -33,26 +32,19 @@ interface Props {
   selectedAdelanto: string;
   setSelectedAdelanto: (v: string) => void;
 
-  /* FILA 5 */
   selectedShop: string;
   setSelectedShop: (v: string) => void;
+
   selectedCourierSelect: string;
   setSelectedCourierSelect: (v: string) => void;
+
   selectedProduct: string;
   setSelectedProduct: (v: string) => void;
-}
 
-const statusMap: Record<string, string> = {
-  Todos: "all",
-  "Sin Asignar": "unassigned",
-  "Por Contactar": "to_contact",
-  Contactado: "contacted",
-  Confirmado: "confirmed",
-  Enviado: "shipped",
-  Entregado: "delivered",
-  Cancelado: "cancelled",
-  "No entregado": "not_delivered",
-};
+  /* 🔥 NUEVO */
+  statusConfig: any;
+  couriers: string[];
+}
 
 export default function OrdersFilters({
   loadOrders,
@@ -82,66 +74,108 @@ export default function OrdersFilters({
   setSelectedProduct,
   selectedAdelanto,
   setSelectedAdelanto,
-
+  statusConfig,
+  couriers,
 }: Props) {
-  const handleClick = (label: string) => {
-    setActiveTab(label);
-    const status = statusMap[label];
-    loadOrders(status);
+  /* =========================
+     🔥 STATUS DINÁMICO
+  ========================= */
+  const statusEntries = [
+    { key: "all", label: "Todos" },
+    {
+      key: "unassigned",
+      label: statusConfig?.unassigned?.label || "Sin Asignar",
+    },
+    {
+      key: "to_contact",
+      label: statusConfig?.to_contact?.label || "Por Contactar",
+    },
+    { key: "contacted", label: statusConfig?.contacted?.label || "Contactado" },
+    { key: "confirmed", label: statusConfig?.confirmed?.label || "Confirmado" },
+    { key: "shipped", label: statusConfig?.shipped?.label || "Enviado" },
+    { key: "delivered", label: statusConfig?.delivered?.label || "Entregado" },
+    { key: "cancelled", label: statusConfig?.cancelled?.label || "Cancelado" },
+    {
+      key: "not_delivered",
+      label: statusConfig?.not_delivered?.label || "No entregado",
+    },
+  ];
+
+  /* =========================
+     🔥 COUNTS
+  ========================= */
+  const getCount = (key: string) => {
+    switch (key) {
+      case "all":
+        return counts?.todos ?? 0;
+      case "unassigned":
+        return counts?.sinAsignar ?? 0;
+      case "to_contact":
+        return counts?.porContactar ?? 0;
+      case "contacted":
+        return counts?.contactado ?? 0;
+      case "confirmed":
+        return counts?.confirmado ?? 0;
+      case "shipped":
+        return counts?.enviado ?? 0;
+      case "delivered":
+        return counts?.entregado ?? 0;
+      case "cancelled":
+        return counts?.cancelado ?? 0;
+      case "not_delivered":
+        return counts?.noEntregado ?? 0;
+      default:
+        return 0;
+    }
+  };
+
+  /* =========================
+     🔥 CLICK STATUS
+  ========================= */
+  const handleClick = (item: any) => {
+    setActiveTab(item.key);
+    loadOrders(item.key);
   };
 
   const advisors = JSON.parse(localStorage.getItem("advisors_cache") || "[]");
 
   return (
     <div className="filters-container">
-      {/* FILA 1 */}
+      {/* =========================
+         🔥 FILA 1 STATUS
+      ========================= */}
       <div className="filters-row chips-scroll">
-        {[
-          { label: "Todos", count: counts?.todos ?? 0 },
-          { label: "Sin Asignar", count: counts?.sinAsignar ?? 0 },
-          { label: "Por Contactar", count: counts?.porContactar ?? 0 },
-          { label: "Contactado", count: counts?.contactado ?? 0 },
-          { label: "Confirmado", count: counts?.confirmado ?? 0 },
-          { label: "Enviado", count: counts?.enviado ?? 0 },
-          { label: "Entregado", count: counts?.entregado ?? 0 },
-          { label: "Cancelado", count: counts?.cancelado ?? 0 },
-          { label: "No entregado", count: counts?.noEntregado ?? 0 },
-        ].map((item) => (
+        {statusEntries.map((item) => (
           <button
-            key={item.label}
-            className={`chip ${activeTab === item.label ? "active" : ""}`}
-            onClick={() => handleClick(item.label)}
+            key={item.key}
+            className={`chip ${activeTab === item.key ? "active" : ""}`}
+            onClick={() => handleClick(item)}
           >
-            {item.label} <span>{item.count}</span>
+            {item.label} <span>{getCount(item.key)}</span>
           </button>
         ))}
       </div>
 
-      {/* FILA 2 */}
+      {/* =========================
+         🔥 FILA 2 COURIERS
+      ========================= */}
       <div className="filters-row chips-scroll">
         {[
+          { label: "Todos", count: orders.length },
+
+          // 🔥 SIN ASIGNAR (después de Todos)
           {
-            label: "Todos",
-            count: orders.length,
-          },
-          {
-            label: "Shalom",
-            count: orders.filter((o) => o.courier === "Shalom").length,
-          },
-          {
-            label: "Olva",
-            count: orders.filter((o) => o.courier === "Olva").length,
-          },
-          {
-            label: "Zeus",
-            count: orders.filter((o) => o.courier === "Zeus").length,
-          },
-          {
-            label: "Otros",
+            label: "Sin Asignar",
             count: orders.filter(
-              (o) => !["Shalom", "Olva", "Zeus"].includes(o.courier),
+              (o) => !o.courier || !couriers.includes(o.courier),
             ).length,
           },
+
+          // 🔥 COURiers DINÁMICOS
+          ...couriers.map((c) => ({
+            label: c,
+            count: orders.filter((o) => o.courier === c).length,
+          })),
         ].map((item) => (
           <button
             key={item.label}
@@ -153,7 +187,9 @@ export default function OrdersFilters({
         ))}
       </div>
 
-      {/* FILA 3 */}
+      {/* =========================
+         🔥 FILA 3 REGIÓN
+      ========================= */}
       <div className="filters-row chips-scroll">
         {[
           { label: "Todos", count: orders.length },
@@ -182,16 +218,15 @@ export default function OrdersFilters({
         ))}
       </div>
 
-      {/* 🔥 FILA 4 FUNCIONAL */}
+      {/* =========================
+         🔥 FILA 4 INPUTS
+      ========================= */}
       <div className="filters-row inputs-row">
-        {/* SEARCH */}
         <input
           placeholder="Nombre, teléfono, # pedido..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
-
-        {/* FECHA */}
 
         <input
           type="date"
@@ -205,15 +240,16 @@ export default function OrdersFilters({
           onChange={(e) => setSelectedStatus(e.target.value)}
         >
           <option value="Todos">Todos los estados</option>
-          <option value="unassigned">Sin Asignar</option>
-          <option value="to_contact">Por Contactar</option>
-          <option value="contacted">Contactado</option>
-          <option value="confirmed">Confirmado</option>
-          <option value="shipped">Enviado</option>
-          <option value="delivered">Entregado</option>
-          <option value="cancelled">Cancelado</option>
-          <option value="not_delivered">No entregado</option>
+
+          {statusEntries
+            .filter((s) => s.key !== "all")
+            .map((s) => (
+              <option key={s.key} value={s.key}>
+                {s.label}
+              </option>
+            ))}
         </select>
+
         {/* PAGO */}
         <select
           value={selectedPayment}
@@ -225,6 +261,7 @@ export default function OrdersFilters({
           <option value="transferencia">Transferencia</option>
         </select>
 
+        {/* ADELANTO */}
         <select
           value={selectedAdelanto}
           onChange={(e) => setSelectedAdelanto(e.target.value)}
@@ -233,6 +270,7 @@ export default function OrdersFilters({
           <option value="si">Con adelanto</option>
           <option value="no">Sin adelanto</option>
         </select>
+
         {/* VENDEDOR */}
         <select
           value={selectedAdvisor}
@@ -249,7 +287,9 @@ export default function OrdersFilters({
         </select>
       </div>
 
-      {/* 🔥 FILA 5 FUNCIONAL */}
+      {/* =========================
+         🔥 FILA 5
+      ========================= */}
       <div className="filters-row inputs-row">
         {/* TIENDA */}
         <select
@@ -273,9 +313,13 @@ export default function OrdersFilters({
           onChange={(e) => setSelectedCourierSelect(e.target.value)}
         >
           <option value="Todos">Courier</option>
-          <option value="Shalom">Shalom</option>
-          <option value="Olva">Olva</option>
-          <option value="Zeus">Zeus</option>
+
+          {couriers.map((c) => (
+            <option key={c} value={c}>
+              {c}
+            </option>
+          ))}
+
           <option value="Otros">Otros</option>
         </select>
 

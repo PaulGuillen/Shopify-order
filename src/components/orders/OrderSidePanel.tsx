@@ -9,7 +9,13 @@ import { generatePDF } from "../../utils/generateDocument";
 import { buildMessage, copyMessage } from "../../utils/messageUtil";
 import ProductEditModal from "../common/ProductEditModal";
 
-export default function OrderSidePanel({ order, onSuccess, onClose }: any) {
+export default function OrderSidePanel({
+  order,
+  onSuccess,
+  onClose,
+  statusConfig,
+  couriers,
+}: any) {
   const [documentType, setDocumentType] = useState<"boleta" | "factura" | null>(
     null,
   );
@@ -33,6 +39,7 @@ export default function OrderSidePanel({ order, onSuccess, onClose }: any) {
   // 🔥 COURIER
   const [courier, setCourier] = useState(order.courier || "Shalom");
   const [customCourier, setCustomCourier] = useState("");
+  const [customAddress, setCustomAddress] = useState("");
 
   // 🔥 AGENCIA
   const [showAgencyModal, setShowAgencyModal] = useState(false);
@@ -149,6 +156,7 @@ export default function OrderSidePanel({ order, onSuccess, onClose }: any) {
       setCourier(data.envio.courier || "Shalom");
       setSelectedAgency(data.envio.agency || null);
       setDeliveryDate(data.envio.date || order.created_day);
+      setCustomAddress(data.envio.customAddress || "");
     }
 
     /* UPSSELLS */
@@ -226,6 +234,7 @@ export default function OrderSidePanel({ order, onSuccess, onClose }: any) {
       envio: {
         courier: courier === "Otros" ? customCourier : courier,
         agency: selectedAgency || null,
+        customAddress: customAddress || null,
         date: deliveryDate,
       },
 
@@ -313,6 +322,7 @@ export default function OrderSidePanel({ order, onSuccess, onClose }: any) {
               <StatusDropdown
                 value={status}
                 onChange={(val) => setStatus(val)}
+                statusConfig={statusConfig}
               />
             </div>
           </div>
@@ -492,8 +502,13 @@ export default function OrderSidePanel({ order, onSuccess, onClose }: any) {
               <div>
                 <CourierSelector
                   value={courier}
-                  onChange={(val) => setCourier(val)}
-                  onCustomChange={(val) => setCustomCourier(val)}
+                  onChange={(val) => {
+                    setCourier(val);
+                    setSelectedAgency(null);
+                  }}
+                  onAddressChange={(val) => setCustomAddress(val)}
+                  couriers={couriers}
+                  address={customAddress} // 🔥 CLAVE
                 />
               </div>
 

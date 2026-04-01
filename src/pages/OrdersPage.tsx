@@ -7,6 +7,7 @@ import OrdersPagination from "../components/orders/OrdersPagination";
 import OrderSidePanel from "../components/orders/OrderSidePanel";
 import { notify } from "../utils/notify";
 import { useAdvisors, useAgencies, useProducts } from "../hooks/useHome";
+import { useSettings } from "../hooks/useSettings";
 
 export default function OrdersPage() {
   const [search, setSearch] = useState("");
@@ -18,13 +19,26 @@ export default function OrdersPage() {
   const [selectedCourierSelect, setSelectedCourierSelect] = useState("Todos");
   const [selectedProduct, setSelectedProduct] = useState("Todos");
 
-  const [activeTab, setActiveTab] = useState("Todos");
+  const [activeTab, setActiveTab] = useState("all");
   const [activeCourier, setActiveCourier] = useState("Todos");
   const [activeRegion, setActiveRegion] = useState("Todos");
   const [selectedAdelanto, setSelectedAdelanto] = useState("Todos");
 
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   const shop = user.shop;
+
+  /* =========================
+       HOOKS
+    ========================= */
+
+  const { agencies, loadingAgencies, hasLoaded } = useAgencies();
+
+  const { products, loadingProducts, hasLoadedProducts } = useProducts(shop);
+
+  const { advisors, loadingAdvisors, hasLoadedAdvisors } = useAdvisors(shop);
+
+  const { statusConfig, couriers, loadingSettings, hasLoadedSettings } =
+    useSettings(shop);
 
   const {
     orders = [],
@@ -84,8 +98,8 @@ export default function OrdersPage() {
 
           const courier = o.courier;
 
-          if (activeCourier === "Otros") {
-            return !["Shalom", "Olva", "Zeus"].includes(courier);
+          if (activeCourier === "Sin Asignar") {
+            return !courier || !couriers.includes(courier);
           }
 
           return courier === activeCourier;
@@ -253,15 +267,6 @@ export default function OrdersPage() {
   );
 
   const [selectedOrder, setSelectedOrder] = useState<any | null>(null);
-  /* =========================
-       HOOKS
-    ========================= */
-
-  const { agencies, loadingAgencies, hasLoaded } = useAgencies();
-
-  const { products, loadingProducts, hasLoadedProducts } = useProducts(shop);
-
-  const { advisors, loadingAdvisors, hasLoadedAdvisors } = useAdvisors(shop);
 
   /* =========================
        TOAST CONTROL
@@ -270,6 +275,7 @@ export default function OrdersPage() {
   const hasShownAgenciesToast = useRef(false);
   const hasShownProductsToast = useRef(false);
   const hasShownAdvisorsToast = useRef(false);
+  const hasShownSettingsToast = useRef(false);
 
   // 🔥 AGENCIAS
   useEffect(() => {
@@ -316,6 +322,21 @@ export default function OrdersPage() {
     }
   }, [hasLoadedAdvisors]);
 
+  // 🔥 SETTINGS
+  useEffect(() => {
+    if (hasShownSettingsToast.current) return;
+
+    if (hasLoadedSettings) {
+      hasShownSettingsToast.current = true;
+
+      if (statusConfig && couriers) {
+        notify.success("Configuraciones cargadas correctamente ⚙️");
+      } else {
+        notify.error("Error al cargar configuraciones ❌");
+      }
+    }
+  }, [hasLoadedSettings]);
+
   return (
     <div className="orders-page">
       <OrdersHeader />
@@ -348,12 +369,15 @@ export default function OrdersPage() {
         setSelectedProduct={setSelectedProduct}
         selectedAdelanto={selectedAdelanto}
         setSelectedAdelanto={setSelectedAdelanto}
+        statusConfig={statusConfig}
+        couriers={couriers}
       />
 
       <OrdersTable
         orders={paginatedOrders}
         loading={loading}
         onSelectOrder={(order) => setSelectedOrder(order)}
+        statusConfig={statusConfig}
       />
 
       <OrdersPagination
@@ -369,6 +393,8 @@ export default function OrdersPage() {
           order={selectedOrder}
           onClose={() => setSelectedOrder(null)}
           onSuccess={() => loadOrders()}
+          statusConfig={statusConfig}
+          couriers={couriers}
         />
       )}
     </div>

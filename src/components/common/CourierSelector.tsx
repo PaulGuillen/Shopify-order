@@ -1,25 +1,36 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./../../styles/components/commons/courierSelector.css";
 
 type Props = {
   value: string;
   onChange: (value: string) => void;
-  onCustomChange?: (value: string) => void;
+  onAddressChange?: (value: string) => void;
+  couriers: string[];
+  address?: string; // 🔥 nuevo
 };
-
-const options = ["Shalom", "Olva", "Zeus", "Otros"];
 
 export default function CourierSelector({
   value,
   onChange,
-  onCustomChange,
+  onAddressChange,
+  couriers,
+  address,
 }: Props) {
-  const [custom, setCustom] = useState("");
+  const [localAddress, setLocalAddress] = useState(address || "");
+
+  /* 🔥 sync desde padre */
+  useEffect(() => {
+    setLocalAddress(address || "");
+  }, [address]);
+
+  const isCustomCourier = (courier: string) => {
+    return !["Shalom", "Olva"].includes(courier);
+  };
 
   return (
     <div className="courier-box">
       <div className="courier-options">
-        {options.map((opt) => (
+        {couriers.map((opt) => (
           <div
             key={opt}
             className={`courier-pill ${value === opt ? "active" : ""}`}
@@ -30,15 +41,14 @@ export default function CourierSelector({
         ))}
       </div>
 
-      {/* OTROS */}
-      {value === "Otros" && (
+      {value && isCustomCourier(value) && (
         <input
           className="courier-input"
-          placeholder="Escribir courier..."
-          value={custom}
+          placeholder={`Envío por ${value}`}
+          value={localAddress}
           onChange={(e) => {
-            setCustom(e.target.value);
-            onCustomChange?.(e.target.value);
+            setLocalAddress(e.target.value);
+            onAddressChange?.(e.target.value);
           }}
         />
       )}
