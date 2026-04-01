@@ -8,6 +8,7 @@ import { useUpdateOrder } from "../../hooks/useOrders";
 import { generatePDF } from "../../utils/generateDocument";
 import { buildMessage, copyMessage } from "../../utils/messageUtil";
 import ProductEditModal from "../common/ProductEditModal";
+import { getPeruDateTime } from "../../utils/formatDate";
 
 export default function OrderSidePanel({
   order,
@@ -267,7 +268,7 @@ export default function OrderSidePanel({
       meta: {
         shop: order.shop,
         orderId: order.id,
-        updatedAt: new Date().toISOString(),
+        updatedAt: getPeruDateTime(),
       },
     };
 

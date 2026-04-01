@@ -1,3 +1,4 @@
+import { formatDateISO } from "../../utils/formatDate";
 import "./../../styles/components/orders/ordersTable.css";
 
 interface Props {
@@ -33,12 +34,10 @@ export default function OrdersTable({
       </div>
 
       {orders.map((order) => {
-        const safeStatus =
-          order?.status || order?.data?.status || "unassigned";
+        const safeStatus = order?.status || order?.data?.status || "unassigned";
 
         const status =
-          statusConfig?.[safeStatus] ||
-          statusConfig?.["unassigned"];
+          statusConfig?.[safeStatus] || statusConfig?.["unassigned"];
 
         return (
           <div
@@ -126,12 +125,21 @@ export default function OrdersTable({
             </div>
 
             {/* VENDEDOR */}
-            <span data-label="Vendedor">
-              {order.advisor || "Sin asignar"}
-            </span>
+            <span data-label="Vendedor">{order.advisor || "Sin asignar"}</span>
 
             {/* FECHA */}
-            <span data-label="Fecha">{order.created_day}</span>
+            <span data-label="Fecha" className="date-box">
+              <span className="date-created">
+                Primer registro: {order.created_day}
+              </span>
+
+              {order.dataUpdated?.meta?.updatedAt && (
+                <span className="date-updated">
+                  Modificación:{" "}
+                  {formatDateISO(order.dataUpdated.meta.updatedAt)}
+                </span>
+              )}
+            </span>
           </div>
         );
       })}
