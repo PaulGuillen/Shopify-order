@@ -50,6 +50,7 @@ export default function OrdersPage() {
   // 🔥 PAGINACIÓN
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(20);
+  const normalize = (v: string) => (v || "").trim().toLowerCase();
 
   const normalizedOrders = useMemo(() => {
     return orders.map((o) => {
@@ -65,7 +66,7 @@ export default function OrdersPage() {
           dni: o.dataUpdated?.cliente?.dni || o.customer?.dni,
         },
 
-        courier: o.dataUpdated?.envio?.courier || o.courier || "Sin courier",
+        courier: o.dataUpdated?.envio?.courier || o.courier || null,
 
         agency: o.dataUpdated?.envio?.agency || o.agency,
 
@@ -96,13 +97,14 @@ export default function OrdersPage() {
         .filter((o) => {
           if (activeCourier === "Todos") return true;
 
-          const courier = o.courier;
+          const courier = normalize(o.courier);
+          const selected = normalize(activeCourier);
 
-          if (activeCourier === "Sin Asignar") {
-            return !courier || !couriers.includes(courier);
+          if (selected === "sin asignar") {
+            return !courier || !couriers.map(normalize).includes(courier);
           }
 
-          return courier === activeCourier;
+          return courier === selected;
         })
 
         /* =========================
@@ -111,11 +113,13 @@ export default function OrdersPage() {
         .filter((o) => {
           if (activeRegion === "Todos") return true;
 
+          const region = normalize(o.customer?.region_type);
+
           if (activeRegion === "Provincias") {
-            return o.customer?.region_type === "Provincia";
+            return region === "provincia";
           }
 
-          return o.customer?.region_type === activeRegion;
+          return region === normalize(activeRegion);
         })
 
         /* =========================
@@ -148,7 +152,7 @@ export default function OrdersPage() {
         .filter((o) => {
           if (selectedStatus === "Todos") return true;
 
-          return o.status === selectedStatus;
+          return normalize(o.status) === normalize(selectedStatus);
         })
 
         /* =========================
@@ -157,7 +161,10 @@ export default function OrdersPage() {
         .filter((o) => {
           if (selectedPayment === "Todos") return true;
 
-          return o.dataUpdated?.pago?.metodo === selectedPayment;
+          return (
+            normalize(o.dataUpdated?.pago?.metodo || o.payment_gateway) ===
+            normalize(selectedPayment)
+          );
         })
 
         /* =========================
@@ -205,15 +212,16 @@ export default function OrdersPage() {
          🚚 COURIER SELECT (FILA 5)
       ========================= */
         .filter((o) => {
+          if (activeCourier !== "Todos") return true;
           if (selectedCourierSelect === "Todos") return true;
 
           const courier = o.courier;
 
           if (selectedCourierSelect === "Otros") {
-            return !["Shalom", "Olva", "Zeus"].includes(courier);
+            return !couriers.map(normalize).includes(normalize(courier));
           }
 
-          return courier === selectedCourierSelect;
+          return normalize(courier) === normalize(selectedCourierSelect);
         })
 
         /* =========================
@@ -222,7 +230,7 @@ export default function OrdersPage() {
         .filter((o) => {
           if (selectedProduct === "Todos") return true;
 
-          return o.product?.name === selectedProduct;
+          return normalize(o.product?.name) === normalize(selectedProduct);
         })
     );
   }, [
@@ -337,6 +345,29 @@ export default function OrdersPage() {
     }
   }, [hasLoadedSettings]);
 
+  const resetFilters = () => {
+    setActiveTab("all");
+    setActiveCourier("Todos");
+    setActiveRegion("Todos");
+
+    setSearch("");
+    setSelectedDate("");
+    setSelectedStatus("Todos");
+    setSelectedPayment("Todos");
+    setSelectedAdvisor("Todos");
+    setSelectedShop("Todas");
+    setSelectedCourierSelect("Todos");
+    setSelectedProduct("Todos");
+    setSelectedAdelanto("Todos");
+
+    setCurrentPage(1);
+  };
+
+  const handleSuccess = () => {
+    resetFilters();
+    loadOrders("all");
+  };
+
   return (
     <div className="orders-page">
       <OrdersHeader />
@@ -392,7 +423,7 @@ export default function OrdersPage() {
         <OrderSidePanel
           order={selectedOrder}
           onClose={() => setSelectedOrder(null)}
-          onSuccess={() => loadOrders()}
+          onSuccess={handleSuccess}
           statusConfig={statusConfig}
           couriers={couriers}
         />

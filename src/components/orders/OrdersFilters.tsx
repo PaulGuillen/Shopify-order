@@ -136,6 +136,7 @@ export default function OrdersFilters({
     setActiveTab(item.key);
     loadOrders(item.key);
   };
+  const normalize = (v: string) => (v || "").trim().toLowerCase();
 
   const advisors = JSON.parse(localStorage.getItem("advisors_cache") || "[]");
 
@@ -167,19 +168,22 @@ export default function OrdersFilters({
           {
             label: "Sin Asignar",
             count: orders.filter(
-              (o) => !o.courier || !couriers.includes(o.courier),
+              (o) =>
+                !o.courier ||
+                !couriers.map(normalize).includes(normalize(o.courier)),
             ).length,
           },
 
           // 🔥 COURiers DINÁMICOS
           ...couriers.map((c) => ({
             label: c,
-            count: orders.filter((o) => o.courier === c).length,
+            count: orders.filter((o) => normalize(o.courier) === normalize(c))
+              .length,
           })),
         ].map((item) => (
           <button
             key={item.label}
-            className={`chip ${activeCourier === item.label ? "active" : ""}`}
+            className={`chip ${normalize(activeCourier) === normalize(item.label) ? "active" : ""}`}
             onClick={() => setActiveCourier(item.label)}
           >
             {item.label} <span>{item.count}</span>
@@ -195,17 +199,22 @@ export default function OrdersFilters({
           { label: "Todos", count: orders.length },
           {
             label: "Lima",
-            count: orders.filter((o) => o.customer?.region_type === "Lima")
-              .length,
+            count: orders.filter(
+              (o) => normalize(o.customer?.region_type) === "lima",
+            ).length,
           },
           {
             label: "Provincias",
-            count: orders.filter((o) => o.customer?.region_type === "Provincia")
-              .length,
+            count: orders.filter(
+              (o) => normalize(o.customer?.region_type) === "provincia",
+            ).length,
           },
           {
             label: "Sin Departamento",
-            count: orders.filter((o) => !o.customer?.department).length,
+            count: orders.filter(
+              (o) =>
+                !o.customer?.department || o.customer?.department.trim() === "",
+            ).length,
           },
         ].map((item) => (
           <button
