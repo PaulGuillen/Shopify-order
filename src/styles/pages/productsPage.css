@@ -173,3 +173,27 @@
         gap: 10px;
     }
 }
+
+.stock-box {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.stock-box .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.stock-box .dot.green {
+  background: #22c55e;
+}
+
+.stock-box .dot.orange {
+  background: #f59e0b;
+}
+
+.stock-box .dot.red {
+  background: #ef4444;
+}

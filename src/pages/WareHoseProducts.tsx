@@ -14,10 +14,12 @@ export default function WareHoseProducts() {
 
   const [openPanel, setOpenPanel] = useState(false);
 
-  /* =============================
-        NORMALIZAR DATA 🔥
-  ============================= */
+  // 🔥 NUEVO
+  const [selectedProduct, setSelectedProduct] = useState<any>(null);
 
+  /* =============================
+        NORMALIZAR DATA
+  ============================= */
   const mappedProducts = useMemo(() => {
     return products.map((p: any) => ({
       id: p.id,
@@ -25,8 +27,7 @@ export default function WareHoseProducts() {
       image: p.image,
       price: Number(p.price || 0),
       stock: Number(p.stock || 0),
-      status: p.status || "active",
-      source: p.source || "shopify", // 🔥 FIX REAL
+      source: p.source || "shopify",
     }));
   }, [products]);
 
@@ -44,48 +45,29 @@ export default function WareHoseProducts() {
       data = data.filter((p) => p.source === "mios");
     }
 
+    if (search) {
+      data = data.filter((p) =>
+        p.title.toLowerCase().includes(search.toLowerCase()),
+      );
+    }
+
     return data;
-  }, [mappedProducts, tab]);
+  }, [mappedProducts, tab, search]);
 
   /* =============================
-        ESTADOS VISUALES
+        STOCK VISUAL
   ============================= */
-
-  const getStatus = (p: any) => {
-    if (p.stock <= 0) return "sin_stock";
-    if (p.stock < 5) return "bajo_stock";
-    return "activo";
+  const getStockLabel = (stock: number) => {
+    if (stock <= 0) return "SIN STOCK";
+    if (stock < 5) return "STOCK BAJO";
+    return "EN STOCK";
   };
 
-  const statusLabel = (status: string) => {
-    switch (status) {
-      case "activo":
-        return "ACTIVO";
-      case "bajo_stock":
-        return "STOCK BAJO";
-      case "sin_stock":
-        return "SIN STOCK";
-      default:
-        return "ACTIVO";
-    }
+  const getStockColor = (stock: number) => {
+    if (stock <= 0) return "red";
+    if (stock < 5) return "orange";
+    return "green";
   };
-
-  const statusColor = (status: string) => {
-    switch (status) {
-      case "activo":
-        return "green";
-      case "bajo_stock":
-        return "orange";
-      case "sin_stock":
-        return "red";
-      default:
-        return "green";
-    }
-  };
-
-  /* =============================
-        RENDER
-  ============================= */
 
   return (
     <div className="products-page">
@@ -93,12 +75,15 @@ export default function WareHoseProducts() {
       <div className="products-page__header">
         <div>
           <h1>Productos</h1>
-          <p>Gestiona tu catálogo desde Shopify y productos propios.</p>
+          <p>Gestiona tu catálogo</p>
         </div>
 
         <button
           className="products-page__btn-primary"
-          onClick={() => setOpenPanel(true)}
+          onClick={() => {
+            setSelectedProduct(null); // 🔥 modo crear
+            setOpenPanel(true);
+          }}
         >
           + Agregar producto
         </button>
@@ -136,7 +121,7 @@ export default function WareHoseProducts() {
         </button>
       </div>
 
-      {/* BUSCADOR */}
+      {/* SEARCH */}
       <div className="products-page__filter">
         <input
           placeholder="Buscar productos..."
@@ -145,56 +130,63 @@ export default function WareHoseProducts() {
         />
       </div>
 
-      {/* TABLA */}
+      {/* TABLE */}
       <div className="products-page__table">
         <div className="products-page__table-header">
-          <span>DETALLE DEL PRODUCTO</span>
+          <span>PRODUCTO</span>
           <span>ORIGEN</span>
           <span>PRECIO</span>
-          <span>ESTADO</span>
+          <span>STOCK</span>
         </div>
 
         {loadingProducts ? (
           <p style={{ padding: 20 }}>Cargando...</p>
         ) : (
-          filteredProducts.map((p) => {
-            const status = getStatus(p);
-
-            return (
-              <div className="products-page__row" key={p.id}>
-                <div className="products-page__product">
-                  <img src={p.image} alt="" />
-
-                  <div>
-                    <p>{p.title}</p>
-                    <span>ID: {p.id}</span>
-                  </div>
-                </div>
-
+          filteredProducts.map((p) => (
+            <div
+              className="products-page__row"
+              key={p.id}
+              onClick={() => {
+                setSelectedProduct(p); // 🔥 modo editar
+                setOpenPanel(true);
+              }}
+            >
+              <div className="products-page__product">
+                <img src={p.image} alt="" />
                 <div>
-                  <span className={`products-page__badge ${p.source}`}>
-                    {p.source === "mios" ? "PROPIO" : "SHOPIFY"}
-                  </span>
-                </div>
-
-                <div>
-                  <strong>S/ {p.price.toFixed(2)}</strong>
-                </div>
-
-                <div className={`products-page__status ${statusColor(status)}`}>
-                  ● {statusLabel(status)}
+                  <p>{p.title}</p>
+                  <span>ID: {p.id}</span>
                 </div>
               </div>
-            );
-          })
+
+              <div>
+                <span className={`products-page__badge ${p.source}`}>
+                  {p.source === "mios" ? "PROPIO" : "SHOPIFY"}
+                </span>
+              </div>
+
+              <div>
+                <strong>S/ {p.price.toFixed(2)}</strong>
+              </div>
+
+              <div
+                className={`products-page__status ${getStockColor(p.stock)}`}
+              >
+                ● Cantidad : {p.stock}{" "}
+                {p.stock <= 0 ? "(Sin stock)" : p.stock < 5 ? "(Bajo)" : ""}
+              </div>
+            </div>
+          ))
         )}
       </div>
 
+      {/* PANEL */}
       <SidePanelProduct
         open={openPanel}
         onClose={() => setOpenPanel(false)}
         shop={shop}
         onSuccess={() => loadProducts()}
+        product={selectedProduct} // 🔥 CLAVE
       />
     </div>
   );

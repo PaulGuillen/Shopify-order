@@ -24,6 +24,7 @@ export default function OrderSidePanel({
   const [showEditProduct, setShowEditProduct] = useState(false);
 
   const [baseProduct, setBaseProduct] = useState(() => ({
+    id: order.product?.id,
     name: order.product?.name,
     quantity: order.product?.quantity || 1,
     price: Number(order.total_price) / (order.product?.quantity || 1),
@@ -188,6 +189,7 @@ export default function OrderSidePanel({
         const price = total / quantity;
 
         setBaseProduct({
+          id: base.id || order.product?.id,
           name: base.name || order.product?.name,
           quantity,
           total,
@@ -244,6 +246,7 @@ export default function OrderSidePanel({
     ========================= */
       productos: {
         base: {
+          id: baseProduct.id,
           name: baseProduct.name,
           quantity: baseProduct.quantity,
           total: baseProduct.total,
