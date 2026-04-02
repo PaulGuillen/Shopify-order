@@ -987,3 +987,28 @@ CLIENTE BOX
     overflow: hidden;
     text-overflow: ellipsis;
 }
+
+.cliente-name-input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid #e5e7eb;
+    font-size: 14px;
+}
+
+.cliente-name-input:focus {
+    border-color: #6366f1;
+}
+
+
+.address-input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid #e5e7eb;
+    font-size: 14px;
+}
+
+.address-input:focus {
+    border-color: #6366f1;
+}

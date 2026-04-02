@@ -64,6 +64,10 @@ export default function OrdersPage() {
           region_type:
             o.dataUpdated?.cliente?.region || o.customer?.region_type,
           dni: o.dataUpdated?.cliente?.dni || o.customer?.dni,
+          department:
+            o.dataUpdated?.cliente?.department || o.customer?.department,
+
+          district: o.dataUpdated?.cliente?.district || o.customer?.district,
         },
 
         courier: o.dataUpdated?.envio?.courier || o.courier || null,
@@ -369,11 +373,73 @@ export default function OrdersPage() {
   const handleSuccess = () => {
     resetFilters();
     loadOrders("all");
+    setSelectedOrder(null);
+  };
+
+  const generateOrderNumber = () => {
+    return Math.floor(100000 + Math.random() * 900000);
+  };
+
+  const handleCreateOrder = () => {
+    const lastOrder = normalizedOrders[0]; // ya vienen ordenados DESC
+
+    const lastNumber = lastOrder?.order_number || 0;
+
+    let newOrderNumber = lastNumber + 1;
+
+    // 🔥 si supera cierto rango → random
+    if (newOrderNumber > 9999) {
+      newOrderNumber = generateOrderNumber();
+    }
+
+    const newOrder = {
+      id: `temp-${Date.now()}`,
+      order_number: newOrderNumber,
+
+      created_day: new Date().toISOString().slice(0, 10),
+      created_at: new Date().toISOString(),
+
+      status: "unassigned",
+
+      total_price: 0,
+
+      customer: {
+        name: "",
+        phone: "",
+        city: "",
+        department: "",
+        region_type: "lima",
+      },
+
+      product: {
+        name: "",
+        quantity: 1,
+        price: 0,
+      },
+
+      advisor: "Sin asignar",
+
+      dataUpdated: {
+        cliente: {},
+        vendedor: {},
+        observacion: "",
+        status: "unassigned",
+        envio: {},
+        productos: {
+          base: {},
+          upsells: [],
+        },
+        pago: {},
+        meta: {},
+      },
+    };
+
+    setSelectedOrder(newOrder);
   };
 
   return (
     <div className="orders-page">
-      <OrdersHeader />
+      <OrdersHeader onCreate={handleCreateOrder} />
 
       <OrdersFilters
         loadOrders={loadOrders}

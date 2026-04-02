@@ -233,6 +233,24 @@ export const updateOrderService = async (
     }
 };
 
+export const createOrder = async (shop: string, order: any, dataUpdated: any) => {
+    const res = await fetch(
+        `${API}/orders/orders-create/${shop}`,
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                order,
+                dataUpdated,
+            }),
+        }
+    );
+
+    return res.json();
+};
+
 export const getAdvisorOrders = async (
     advisorId: string,
     shop: string

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { assignOrder, fetchOrders, fetchOrdersByWorkflow, getAdvisorOrders, getAdvisorOrdersContacted, updateOrderService, updateOrderStatus } from "../services/orderService";
+import { assignOrder, createOrder, fetchOrders, fetchOrdersByWorkflow, getAdvisorOrders, getAdvisorOrdersContacted, updateOrderService, updateOrderStatus } from "../services/orderService";
 import type { Order } from "../services/orderService";
 
 //New Flow
@@ -106,6 +106,30 @@ export const useUpdateOrder = () => {
 
     return {
         updateOrder,
+        loading,
+    };
+};
+
+export const useCreateOrder = () => {
+    const [loading, setLoading] = useState(false);
+
+    const create = async (shop: string, order: any, dataUpdated: any) => {
+        try {
+            setLoading(true);
+
+            const res = await createOrder(shop, order, dataUpdated);
+
+            return res; // 🔥 IMPORTANTE
+        } catch (error) {
+            console.error("❌ createOrder error:", error);
+            return null;
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return {
+        createOrder: create,
         loading,
     };
 };

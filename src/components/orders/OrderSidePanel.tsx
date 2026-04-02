@@ -4,7 +4,7 @@ import StatusDropdown from "./StatusDropdown";
 import AgencySelectorModal from "../common/AgencySelectorModal";
 import CourierSelector from "../common/CourierSelector";
 import AddProductModal from "../common/AddProductModal";
-import { useUpdateOrder } from "../../hooks/useOrders";
+import { useCreateOrder, useUpdateOrder } from "../../hooks/useOrders";
 import { generatePDF } from "../../utils/generateDocument";
 import { buildMessage, copyMessage } from "../../utils/messageUtil";
 import ProductEditModal from "../common/ProductEditModal";
@@ -31,10 +31,14 @@ export default function OrderSidePanel({
     total: Number(order.total_price),
   }));
 
+  const isNewOrder = order.id?.startsWith("temp");
+
   const advisors = JSON.parse(localStorage.getItem("advisors_cache") || "[]");
   const [selectedAdvisor, setSelectedAdvisor] = useState<any>(null);
 
   const { updateOrder, loading } = useUpdateOrder();
+
+  const { createOrder, loading: loadingCreate } = useCreateOrder();
 
   const [status, setStatus] = useState(order.status);
 
@@ -94,6 +98,13 @@ export default function OrderSidePanel({
 
   const [editableTotal, setEditableTotal] = useState("");
 
+  const [customerName, setCustomerName] = useState(order.customer?.name || "");
+  const [department, setDepartment] = useState(
+    order.customer?.department || "",
+  );
+
+  const [district, setDistrict] = useState(order.customer?.district || "");
+
   const adelantoNumber = Number(adelanto || 0);
   const totalEditableNumber = Number(editableTotal || 0);
   const totalFinalConAdelanto = Math.max(
@@ -140,6 +151,13 @@ export default function OrderSidePanel({
       setPhone((data.cliente.phone || "").replace(/^(\+51|51)/, ""));
       setRegionType((data.cliente.region || "lima").toLowerCase());
       setDni(data.cliente.dni || "");
+
+      // 🔥 FIX PRO
+      setDepartment(
+        data.cliente.department || order.customer?.department || "",
+      );
+
+      setDistrict(data.cliente.district || order.customer?.district || "");
     }
 
     /* VENDEDOR */
@@ -203,6 +221,10 @@ export default function OrderSidePanel({
     if (data.observacion) {
       setObservacion(data.observacion);
     }
+
+    if (data.cliente?.name) {
+      setCustomerName(data.cliente.name);
+    }
   }, [order]);
 
   useEffect(() => {
@@ -212,17 +234,29 @@ export default function OrderSidePanel({
     setDeliveryDate(order.delivery_date || order.created_day);
   }, [order]);
 
+  useEffect(() => {
+    if (!order) return;
+
+    // 🔥 SOLO si no hay dataUpdated
+    if (!order.dataUpdated?.cliente) {
+      setDepartment(order.customer?.department || "");
+      setDistrict(order.customer?.district || "");
+    }
+  }, [order]);
+
   const handleUpdate = () => {
     const payload = {
       /* =========================
        CLIENTE
     ========================= */
       cliente: {
-        name: order.customer?.name,
+        name: customerName,
         phone: phone,
         phoneWithPrefix: `+51${phone}`,
         region: regionType,
         dni: dni || "",
+        department: department,
+        district: district,
       },
 
       /* =========================
@@ -318,6 +352,29 @@ export default function OrderSidePanel({
         : "📋 Mensaje Provincia copiado",
     );
   };
+
+  const handleCreateClick = async () => {
+    if (!baseProduct?.id) {
+      alert("⚠️ Debes seleccionar un producto base");
+      return;
+    }
+
+    const payload = handleUpdate();
+
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+
+    const response = await createOrder(user.shop, order, payload);
+
+    if (response?.success) {
+      order.id = response.id;
+
+      onSuccess();
+      onClose();
+      alert("✅ Orden creada");
+    }
+  };
+
+  const hasBaseProduct = !!baseProduct?.id;
 
   return (
     <>
@@ -476,9 +533,13 @@ export default function OrderSidePanel({
                   INFO CLIENTE
               ========================= */}
               <div className="cliente-box">
-                <p className="cliente-name">
-                  {order.customer?.name || "Cliente"}
-                </p>
+                <input
+                  type="text"
+                  className="cliente-name-input"
+                  placeholder="Nombre del cliente"
+                  value={customerName}
+                  onChange={(e) => setCustomerName(e.target.value)}
+                />
 
                 <input
                   type="text"
@@ -518,6 +579,22 @@ export default function OrderSidePanel({
                     📋
                   </button>
                 </div>
+
+                <input
+                  type="text"
+                  className="address-input"
+                  placeholder="Departamento (ej: Lima)"
+                  value={department}
+                  onChange={(e) => setDepartment(e.target.value)}
+                />
+
+                <input
+                  type="text"
+                  className="address-input"
+                  placeholder="Distrito (ej: Miraflores)"
+                  value={district}
+                  onChange={(e) => setDistrict(e.target.value)}
+                />
               </div>
             </div>
 
@@ -606,7 +683,7 @@ export default function OrderSidePanel({
               <div className="product-item">
                 <div className="product-left">
                   <p className="product-title">
-                    {baseProduct.name || "Producto"}
+                    {baseProduct.name || "Seleccionar producto"}
                   </p>
 
                   <span className="product-meta">
@@ -622,9 +699,18 @@ export default function OrderSidePanel({
                   {/* 🔥 NUEVO BOTÓN */}
                   <button
                     className="modify-text"
-                    onClick={() => setShowEditProduct(true)}
+                    onClick={() => {
+                      if (isNewOrder && !hasBaseProduct) {
+                        setShowAddProduct(true); // 🔥 abrir selector
+                      } else {
+                        setShowEditProduct(true);
+                      }
+                    }}
                   >
-                    ✏️ Modificar
+                    ✏️{" "}
+                    {isNewOrder && !hasBaseProduct
+                      ? "Seleccionar"
+                      : "Modificar"}
                   </button>
                 </div>
               </div>
@@ -753,7 +839,7 @@ export default function OrderSidePanel({
           <div className="sidepanel-footer">
             <button
               className="update-btn"
-              onClick={handleUpdateClick}
+              onClick={isNewOrder ? handleCreateClick : handleUpdateClick}
               disabled={loading}
             >
               {loading ? (
@@ -761,7 +847,9 @@ export default function OrderSidePanel({
               ) : (
                 <>
                   <span className="update-icon">✓</span>
-                  <span>Actualizar Pedido</span>
+                  <span>
+                    {isNewOrder ? "Crear Pedido" : "Actualizar Pedido"}
+                  </span>
                 </>
               )}
             </button>
@@ -785,6 +873,21 @@ export default function OrderSidePanel({
         <AddProductModal
           onClose={() => setShowAddProduct(false)}
           onSelect={(product) => {
+            if (isNewOrder && !hasBaseProduct) {
+              // 🔥 ESTE ES EL BASE PRODUCT
+              setBaseProduct({
+                id: product.id,
+                name: product.title,
+                quantity: product.quantity,
+                price: product.price,
+                total: product.total,
+              });
+
+              setShowAddProduct(false);
+              return;
+            }
+
+            // 🔥 SI YA HAY BASE → ES UPSELL
             setExtraProducts((prev) => {
               const exist = prev.find((p) => p.id === product.id);
 
@@ -802,6 +905,8 @@ export default function OrderSidePanel({
 
               return [...prev, product];
             });
+
+            setShowAddProduct(false);
           }}
         />
       )}

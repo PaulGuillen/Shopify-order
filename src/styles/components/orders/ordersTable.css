@@ -261,3 +261,13 @@
         align-self: flex-start;
     }
 }
+
+.customer-name {
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.customer-phone {
+  font-size: 12px;
+  color: #64748b;
+}

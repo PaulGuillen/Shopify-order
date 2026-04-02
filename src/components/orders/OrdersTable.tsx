@@ -51,13 +51,18 @@ export default function OrdersTable({
 
             {/* CLIENTE */}
             <div className="customer" data-label="Cliente">
-              <p>{order.customer?.name}</p>
-              <span>{order.customer?.phone}</span>
+              <p className="customer-name">
+                {order.customer?.name || "Sin nombre"}
+              </p>
+
+              <span className="customer-phone">
+                {order.customer?.phone || "-"}
+              </span>
             </div>
 
             {/* UBICACIÓN */}
             <span data-label="Ubicación">
-              {order.customer?.city} - {order.customer?.department}
+              {order.customer?.department || "-"} - {order.customer?.district || "-"}
             </span>
 
             {/* 🔥 ESTADO DINÁMICO */}
@@ -132,7 +137,7 @@ export default function OrdersTable({
             <span data-label="Observación" className="obs-box">
               {order.observacion || "Sin observación"}
             </span>
-            
+
             {/* FECHA */}
             <span data-label="Fecha" className="date-box">
               <span className="date-created">
