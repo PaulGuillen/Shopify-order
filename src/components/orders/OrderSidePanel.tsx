@@ -43,6 +43,8 @@ export default function OrderSidePanel({
   const [customCourier, setCustomCourier] = useState("");
   const [customAddress, setCustomAddress] = useState("");
 
+  const [observacion, setObservacion] = useState("");
+
   // 🔥 AGENCIA
   const [showAgencyModal, setShowAgencyModal] = useState(false);
   const [selectedAgency, setSelectedAgency] = useState<any>(null);
@@ -197,6 +199,10 @@ export default function OrderSidePanel({
         });
       }
     }
+
+    if (data.observacion) {
+      setObservacion(data.observacion);
+    }
   }, [order]);
 
   useEffect(() => {
@@ -225,6 +231,11 @@ export default function OrderSidePanel({
       vendedor: {
         advisor: selectedAdvisor?.name || "Sin asignar",
       },
+
+      /* =========================
+       OBSERVACION
+    ========================= */
+      observacion: observacion,
 
       /* =========================
        STATUS
@@ -420,6 +431,20 @@ export default function OrderSidePanel({
                     ))}
                 </select>
               )}
+            </div>
+
+            {/* 🔥 OBSERVACION */}
+            <div className="card">
+              <div className="card-header">
+                <span>📝 Observación</span>
+              </div>
+
+              <textarea
+                className="observacion-input"
+                placeholder="Ej: Falta cobrar, falta llamar, cliente ocupado..."
+                value={observacion}
+                onChange={(e) => setObservacion(e.target.value)}
+              />
             </div>
 
             {/* BODY */}

@@ -927,9 +927,12 @@ CLIENTE BOX
     border-radius: 14px;
     background: #f8fafc;
     border: 1px solid #e2e8f0;
-    display: flex;                 /* 🔥 FALTA ESTO */
-    align-items: center;           /* 🔥 */
-    justify-content: space-between;/* 🔥 CLAVE */
+    display: flex;
+    /* 🔥 FALTA ESTO */
+    align-items: center;
+    /* 🔥 */
+    justify-content: space-between;
+    /* 🔥 CLAVE */
 }
 
 /* LABEL */
@@ -941,7 +944,7 @@ CLIENTE BOX
 
 /* ACTIONS */
 .doc-actions {
-     display: flex;
+    display: flex;
     gap: 10px;
 }
 
@@ -963,4 +966,24 @@ CLIENTE BOX
 
 .modify-text:hover {
     text-decoration: underline;
+}
+
+.observacion-input {
+    width: 100%;
+    min-height: 80px;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    padding: 10px;
+    font-size: 13px;
+    resize: none;
+    outline: none;
+}
+
+.obs-box {
+    font-size: 12px;
+    color: #475569;
+    max-width: 180px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }

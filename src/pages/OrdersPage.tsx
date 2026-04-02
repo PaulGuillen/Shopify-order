@@ -78,10 +78,13 @@ export default function OrdersPage() {
         advisor: o.dataUpdated?.vendedor?.advisor || o.advisor,
 
         /* 💰 PAGO NORMALIZADO */
-        total_price: o.dataUpdated?.pago?.totalOriginal || o.total_price, // 👉 TOTAL A COBRAR
-        total_final: o.dataUpdated?.pago?.totalFinal, // 👉 SALDO
-        adelanto: o.dataUpdated?.pago?.adelanto, // 👉 ADELANTO
-        metodo: o.dataUpdated?.pago?.metodo, // 👉 MÉTODO
+        total_price: o.dataUpdated?.pago?.totalOriginal || o.total_price,
+        total_final: o.dataUpdated?.pago?.totalFinal,
+        adelanto: o.dataUpdated?.pago?.adelanto,
+        metodo: o.dataUpdated?.pago?.metodo,
+
+        /* 🔥 NUEVO */
+        observacion: o.dataUpdated?.observacion || "",
       };
     });
   }, [orders]);

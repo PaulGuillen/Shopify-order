@@ -1,27 +1,58 @@
+/* =========================
+   CONTAINER
+========================= */
+
 .orders-table {
     background: white;
     border-radius: 14px;
     overflow: hidden;
-}
-
-.table-header {
-    display: grid;
-    grid-template-columns: 120px 1.5fr 1fr 1fr 1fr 1fr 1fr;
-    padding: 14px;
-    background: #f1f5f9;
-    font-weight: 600;
-    
+    border: 1px solid #e5e7eb;
 }
 
 /* =========================
-   ROWS 🔥 (ESTO TE FALTABA)
+   HEADER
+========================= */
+
+.table-header {
+    display: grid;
+    grid-template-columns:
+        90px
+        /* pedido */
+        1.5fr
+        /* cliente */
+        1.4fr
+        /* 🔥 ubicación (ANTES 1fr) */
+        1.1fr
+        /* 🔥 estado (ANTES 1fr) */
+        1.2fr
+        /* pago */
+        0.8fr
+        /* vendedor */
+        1.3fr
+        /* observación */
+        1.2fr;
+    /* fecha */
+    padding: 14px 10px;
+    background: #f8fafc;
+    font-weight: 600;
+    font-size: 13px;
+    color: #475569;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+/* =========================
+   ROWS
 ========================= */
 
 .table-row {
     display: grid;
-    grid-template-columns: 120px 1.5fr 1fr 1fr 1fr 1fr 1fr;
+    grid-template-columns:
+        90px 1.5fr 1.4fr 1.1fr 1.2fr 0.8fr 1.3fr 1.2fr;
     padding: 4px 10px;
-    border-bottom: 2px solid #eee;
+    border-bottom: 2px solid #f1f5f9;
+    font-size: 14px;
+    color: #0f172a;
+    transition: all 0.2s ease;
     align-items: center;
 }
 
@@ -30,14 +61,30 @@
     background: #f9fafb;
 }
 
-.table-row span {
+/* =========================
+   CELLS
+========================= */
+
+.table-row>span {
     display: flex;
     align-items: center;
 }
 
+/* =========================
+   CLIENTE
+========================= */
+
+.customer {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
 .customer p {
     margin: 0;
-    font-weight: 500;
+    font-weight: 600;
+    font-size: 14px;
+    color: #0f172a;
 }
 
 .customer span {
@@ -46,7 +93,7 @@
 }
 
 /* =========================
-   BADGE BASE
+   BADGE
 ========================= */
 
 .badge {
@@ -62,128 +109,63 @@
 
     white-space: nowrap;
     width: fit-content;
-    /* 🔥 CLAVE */
-    max-width: 120px;
-    /* evita que crezca mucho */
+
+    max-width: 140px;
 
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
 /* =========================
-   📱 MOBILE RESPONSIVE
-========================= */
-
-@media (max-width: 768px) {
-
-    .table-header {
-        display: none;
-    }
-
-    .table-row {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-
-        padding: 14px;
-        border-bottom: 1px solid #eee;
-    }
-
-    .table-row span,
-    .table-row .customer,
-    .table-row div {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        width: 100%;
-    }
-
-    /* 🔥 LABEL AUTOMÁTICO */
-    .table-row span::before,
-    .table-row div::before,
-    .table-row .customer::before {
-        content: attr(data-label);
-        font-size: 12px;
-        color: #64748b;
-        font-weight: 500;
-    }
-
-    /* CLIENTE especial */
-    .customer {
-        flex-direction: column;
-        align-items: flex-start !important;
-    }
-
-    .customer::before {
-        margin-bottom: 4px;
-    }
-
-    .customer span {
-        font-size: 12px;
-    }
-
-    /* BADGE centrado */
-    .badge {
-        align-self: flex-start;
-    }
-}
-
-/* =========================
-   💰 PAYMENT COMPACT
+   PAYMENT
 ========================= */
 
 .payment-box {
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    align-items: flex-start;
+    gap: 3px;
 }
 
-/* TOTAL */
 .payment-total {
     font-size: 14px;
     font-weight: 700;
     color: #0f172a;
 }
 
-/* ADELANTO */
 .payment-adelanto {
-    font-size: 13px;
+    font-size: 12px;
     color: #059669;
 }
 
-/* SALDO */
 .payment-saldo {
-    font-size: 13px;
+    font-size: 12px;
     color: #64748b;
 }
 
-/* =========================
-   💳 PAYMENT METHODS COLORS
-========================= */
-
 .payment-method {
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 600;
     text-transform: capitalize;
+
     width: fit-content;
-    padding: 2px 6px;
+    padding: 3px 8px;
     border-radius: 6px;
-    font-size: 13px;
 }
 
-/* YAPE (morado) */
+/* YAPE */
 .method-yape {
     background: #ede9fe;
     color: #6d28d9;
 }
 
-/* PLIN (verde) */
+/* PLIN */
 .method-plin {
     background: #ecfdf5;
     color: #059669;
 }
 
-/* TRANSFERENCIA (azul) */
+/* TRANSFERENCIA */
 .method-transferencia {
     background: #eff6ff;
     color: #2563eb;
@@ -195,20 +177,87 @@
     color: #64748b;
 }
 
+/* =========================
+   OBSERVACION
+========================= */
+
+.obs-box {
+    font-size: 13px;
+    color: #475569;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    max-width: 220px;
+}
+
+/* =========================
+   FECHA
+========================= */
+
 .date-box {
-
-  gap: 2px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
 }
 
-/* 🔥 NEGRO (importante) */
 .date-created {
-  font-size: 12px;
-  color: #64748b;
+    font-size: 12px;
+    color: #64748b;
 }
 
-/* 🔥 PLOMO (secundario) */
 .date-updated {
-  font-size: 13px;
-  font-weight: 600;
-  color: #0f172a;
+    font-size: 13px;
+    font-weight: 600;
+    color: #0f172a;
+}
+
+.date-box span {
+    display: block;
+    width: 100%;
+    text-align: left;
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 768px) {
+    .table-header {
+        display: none;
+    }
+
+    .table-row {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        padding: 14px;
+    }
+
+    .table-row span,
+    .table-row .customer,
+    .table-row div {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+    }
+
+    .table-row span::before,
+    .table-row div::before,
+    .table-row .customer::before {
+        content: attr(data-label);
+        font-size: 12px;
+        color: #64748b;
+        font-weight: 500;
+    }
+
+    .customer {
+        align-items: flex-start !important;
+    }
+
+    .badge {
+        align-self: flex-start;
+    }
 }

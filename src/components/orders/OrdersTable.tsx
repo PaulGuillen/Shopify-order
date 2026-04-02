@@ -30,6 +30,7 @@ export default function OrdersTable({
         <span>Estado</span>
         <span>Pago</span>
         <span>Vendedor</span>
+        <span>Observación</span> {/* 🔥 NUEVO */}
         <span>Fecha</span>
       </div>
 
@@ -127,6 +128,11 @@ export default function OrdersTable({
             {/* VENDEDOR */}
             <span data-label="Vendedor">{order.advisor || "Sin asignar"}</span>
 
+            {/* 🔥 OBSERVACION */}
+            <span data-label="Observación" className="obs-box">
+              {order.observacion || "Sin observación"}
+            </span>
+            
             {/* FECHA */}
             <span data-label="Fecha" className="date-box">
               <span className="date-created">
