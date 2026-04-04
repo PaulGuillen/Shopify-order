@@ -1,4 +1,5 @@
 import { formatDateISO } from "../../utils/formatDate";
+import { formatMoney } from "../../utils/generalUtil";
 import "./../../styles/components/orders/ordersTable.css";
 
 interface Props {
@@ -62,7 +63,8 @@ export default function OrdersTable({
 
             {/* UBICACIÓN */}
             <span data-label="Ubicación">
-              {order.customer?.department || "-"} - {order.customer?.district || "-"}
+              {order.customer?.department || "-"} -{" "}
+              {order.customer?.district || "-"}
             </span>
 
             {/* 🔥 ESTADO DINÁMICO */}
@@ -91,20 +93,20 @@ export default function OrdersTable({
             {/* 💰 PAGO */}
             <div data-label="Pago" className="payment-box">
               <span className="payment-total">
-                Total: S/ {Number(order.total_price || 0).toFixed(2)}
+                Total: S/ {formatMoney(order.total_price)}
               </span>
 
               <div className="payment-divider" />
 
               {order.adelanto > 0 && (
                 <span className="payment-adelanto">
-                  💰 Adelanto: S/ {order.adelanto}
+                  💰 Adelanto: S/ {formatMoney(order.adelanto)}
                 </span>
               )}
 
               {order.total_final != null && (
                 <span className="payment-saldo">
-                  🧾 Cobrar: S/ {order.total_final}
+                  🧾 Cobrar: S/ {formatMoney(order.total_final)}
                 </span>
               )}
 
@@ -144,10 +146,10 @@ export default function OrdersTable({
                 Primer registro: {order.created_day}
               </span>
 
-              {order.dataUpdated?.meta?.updatedAt && (
+              {order.dataUpdated?.meta?.updatedAtFormatted && (
                 <span className="date-updated">
                   Modificación:{" "}
-                  {formatDateISO(order.dataUpdated.meta.updatedAt)}
+                  {formatDateISO(order.dataUpdated.meta.updatedAtFormatted)}
                 </span>
               )}
             </span>

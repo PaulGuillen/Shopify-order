@@ -307,13 +307,17 @@ export default function OrdersFilters({
         >
           <option value="Todas">Todas las tiendas</option>
 
-          {[...new Set(orders.map((o) => o.product?.vendor))].map(
-            (shop: any) => (
-              <option key={shop} value={shop}>
-                {shop}
-              </option>
+          {[
+            ...new Set(
+              orders
+                .map((o) => o.product?.vendor)
+                .filter((v) => v && v.trim() !== ""), // 🔥 LIMPIEZA
             ),
-          )}
+          ].map((shop: any) => (
+            <option key={shop} value={shop}>
+              {shop}
+            </option>
+          ))}
         </select>
 
         {/* COURIER */}
@@ -323,13 +327,12 @@ export default function OrdersFilters({
         >
           <option value="Todos">Courier</option>
 
+          <option value="Otros">Sin Asignar</option>
           {couriers.map((c) => (
             <option key={c} value={c}>
               {c}
             </option>
           ))}
-
-          <option value="Otros">Otros</option>
         </select>
 
         {/* PRODUCTO */}
@@ -339,7 +342,22 @@ export default function OrdersFilters({
         >
           <option value="Todos">Producto</option>
 
-          {[...new Set(orders.map((o) => o.product?.name))].map((p: any) => (
+          {[
+            ...new Set(
+              orders
+                .flatMap((o) => {
+                  const base = o.dataUpdated?.productos?.base;
+                  const upsells = o.dataUpdated?.productos?.upsells || [];
+
+                  return [
+                    o.product?.name,
+                    base?.name,
+                    ...upsells.map((u: any) => u.title || u.name),
+                  ];
+                })
+                .filter((p) => p && p.trim() !== ""),
+            ),
+          ].map((p: any) => (
             <option key={p} value={p}>
               {p}
             </option>

@@ -150,7 +150,20 @@ export default function OrdersPage() {
         .filter((o) => {
           if (!selectedDate) return true;
 
-          return o.created_day === selectedDate;
+          const created = o.created_day;
+
+          const updatedRaw = o?.dataUpdated?.meta?.updatedAtFormatted;
+
+          let updated = null;
+
+          if (updatedRaw) {
+            const date = new Date(updatedRaw);
+            if (!isNaN(date.getTime())) {
+              updated = date.toISOString().slice(0, 10);
+            }
+          }
+
+          return [created, updated].includes(selectedDate);
         })
 
         /* =========================
@@ -232,12 +245,23 @@ export default function OrdersPage() {
         })
 
         /* =========================
-         📦 PRODUCTO (FILA 5)
-      ========================= */
+            📦 PRODUCTO (FILA 5)
+          ========================= */
         .filter((o) => {
           if (selectedProduct === "Todos") return true;
 
-          return normalize(o.product?.name) === normalize(selectedProduct);
+          const base = o.dataUpdated?.productos?.base;
+          const upsells = o.dataUpdated?.productos?.upsells || [];
+
+          const allProducts = [
+            o.product?.name,
+            base?.name,
+            ...upsells.map((u: any) => u.title || u.name),
+          ];
+
+          return allProducts.some(
+            (p) => normalize(p) === normalize(selectedProduct),
+          );
         })
     );
   }, [

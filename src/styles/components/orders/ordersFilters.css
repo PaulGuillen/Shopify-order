@@ -59,8 +59,20 @@
 
 .inputs-row input,
 .inputs-row select {
-    padding: 10px;
+    padding: 10px 36px 10px 12px; /* espacio derecha para icono */
     border-radius: 10px;
     border: 1px solid #e2e8f0;
     min-width: 160px;
+
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+
+    background-color: white;
+
+    /* 🔥 ICONO CUSTOM */
+    background-image: url("data:image/svg+xml;utf8,<svg fill='%2364748b' height='20' viewBox='0 0 20 20' width='20' xmlns='http://www.w3.org/2000/svg'><path d='M5 7l5 5 5-5z'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 16px;
 }
