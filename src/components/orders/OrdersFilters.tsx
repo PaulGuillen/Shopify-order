@@ -276,6 +276,7 @@ export default function OrdersFilters({
           onChange={(e) => setSelectedAdelanto(e.target.value)}
         >
           <option value="Todos">Adelanto</option>
+          <option value="por_cobrar">Por cobrar (activo)</option>
           <option value="si">Con adelanto</option>
           <option value="no">Sin adelanto</option>
         </select>

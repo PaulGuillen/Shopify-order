@@ -1,6 +1,6 @@
 import { useState } from "react";
 import "../styles/pages/dashboardPage.css";
-
+import { useNavigate } from "react-router-dom";
 import {
   ResponsiveContainer,
   AreaChart,
@@ -13,6 +13,8 @@ import {
 import { useDashboard } from "../hooks/useDashboard";
 
 export default function DashboardPage() {
+  const navigate = useNavigate();
+
   const [period, setPeriod] = useState("month");
 
   const user = JSON.parse(localStorage.getItem("user") || "{}");
@@ -76,6 +78,19 @@ export default function DashboardPage() {
     return count === 1 ? "1 pedido" : `${count} pedidos`;
   };
 
+  const goToOrdersWithFilters = (filters: any) => {
+    // 🔥 guardamos filtros globales
+    localStorage.setItem("orders_filters", JSON.stringify(filters));
+
+    // 🔥 navegamos
+    navigate("/orders");
+
+    // 🔥 notificamos a OrdersPage
+    setTimeout(() => {
+      window.dispatchEvent(new Event("orders-filters-update"));
+    }, 100);
+  };
+
   return (
     <div className="analytics-container">
       {/* HEADER */}
@@ -95,12 +110,28 @@ export default function DashboardPage() {
           <h2>S/ {summary?.totalSales?.toFixed(2) || 0}</h2>
         </div>
 
-        <div className="metric-card revenue">
+        <div
+          className="metric-card revenue"
+          onClick={() =>
+            goToOrdersWithFilters({
+              adelanto: "si",
+              payment: ["yape", "plin", "transferencia"],
+            })
+          }
+        >
           <div className="metric-title">Adelantos (Ganancia)</div>
           <h2>S/ {summary?.totalRevenue?.toFixed(2) || 0}</h2>
         </div>
 
-        <div className="metric-card pending">
+        <div
+          className="metric-card pending"
+          onClick={() =>
+            goToOrdersWithFilters({
+              adelanto: "por_cobrar",
+            })
+          }
+          style={{ cursor: "pointer" }}
+        >
           <div className="metric-title">Pendiente de pago</div>
           <h2>S/ {summary?.totalPending?.toFixed(2) || 0}</h2>
         </div>
@@ -119,7 +150,17 @@ export default function DashboardPage() {
 
       <div className="analytics-payments">
         {analytics?.paymentSummary?.map((p: any) => (
-          <div key={p.method} className={`payment-card ${p.method}`}>
+          <div
+            key={p.method}
+            className={`payment-card ${p.method}`}
+            onClick={() =>
+              goToOrdersWithFilters({
+                payment: p.method,
+                adelanto: "Todos",
+              })
+            }
+            style={{ cursor: "pointer" }}
+          >
             <span className="payment-label">
               Venta por {capitalize(p.method)}
             </span>
@@ -130,7 +171,6 @@ export default function DashboardPage() {
           </div>
         ))}
       </div>
-
 
       {/* CHART */}
 

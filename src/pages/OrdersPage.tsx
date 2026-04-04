@@ -167,8 +167,8 @@ export default function OrdersPage() {
         })
 
         /* =========================
-         📊 STATUS
-      ========================= */
+            📊 STATUS
+          ========================= */
         .filter((o) => {
           if (selectedStatus === "Todos") return true;
 
@@ -176,31 +176,55 @@ export default function OrdersPage() {
         })
 
         /* =========================
-         💰 PAGO
-      ========================= */
+            💰 PAGO
+          ========================= */
         .filter((o) => {
           if (selectedPayment === "Todos") return true;
 
-          return (
-            normalize(o.dataUpdated?.pago?.metodo || o.payment_gateway) ===
-            normalize(selectedPayment)
+          const method = normalize(
+            o.dataUpdated?.pago?.metodo || o.payment_gateway,
           );
+
+          if (Array.isArray(selectedPayment)) {
+            return selectedPayment.map(normalize).includes(method);
+          }
+
+          return method === normalize(selectedPayment);
         })
 
         /* =========================
-         💰 Adelanto
-      ========================= */
+            💰 Adelanto
+          ========================= */
         .filter((o) => {
           if (selectedAdelanto === "Todos") return true;
 
           const adelanto = o.adelanto || 0;
+          const totalFinal = o.total_final || o.total_price || 0;
 
+          const estadosActivos = ["confirmed", "shipped", "delivered"];
+          const status = (o.status || "").toLowerCase();
+
+          /* =========================
+                💰 CON ADELANTO
+              ========================= */
           if (selectedAdelanto === "si") {
             return adelanto > 0;
           }
 
+          /* =========================
+              💰 SIN ADELANTO
+            ========================= */
           if (selectedAdelanto === "no") {
             return adelanto === 0;
+          }
+
+          /* =========================
+              🔥 POR COBRAR
+            ========================= */
+          if (selectedAdelanto === "por_cobrar") {
+            return (
+              estadosActivos.includes(status) && totalFinal > adelanto // 🔥 hay saldo pendiente
+            );
           }
 
           return true;
@@ -306,6 +330,48 @@ export default function OrdersPage() {
   );
 
   const [selectedOrder, setSelectedOrder] = useState<any | null>(null);
+
+  useEffect(() => {
+    const applyFiltersFromDashboard = () => {
+      const raw = localStorage.getItem("orders_filters");
+      if (!raw) return;
+
+      const filters = JSON.parse(raw);
+
+      console.log("🔥 APPLY FILTERS FROM DASHBOARD:", filters);
+
+      // 🔥 ADELANTO
+      if (filters.adelanto) {
+        setSelectedAdelanto(filters.adelanto);
+      }
+
+      // 🔥 PAYMENT (puede ser array)
+      if (filters.payment) {
+        if (Array.isArray(filters.payment)) {
+          // 🔥 caso múltiples → puedes manejar "multi" o default
+          setSelectedPayment("Todos"); // opcional
+        } else {
+          setSelectedPayment(filters.payment);
+        }
+      }
+
+      // 🔥 limpiar después de usar
+      localStorage.removeItem("orders_filters");
+    };
+
+    // 🔥 ejecutar al entrar
+    applyFiltersFromDashboard();
+
+    // 🔥 escuchar cambios
+    window.addEventListener("orders-filters-update", applyFiltersFromDashboard);
+
+    return () => {
+      window.removeEventListener(
+        "orders-filters-update",
+        applyFiltersFromDashboard,
+      );
+    };
+  }, []);
 
   /* =========================
        TOAST CONTROL
