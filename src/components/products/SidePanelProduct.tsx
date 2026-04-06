@@ -17,7 +17,7 @@ export default function SidePanelProduct({
   product,
 }: Props) {
   const [loading, setLoading] = useState(false);
-
+  const API = import.meta.env.VITE_API_URL;
   const [form, setForm] = useState({
     title: "",
     image: "",
@@ -70,18 +70,18 @@ export default function SidePanelProduct({
       if (product) {
         // 🔥 UPDATE
         await fetch(
-          `http://localhost:8080/products/firebase/${shop}/${product.id}`,
+          `${API}/products/firebase/${shop}/${product.id}`,
           {
             method: "PUT",
             headers: {
               "Content-Type": "application/json",
             },
             body: JSON.stringify(payload),
-          }
+          },
         );
       } else {
         // 🔥 CREATE
-        await fetch(`http://localhost:8080/products/firebase/${shop}`, {
+        await fetch(`${API}/products/firebase/${shop}`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -150,11 +150,7 @@ export default function SidePanelProduct({
           </button>
 
           <button className="products-panel__btn-primary" onClick={handleSave}>
-            {loading
-              ? "Guardando..."
-              : product
-              ? "Actualizar"
-              : "Guardar"}
+            {loading ? "Guardando..." : product ? "Actualizar" : "Guardar"}
           </button>
         </div>
       </div>

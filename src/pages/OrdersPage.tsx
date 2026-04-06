@@ -198,15 +198,17 @@ export default function OrdersPage() {
         .filter((o) => {
           if (selectedAdelanto === "Todos") return true;
 
-          const adelanto = o.adelanto || 0;
-          const totalFinal = o.total_final || o.total_price || 0;
+          const pago = o.dataUpdated?.pago;
+
+          const adelanto = pago?.adelanto || 0;
+          const totalFinal = pago?.totalFinal;
 
           const estadosActivos = ["confirmed", "shipped", "delivered"];
           const status = (o.status || "").toLowerCase();
 
           /* =========================
-                💰 CON ADELANTO
-              ========================= */
+              💰 CON ADELANTO
+            ========================= */
           if (selectedAdelanto === "si") {
             return adelanto > 0;
           }
@@ -219,14 +221,22 @@ export default function OrdersPage() {
           }
 
           /* =========================
-              🔥 POR COBRAR
+              🔥 POR COBRAR (CORRECTO)
             ========================= */
           if (selectedAdelanto === "por_cobrar") {
             return (
-              estadosActivos.includes(status) && totalFinal > adelanto // 🔥 hay saldo pendiente
+              estadosActivos.includes(status) &&
+              totalFinal != null && // 🔥 existe
+              totalFinal > 0 // 🔥 hay deuda
             );
           }
 
+          if (selectedAdelanto === "adelanto_activo") {
+            return (
+              adelanto > 0 &&
+              estadosActivos.includes(status) // 🔥 solo en estos estados
+            );
+          }
           return true;
         })
 

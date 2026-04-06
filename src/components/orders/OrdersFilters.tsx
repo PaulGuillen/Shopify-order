@@ -277,6 +277,7 @@ export default function OrdersFilters({
         >
           <option value="Todos">Adelanto</option>
           <option value="por_cobrar">Por cobrar (activo)</option>
+          <option value="adelanto_activo">Adelanto (activo)</option>
           <option value="si">Con adelanto</option>
           <option value="no">Sin adelanto</option>
         </select>

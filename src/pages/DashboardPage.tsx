@@ -113,9 +113,8 @@ export default function DashboardPage() {
         <div
           className="metric-card revenue"
           onClick={() =>
-            goToOrdersWithFilters({
-              adelanto: "si",
-              payment: ["yape", "plin", "transferencia"],
+           goToOrdersWithFilters({
+              adelanto: "adelanto_activo",
             })
           }
         >
