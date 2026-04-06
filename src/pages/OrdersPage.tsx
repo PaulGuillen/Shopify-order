@@ -340,50 +340,6 @@ export default function OrdersPage() {
 
   const [selectedOrder, setSelectedOrder] = useState<any | null>(null);
 
-  useEffect(() => {
-    if (!orders?.length) return; // 🔥 CLAVE
-    
-    const applyFiltersFromDashboard = () => {
-      const raw = localStorage.getItem("orders_filters");
-      if (!raw) return;
-
-      const filters = JSON.parse(raw);
-
-      console.log("🔥 APPLY FILTERS FROM DASHBOARD:", filters);
-
-      // 🔥 ADELANTO
-      if (filters.adelanto) {
-        setSelectedAdelanto(filters.adelanto);
-      }
-
-      // 🔥 PAYMENT (puede ser array)
-      if (filters.payment) {
-        if (Array.isArray(filters.payment)) {
-          // 🔥 caso múltiples → puedes manejar "multi" o default
-          setSelectedPayment("Todos"); // opcional
-        } else {
-          setSelectedPayment(filters.payment);
-        }
-      }
-
-      // 🔥 limpiar después de usar
-      localStorage.removeItem("orders_filters");
-    };
-
-    // 🔥 ejecutar al entrar
-    applyFiltersFromDashboard();
-
-    // 🔥 escuchar cambios
-    window.addEventListener("orders-filters-update", applyFiltersFromDashboard);
-
-    return () => {
-      window.removeEventListener(
-        "orders-filters-update",
-        applyFiltersFromDashboard,
-      );
-    };
-  }, []);
-
   /* =========================
        TOAST CONTROL
     ========================= */
@@ -537,6 +493,53 @@ export default function OrdersPage() {
 
     setSelectedOrder(newOrder);
   };
+
+    useEffect(() => {
+
+    const applyFiltersFromDashboard = () => {
+
+      if (!localStorage.getItem("orders_filters")) return;
+      
+      const raw = localStorage.getItem("orders_filters");
+      if (!raw) return;
+
+      const filters = JSON.parse(raw);
+
+      console.log("🔥 APPLY FILTERS FROM DASHBOARD:", filters);
+
+      // 🔥 ADELANTO
+      if (filters.adelanto) {
+        setSelectedAdelanto(filters.adelanto);
+      }
+
+      // 🔥 PAYMENT (puede ser array)
+      if (filters.payment) {
+        if (Array.isArray(filters.payment)) {
+          // 🔥 caso múltiples → puedes manejar "multi" o default
+          setSelectedPayment("Todos"); // opcional
+        } else {
+          setSelectedPayment(filters.payment);
+        }
+      }
+
+      // 🔥 limpiar después de usar
+      localStorage.removeItem("orders_filters");
+    };
+
+    // 🔥 ejecutar al entrar
+    applyFiltersFromDashboard();
+
+    // 🔥 escuchar cambios
+    window.addEventListener("orders-filters-update", applyFiltersFromDashboard);
+
+    return () => {
+      window.removeEventListener(
+        "orders-filters-update",
+        applyFiltersFromDashboard,
+      );
+    };
+  }, []);
+
 
   return (
     <div className="orders-page">

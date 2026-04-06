@@ -26,7 +26,7 @@ export default function AddProductModal({ onClose, onSelect }: Props) {
   /* FILTER */
   const filtered = useMemo(() => {
     return products.filter((p) =>
-      p.title.toLowerCase().includes(search.toLowerCase())
+      (p.title || "").toLowerCase().includes((search || "").toLowerCase()),
     );
   }, [products, search]);
 
@@ -81,17 +81,11 @@ export default function AddProductModal({ onClose, onSelect }: Props) {
                 className="add-product-item"
                 onClick={() => setSelectedProduct(p)}
               >
-                <img
-                  src={p.image}
-                  alt=""
-                  className="add-product-img"
-                />
+                <img src={p.image} alt="" className="add-product-img" />
 
                 <div className="add-product-info">
                   <p className="add-product-name">{p.title}</p>
-                  <span className="add-product-price">
-                    PEN {p.price}
-                  </span>
+                  <span className="add-product-price">PEN {p.price}</span>
                 </div>
               </div>
             ))}
@@ -145,16 +139,12 @@ export default function AddProductModal({ onClose, onSelect }: Props) {
                 <div className="add-product-stepper">
                   <button
                     className="add-product-stepper-btn"
-                    onClick={() =>
-                      setQuantity((q) => Math.max(1, q - 1))
-                    }
+                    onClick={() => setQuantity((q) => Math.max(1, q - 1))}
                   >
                     −
                   </button>
 
-                  <span className="add-product-stepper-value">
-                    {quantity}
-                  </span>
+                  <span className="add-product-stepper-value">{quantity}</span>
 
                   <button
                     className="add-product-stepper-btn"
@@ -194,8 +184,8 @@ export default function AddProductModal({ onClose, onSelect }: Props) {
                 {difference < 0
                   ? `Descuento: PEN ${Math.abs(difference).toFixed(2)}`
                   : difference > 0
-                  ? `Extra: PEN ${difference.toFixed(2)}`
-                  : "Sin diferencia"}
+                    ? `Extra: PEN ${difference.toFixed(2)}`
+                    : "Sin diferencia"}
               </p>
             </div>
 
