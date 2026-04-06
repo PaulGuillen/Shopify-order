@@ -233,8 +233,7 @@ export default function OrdersPage() {
 
           if (selectedAdelanto === "adelanto_activo") {
             return (
-              adelanto > 0 &&
-              estadosActivos.includes(status) // 🔥 solo en estos estados
+              adelanto > 0 && estadosActivos.includes(status) // 🔥 solo en estos estados
             );
           }
           return true;
@@ -342,6 +341,8 @@ export default function OrdersPage() {
   const [selectedOrder, setSelectedOrder] = useState<any | null>(null);
 
   useEffect(() => {
+    if (!orders?.length) return; // 🔥 CLAVE
+    
     const applyFiltersFromDashboard = () => {
       const raw = localStorage.getItem("orders_filters");
       if (!raw) return;
