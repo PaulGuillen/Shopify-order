@@ -14,6 +14,27 @@ const extractShopFromEmail = (email: string) => {
   return parts.length > 1 ? parts[1] : null;
 };
 
+const plans = [
+  {
+    name: "Plan S/30",
+    badge: "Inicio",
+    description:
+      "Una base simple y elegante para organizar tus primeros pedidos, mantener visibilidad diaria y crecer con orden desde el día uno.",
+  },
+  {
+    name: "Plan S/50",
+    badge: "Impulso",
+    description:
+      "Perfecto para tiendas en movimiento que necesitan más control operativo, mejor seguimiento y una experiencia más fluida para vender.",
+  },
+  {
+    name: "Plan S/100",
+    badge: "Escala",
+    description:
+      "Pensado para equipos con mayor volumen que buscan velocidad, claridad y una operación sólida para sostener su siguiente etapa.",
+  },
+];
+
 export default function LoginPage() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
@@ -165,6 +186,16 @@ export default function LoginPage() {
 
         <p>Inicia sesión para administrar tu tienda</p>
       </div>
+
+      <section className="plans-section">
+        {plans.map((plan) => (
+          <article key={plan.name} className="plan-card">
+            <span className="plan-badge">{plan.badge}</span>
+            <h3>{plan.name}</h3>
+            <p>{plan.description}</p>
+          </article>
+        ))}
+      </section>
 
       {/* LOGIN FORM */}
 

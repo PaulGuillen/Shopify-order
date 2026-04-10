@@ -14,8 +14,14 @@ import { useDashboard } from "../hooks/useDashboard";
 
 export default function DashboardPage() {
   const navigate = useNavigate();
+  const today = new Date().toISOString().slice(0, 10);
+  const defaultStartDate = new Date(Date.now() - 29 * 24 * 60 * 60 * 1000)
+    .toISOString()
+    .slice(0, 10);
 
   const [period, setPeriod] = useState("month");
+  const [startDate, setStartDate] = useState(defaultStartDate);
+  const [endDate, setEndDate] = useState(today);
 
   const user = JSON.parse(localStorage.getItem("user") || "{}");
 
@@ -31,16 +37,62 @@ export default function DashboardPage() {
     setPeriod(type);
 
     if (type === "day") {
+      setStartDate(
+        new Date(Date.now() - 6 * 24 * 60 * 60 * 1000)
+          .toISOString()
+          .slice(0, 10),
+      );
+      setEndDate(today);
       reloadAnalytics("day", 7);
     }
 
     if (type === "week") {
+      setStartDate(
+        new Date(Date.now() - 29 * 24 * 60 * 60 * 1000)
+          .toISOString()
+          .slice(0, 10),
+      );
+      setEndDate(today);
       reloadAnalytics("week", 30);
     }
 
     if (type === "month") {
+      setStartDate(
+        new Date(Date.now() - 89 * 24 * 60 * 60 * 1000)
+          .toISOString()
+          .slice(0, 10),
+      );
+      setEndDate(today);
       reloadAnalytics("month", 90);
     }
+  };
+
+  const getGroupByForRange = (days: number) => {
+    if (days <= 14) return "day";
+    if (days <= 90) return "week";
+    return "month";
+  };
+
+  const handleApplyDateFilter = () => {
+    if (!startDate || !endDate) return;
+
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    if (start > end) return;
+
+    const diffInMs = end.getTime() - start.getTime();
+    const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24)) + 1;
+
+    setPeriod("custom");
+    reloadAnalytics(getGroupByForRange(diffInDays), diffInDays);
+  };
+
+  const handleResetDateFilter = () => {
+    setStartDate(defaultStartDate);
+    setEndDate(today);
+    setPeriod("month");
+    reloadAnalytics("month", 30);
   };
 
   /* =========================
@@ -99,6 +151,36 @@ export default function DashboardPage() {
         <div>
           <h1>Buenos días 🚀</h1>
           <p>Resumen del rendimiento de tu tienda</p>
+        </div>
+        <div className="analytics-date-filter">
+          <label className="date-field">
+            <span>Desde</span>
+            <input
+              type="date"
+              value={startDate}
+              max={endDate || today}
+              onChange={(e) => setStartDate(e.target.value)}
+            />
+          </label>
+
+          <label className="date-field">
+            <span>Hasta</span>
+            <input
+              type="date"
+              value={endDate}
+              min={startDate}
+              max={today}
+              onChange={(e) => setEndDate(e.target.value)}
+            />
+          </label>
+
+          <button className="date-btn" onClick={handleApplyDateFilter}>
+            Filtrar fechas
+          </button>
+
+          <button className="date-btn secondary" onClick={handleResetDateFilter}>
+            Limpiar
+          </button>
         </div>
       </div>
 

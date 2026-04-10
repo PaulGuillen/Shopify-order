@@ -6,7 +6,7 @@ import OrdersPage from "../pages/OrdersPage";
 import WareHoseProducts from "../pages/WareHoseProducts";
 import CustomersPage from "../pages/CustomersPage";
 import DashboardPage from "../pages/DashboardPage";
-import ShipmentsPage from "../pages/ShipmentsPage";
+import ShipmentsPage from "../pages/AgencyShipmentsPage";
 import DraftOrdersPage from "../pages/DrafOrdersPage";
 import SettingsPage from "../pages/SettingsPage";
 import CatalogPage from "../pages/CatalogPage";
